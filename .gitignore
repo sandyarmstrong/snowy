@@ -1,0 +1,3 @@
+*.pyc
+snowy.db
+local_settings.py

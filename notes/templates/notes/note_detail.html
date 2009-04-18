@@ -1,0 +1,10 @@
+{% extends 'notes/base.html' %}
+
+{% block title %}{{ object.title }} | Notes | {{ block.super }}{% endblock %}
+
+{% block body %}
+
+<h3>{{ object.title }}</h3>
+<p>{{ object.body }}</p>
+
+{% endblock %}

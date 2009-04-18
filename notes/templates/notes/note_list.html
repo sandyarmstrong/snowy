@@ -1,0 +1,14 @@
+{% extends 'notes/base.html' %}
+
+{% block title %}Notes | {{ block.super }}{% endblock %}
+{% block body %}
+
+{% if object_list %}
+    {% for object in object_list %}
+        <p><a href="{% url note_detail object.id %}">{{ object.title }}</a></p>
+    {% endfor %}
+{% else %}
+No notes yet!
+{% endif %}
+
+{% endblock %}
