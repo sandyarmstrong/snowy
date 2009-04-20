@@ -2,16 +2,38 @@
 <html lang="en">
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>{% block title %}home{% endblock %}</title>
-	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}stylesheets/screen.css" media="screen">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>{% block title %}home{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/screen.css" media="screen">
 {% block extra_head %}
 {% endblock %}
 </head>
 
 <body>
-{% block body %}
+    <div id="header-container">
+        <div id="header-logo">
+            <img src="{{ MEDIA_URL }}img/tomboy-logo.png" alt="tomboy: simple note-taking."/>
+        </div>
+        <div id="header-auth">
+            <!-- registration login form -->
+        </div>
+        <div class="clear"></div>
+        </div>
+    </div>
+    <div id="content-container">
+        <div id="sidebar">
+{% block sidebar %}
 {% endblock %}
+        </div>
+        <div id="content">
+{% block content %}
+{% endblock %}
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div id="footer">
+    </div>
 {% block extra_body %}
 {% endblock %}
 </body>
