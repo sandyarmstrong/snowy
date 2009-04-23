@@ -14,18 +14,32 @@
         <div id="header-logo">
             <img src="{{ MEDIA_URL }}img/tomboy-logo.png" alt="tomboy: simple note-taking."/>
         </div>
+        <div id="header-avatar">
+{% if user.is_authenticated %}
+            <img src="{{ MEDIA_URL }}img/blank-avatar.png" width="73" height="73" alt="Your Avatar"/>
+{% endif %}
+        </div>
         <div id="header-auth">
+{% if user.is_authenticated %}
             <!-- registration login form -->
+            <h3>{{ user }}</h3>
+            <p><a href="">preferences</a> / <a href="{% url django.contrib.auth.views.logout %}">log out</a></p>
+{% else %}
+            <p>care to <a href="{% url django.contrib.auth.views.login %}">log in</a>?</p>
+{% endif %}
         </div>
         <div class="clear"></div>
         </div>
     </div>
     <div id="content-container">
         <div id="sidebar">
+<br><br>
 {% block sidebar %}
 {% endblock %}
         </div>
         <div id="content">
+<br><br>
+<br><br>
 {% block content %}
 {% endblock %}
         </div>

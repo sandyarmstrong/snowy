@@ -27,6 +27,27 @@ a, a:link, a:hover, a:active, a:visited {
 
 #header-auth {
     float: right;
+    margin: 1em 1em 0 0;
+    text-align: right;
+    vertical-align: middle;
+}
+
+#header-avatar {
+    float: right;
+    margin-left: 5px;
+}
+
+#header-avatar img {
+    border: 2px solid #FFFFFF;
+}
+
+#header-auth p, #header-auth h3 {
+    margin: 0;
+    padding: 0;
+}
+
+#header-auth p {
+    padding-top: .25em;
 }
 
 #content-container {
@@ -34,8 +55,13 @@ a, a:link, a:hover, a:active, a:visited {
 }
 
 #sidebar {
+    width: 20%;
+    min-width: 250px;
+    max-width: 500px;
+
+    margin-top: 20px;
+
     float: left;
-    width: 250px;
 
     background-color: #403b33;
     
@@ -70,8 +96,11 @@ a, a:link, a:hover, a:active, a:visited {
 }
 
 #content {
+    width: 80%;
+
     float: left;
     background-color: #edece6;
+    
 }
 
 #footer {
