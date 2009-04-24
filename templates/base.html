@@ -16,7 +16,7 @@
         </div>
         <div id="header-avatar">
 {% if user.is_authenticated %}
-            <img src="{{ MEDIA_URL }}img/blank-avatar.png" width="73" height="73" alt="Your Avatar"/>
+            <img src="{{ MEDIA_URL }}img/blank-avatar.png" width="48" height="48" alt="Your Avatar"/>
 {% endif %}
         </div>
         <div id="header-auth">
@@ -31,19 +31,22 @@
         <div class="clear"></div>
         </div>
     </div>
-    <div id="content-container">
-        <div id="sidebar">
-<br><br>
+    <table id="container">
+        <tr>
+            <td id="sidebar-container">
+                <div id="sidebar">
 {% block sidebar %}
 {% endblock %}
-        </div>
-        <div id="content">
-<br><br>
-<br><br>
+                </div>
+            </td>
+            <td id="content-container">
+                <div id="content">
 {% block content %}
 {% endblock %}
-        </div>
-        <div class="clear"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
     </div>
 
     <div id="footer">

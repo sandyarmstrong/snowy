@@ -2,9 +2,11 @@
 
 {% block title %}{{ object.title }} | Notes | {{ block.super }}{% endblock %}
 
-{% block body %}
+{% block sidebar %}
+{{ block.super }}
+{% endblock %}
 
-<h3>{{ object.title }}</h3>
+{% block content %}
+<h2>{{ object.title }}</h2>
 <p>{{ object.body }}</p>
-
 {% endblock %}

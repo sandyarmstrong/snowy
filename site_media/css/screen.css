@@ -13,6 +13,11 @@ a, a:link, a:hover, a:active, a:visited {
     text-decoration: underline;
 }
 
+h2 {
+    color: #d3643b;
+    font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
+}
+
 .clear {
     clear: both;
 }
@@ -27,9 +32,17 @@ a, a:link, a:hover, a:active, a:visited {
 
 #header-auth {
     float: right;
-    margin: 1em 1em 0 0;
+    margin: 0.5em 1em 0 0;
     text-align: right;
     vertical-align: middle;
+
+    font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
+    whitespace: nowrap;
+}
+
+#header-auth p, #header-auth h3 {
+    margin: 0;
+    padding: 0;
 }
 
 #header-avatar {
@@ -41,36 +54,40 @@ a, a:link, a:hover, a:active, a:visited {
     border: 2px solid #FFFFFF;
 }
 
-#header-auth p, #header-auth h3 {
-    margin: 0;
-    padding: 0;
+table#container {
+    padding: 20px;
+    width: 100%;
+    border: 0;
 }
 
-#header-auth p {
-    padding-top: .25em;
-}
-
-#content-container {
-    margin: 20px;
-}
-
-#sidebar {
+#sidebar-container {
     width: 20%;
     min-width: 250px;
     max-width: 500px;
-
-    margin-top: 20px;
-
-    float: left;
-
-    background-color: #403b33;
     
+    margin: 0;
+}
+
+#sidebar {
+    margin-top: 20px;
+    background-color: #403b33;
     font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
 }
 
 #sidebar h3 {
     font-family: Verdana, Candara, Tahmoa, Arial, sans-serif;
     text-transform: uppercase;
+}
+
+#sidebar input#search {
+    width: 250px;
+    margin: 4px;
+    padding: 4px 4px 4px 35px;
+    
+    border: 1px solid #bababa;
+    background: #73685d url('/site_media/img/search.png') center left no-repeat;
+    
+    color: #FFFFFF;
 }
 
 #sidebar .selected {
@@ -95,12 +112,17 @@ a, a:link, a:hover, a:active, a:visited {
     color: #b8dee3;
 }
 
-#content {
+#content-container {
     width: 80%;
+    margin: 0;
+}
 
-    float: left;
+#content {
     background-color: #edece6;
-    
+}
+
+#content h2, #content p {
+    padding-left: 6px;
 }
 
 #footer {
