@@ -17,14 +17,14 @@
   <maintainer>
     <foaf:Person>
       <foaf:name>Brad Taylor</foaf:name>
-      <foaf:mbox rdf:resource="brad@getcoded.net" />
+      <foaf:mbox rdf:resource="mailto:brad@getcoded.net" />
       <gnome:userid>btaylor</gnome:userid>
     </foaf:Person>
   </maintainer>
   <maintainer>
     <foaf:Person>
       <foaf:name>Sandy Armstrong</foaf:name>
-      <foaf:mbox rdf:resource="sanford.armstrong@gmail.com" />
+      <foaf:mbox rdf:resource="mailto:sanford.armstrong@gmail.com" />
       <gnome:userid>sharm</gnome:userid>
     </foaf:Person>
   </maintainer>
