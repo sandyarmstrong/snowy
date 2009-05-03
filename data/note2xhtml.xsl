@@ -16,32 +16,7 @@
 <xsl:param name="newline" select="'&#xA;'" />
 
 <xsl:template match="/">
-	<html>
-	<head>
-	<title><xsl:value-of select="/tomboy:note/tomboy:title" /></title>
-	<style type="text/css">
-	body { <xsl:value-of select="$font" /> }
-	h1 { font-size: xx-large;
-     	     font-weight: bold;
-     	     border-bottom: 1px solid black; }
-	div.note { overflow: auto;
-		   position: relative;
-		   display: block;
-		   padding: 5pt;
-		   margin: 5pt; 
-		   white-space: -moz-pre-wrap; /* Mozilla */
- 	      	   white-space: -pre-wrap;     /* Opera 4 - 6 */
- 	      	   white-space: -o-pre-wrap;   /* Opera 7 */
- 	      	   white-space: pre-wrap;      /* CSS3 */
- 	      	   word-wrap: break-word;      /* IE 5.5+ */ }
-	</style>
-	</head>
-	<body>
-
 	<xsl:apply-templates select="tomboy:note"/>
-
-	</body>
-	</html>
 </xsl:template>
 
 <xsl:template match="text()">
@@ -102,27 +77,28 @@
 </xsl:template>
 
 <xsl:template match="tomboy:highlight">
-	<span style="background:yellow"><xsl:apply-templates select="node()"/></span>
+	<span class="note-highlight"><xsl:apply-templates select="node()"/></span>
 </xsl:template>
 
 <xsl:template match="tomboy:datetime">
-	<span style="font-style:italic;font-size:small;color:#888A85">
+	<span class="note-datetime">
 		<xsl:apply-templates select="node()"/>
 	</span>
 </xsl:template>
 
 <xsl:template match="size:small">
-	<span style="font-size:small"><xsl:apply-templates select="node()"/></span>
+	<span class="note-size-small"><xsl:apply-templates select="node()"/></span>
 </xsl:template>
 
 <xsl:template match="size:large">
-	<span style="font-size:large"><xsl:apply-templates select="node()"/></span>
+	<span class="note-size-large"><xsl:apply-templates select="node()"/></span>
 </xsl:template>
 
 <xsl:template match="size:huge">
-	<span style="font-size:xx-large"><xsl:apply-templates select="node()"/></span>
+	<span class="note-size-huge"><xsl:apply-templates select="node()"/></span>
 </xsl:template>
 
+<!-- TODO:
 <xsl:template match="link:broken">
 	<span style="color:#555753;text-decoration:underline">
 		<xsl:value-of select="node()"/>
@@ -156,27 +132,31 @@
 		<xsl:apply-templates select="node()" />
 	</li>
 </xsl:template>
+-->
 
 <!-- Evolution.dll Plugin -->
+<!--
 <xsl:template match="link:evo-mail">
 	<a href="{./@uri}">
 		<img alt="Open Email Link" width="16" height="10" border="0">
-			<!-- Inline Base64 encoded stock_mail.png =) -->
+			Inline Base64 encoded stock_mail.png =)
 			<xsl:attribute name="src">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAKCAYAAAC9vt6cAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI WXMAAAsQAAALEAGtI711AAAAB3RJTUUH1QkeAjYaRAvZgAAAALxJREFUKM+NkjGKw1AMRN+GhRS/ 2xP4EHZr0E1UxFVuoiKdikCKfxMfwKdw+3t1gb/F4hASe50BgZjRDEII/jAAtWmaCnxSAy+oZlYj YrfMbAkB4GsJiAjcnfPpRNzvrCHnjIjQdd3De3geUFX8diMdj6tmVX3jD6+EquLXKz9p37waANC2 LRfPpJTIOdP3PXuoEVFLKdXMaills5+m6f8jbq26dcTvRXR3RIR5njcDRIRxHFe14cMHenukX9eX mbvfl0q9AAAAAElFTkSuQmCC</xsl:attribute>
 		</img>
 		<xsl:value-of select="node()"/>
 	</a>
 </xsl:template>
+-->
 
 <!-- FixedWidth.dll Plugin -->
 <xsl:template match="tomboy:monospace">
-	<span style="font-family:monospace"><xsl:apply-templates select="node()"/></span>
+	<span class="note-monospace"><xsl:apply-templates select="node()"/></span>
 </xsl:template>
 
 <!-- Bugzilla.dll Plugin -->
+<!--
 <xsl:template match="link:bugzilla">
 	<a href="{@uri}"><xsl:value-of select="node()" /></a>
 </xsl:template>
+-->
 
 </xsl:stylesheet>
-

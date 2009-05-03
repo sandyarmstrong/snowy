@@ -1,12 +1,24 @@
 {% extends 'notes/base.html' %}
 
-{% block title %}{{ object.title }} | Notes | {{ block.super }}{% endblock %}
+{% block extra_head %}
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/DUI.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/funcooker.js" charset="utf-8"></script>
+{% endblock %}
+
+{% block title %}{{ note.title }} | Notes | {{ block.super }}{% endblock %}
 
 {% block sidebar %}
 {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>{{ object.title }}</h2>
-<p>{{ object.body }}</p>
+<div id="funcooker">
+{{ body|safe|linebreaksbr }}
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+    new FunCooker("#funcooker");
+});
+</script>
 {% endblock %}

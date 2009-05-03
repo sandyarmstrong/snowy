@@ -29,5 +29,5 @@ notes_dict = {'queryset': Note.objects.all(), }
 
 urlpatterns = patterns('',
     (r'^$', object_list, notes_dict),
-    url(r'^(?P<object_id>\d+)/$', object_detail, notes_dict, name='note_detail'),
+    url(r'^(?P<note_id>\d+)/$', 'snowy.notes.views.note_detail', name='note_detail'),
 )
