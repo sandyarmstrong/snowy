@@ -115,7 +115,7 @@ table#container {
 
 #content {
     width: 80%;
-    padding: 10px;
+    padding: 12px;
     background-color: #edece6;
     font-family: Candara, Verdana, Tahmoa, Arial, sans-serif;
 }
@@ -125,6 +125,7 @@ table#container {
 }
 
 #toolbar {
+    position: relative;
     float: right;
     width: 150px;
     padding: 8px;
