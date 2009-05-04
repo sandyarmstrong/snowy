@@ -13,7 +13,7 @@ a, a:link, a:hover, a:active, a:visited {
     text-decoration: underline;
 }
 
-h2 {
+h1 {
     color: #d3643b;
     font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
 }
@@ -66,6 +66,7 @@ table#container {
     max-width: 500px;
     
     margin: 0;
+    vertical-align: top;
 }
 
 #sidebar {
@@ -112,20 +113,84 @@ table#container {
     color: #b8dee3;
 }
 
-#content-container {
-    width: 80%;
-    margin: 0;
-}
-
 #content {
+    width: 80%;
+    padding: 10px;
     background-color: #edece6;
+    font-family: Candara, Verdana, Tahmoa, Arial, sans-serif;
 }
 
-#content h2, #content p {
-    padding-left: 6px;
+#content h1 {
+    margin: 0.2em 0 0.5em 0;
+}
+
+#toolbar {
+    float: right;
+    width: 150px;
+    padding: 8px;
+
+    background-color: #dbe1c7;
+    border: 1px solid #b7beab;
+
+    color: #6d7063;
+}
+
+#toolbar a, #toolbar a:link, #toolbar a:active, #toolbar a:visited {
+    color: #6d7063;
+    text-decoration: none;
+}
+
+#toolbar:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+#toolbar h3 {
+    margin: 0.5em 0 0.3em 0;
+
+    font-family: Candara, Verdana, Tahmoa, Arial, sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #acb5a0;
+}
+
+#toolbar #text {
+    color: #000000;
+    font-size: 1.2em;
+}
+
+#toolbar-text a, #toolbar-text a:link, #toolbar-text a:active, #toolbar-text a:visited {
+    color: #000000;
+    text-decoration: none;
+    margin-right: 0.5em;
+}
+
+#toolbar p {
+    margin: 0.2em 0 0.2em 1em;
 }
 
 #footer {
     height: 500px;
     background-color: #4e6960;
+}
+
+/* Note-specific styles */
+.note-highlight {
+    background-color: yellow;
+}
+
+.note-monospace {
+    font-family: Consolas, monospace;
+}
+
+.note-size-small {
+    font-size: 0.8em;
+}
+
+.note-size-large {
+    font-size: 1.5em;
+}
+
+.note-size-huge {
+    font-size: 2.0em;
 }

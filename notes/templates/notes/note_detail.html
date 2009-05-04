@@ -13,12 +13,38 @@
 {% endblock %}
 
 {% block content %}
+<div id="toolbar">
+<h3>Text</h3>
+<p id="toolbar-text">
+<a href="javascript:fc.normalStyle();" title="Normal">A</a>
+<a href="javascript:fc.bold();" title="Bold"><b>A</b></a>
+<a href="javascript:fc.strikethrough();" title="Strikethrough"><strike>A</strike></a>
+<a href="javascript:fc.highlight();" title="Highlight"><span class="note-highlight">A</span></a>
+<a href="javascript:fc.fixedWidth();" title="Fixed Width"><span class="note-monospace">A</span></a>
+</p>
+<h3>Font Size</h3>
+<p class="note-small"><a href="javascript:fc.small();">Small</a></p>
+<p><a href="javascript:fc.normalSize();">Normal</a></p>
+<p class="note-large"><a href="javascript:fc.large();">Large</a></p>
+<p class="note-huge"><a href="javascript:fc.huge();">Huge</a></p>
+<h3>Formatting</h3>
+<p><a href="#">Bullets</a></p>
+<p><a href="#">Increase Indent</a></p>
+<p><a href="#">Decrease Indent</a></p>
+<h3>Actions</h3>
+<p><a href="#">Link</a></p>
+<p><a href="#">Delete</a></p>
+<p><a href="#">History</a></p>
+<p><a href="#">Sharing</a></p>
+</div>
 <div id="funcooker">
 {{ body|safe|linebreaksbr }}
 </div>
 <script type="text/javascript">
+var fc = null;
 $(document).ready(function() {
-    new FunCooker("#funcooker");
+    fc = new FunCooker("#funcooker");
 });
 </script>
+
 {% endblock %}

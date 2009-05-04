@@ -32,7 +32,62 @@ var FunCooker = DUI.Class.create({
         return $.browser.mozilla;
     },
 
-    boldSelection: function() {
+    normalStyle: function() {
+        // TODO:
+    },
+
+    bold: function() {
+        this.wrapSelection(document.createElement("b"));
+        this.target.focus();
+    },
+
+    strikethrough: function() {
+        this.wrapSelection(document.createElement("strike"));
+        this.target.focus();
+    },
+
+    highlight: function() {
+        var elm = document.createElement("span");
+        $(elm).addClass("note-highlight");
+
+        this.wrapSelection(elm);
+        this.target.focus();
+    },
+
+    fixedWidth: function() {
+        var elm = document.createElement("span");
+        $(elm).addClass("note-monospace");
+
+        this.wrapSelection(elm);
+        this.target.focus();
+    },
+
+    small: function() {
+        var elm = document.createElement("span");
+        $(elm).addClass("note-size-small");
+
+        this.wrapSelection(elm);
+        this.target.focus();
+    },
+
+    normalSize: function() {
+        // TODO:
+    },
+
+    large: function() {
+        var elm = document.createElement("span");
+        $(elm).addClass("note-size-large");
+
+        this.wrapSelection(elm);
+        this.target.focus();
+    },
+
+    huge: function() {
+        var elm = document.createElement("span");
+        $(elm).addClass("note-size-huge");
+
+        this.wrapSelection(elm);
+        this.target.focus();
     },
 
     wrapSelection: function(wrapper) {
@@ -40,8 +95,10 @@ var FunCooker = DUI.Class.create({
         if (range) {
             // insure that the selection range is inside of the editor
             var parent = this.findParentById(range.commonAncestorContainer,
-                                             target.id);
+                                             this.target.id);
             if (!parent) {
+		// TODO: Fallback behavior should be to move the caret to the
+		// end of the div and wrap it.
                 return;
             }
 

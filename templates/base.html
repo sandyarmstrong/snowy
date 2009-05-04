@@ -36,7 +36,7 @@
         <div class="clear"></div>
         </div>
     </div>
-    <table id="container">
+    <table id="container" cellspacing="0" cellpadding="0">
         <tr>
             <td id="sidebar-container">
                 <div id="sidebar">
@@ -44,11 +44,9 @@
 {% endblock %}
                 </div>
             </td>
-            <td id="content-container">
-                <div id="content">
+            <td id="content">
 {% block content %}
 {% endblock %}
-                </div>
             </td>
         </tr>
     </table>
