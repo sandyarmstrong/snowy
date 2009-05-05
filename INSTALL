@@ -7,16 +7,19 @@ Running Snowy From Your Git Checkout
 	svn co http://code.djangoproject.com/svn/django/trunk/ django
 	cd django && sudo python setup.py install
 
-2. Setup snowy database (in your snowy git checkout):
+2. Set up your local settings file (in your snowy git checkout):
+	cp local_settings.py.in local_settings.py
+
+3. Setup snowy database (in your snowy git checkout):
 	python manage.py syncdb
 
-3. Start local snowy (in your snowy git checkout):
+4. Start local snowy (in your snowy git checkout):
 	python manage.py runserver
 
-4. Admin your snowy:
+5. Admin your snowy:
 	http://127.0.0.1:8000/admin (you can add notes here for now)
 
-5. Play with snowy:
+6. Play with snowy:
 	http://127.0.0.1:8000/notes/1 (for example)
 
 
