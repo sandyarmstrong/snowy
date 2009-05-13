@@ -91,6 +91,11 @@ table#container {
     color: #FFFFFF;
 }
 
+#sidebar input#search.dim {
+    color: #aba49e;
+    font-style: italic;
+}
+
 #sidebar .selected {
     background-color: #d6e1c7;
     color: #545247

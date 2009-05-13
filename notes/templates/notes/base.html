@@ -1,5 +1,20 @@
 {% extends "site_base.html" %}
 
+{% load i18n %}
+
 {% block sidebar %}
-<input type="text" id="search" name="search" accesskey="s">
+<input type="text" id="search" class="dim" name="search" accesskey="s" value="{% trans "Search your notes" %}">
+{% endblock %}
+
+{% block extra_body %}
+<script type="text/javascript">
+$(document).ready(function() {
+    var undim = function () {
+        $("#search").removeClass("dim")
+                    .val("")
+                    .unbind("focus", undim);
+    }
+    $("#search").bind("focus", undim);
+});
+</script>
 {% endblock %}
