@@ -24,23 +24,42 @@ class Note(models.Model):
     )
 
     guid = models.CharField(max_length=36)
+
+    author = models.ForeignKey(User)
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User)
+    user_modified = models.DateTimeField(auto_now_add=True)
+
     title = models.CharField(max_length=128)
     content = models.TextField(blank=True)
     content_version = models.CharField(max_length=10)
+
     tags = models.ManyToManyField('NoteTag', null=True, blank=True)
     permissions = models.IntegerField(choices=NOTE_PERMISSIONS,
                                       default=0)
+
+    open_on_startup = models.BooleanField(default=False)
+
+    class Meta:
+        get_latest_by = 'user_modified'
+        unique_together = ('author', 'title')
 
     def __unicode__(self):
         return self.title
 
 class NoteTag(models.Model):
-    user = models.ForeignKey(User)
+    author = models.ForeignKey(User)
     name = models.CharField(max_length=256)
-    is_notebook = models.BooleanField()
+    is_notebook = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('author', 'name')
 
     def __unicode__(self):
+        return self.name
+
+    def get_name_for_display(self):
+        if self.is_notebook:
+            return self.name.split(':', 3)[-1]
         return self.name
