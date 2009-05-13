@@ -29,42 +29,25 @@ var FunCooker = DUI.Class.create({
 
     editingEnabled: function() {
         // TODO: Support other platforms
-        return $.browser.mozilla;
+        return true;
     },
 
     normalStyle: function() {
-        var range = this.getSelectionRange();
-        if (!range) {
-            return;
+        var range = this._getSelectionRange();
+        if (range) {
+            this._flattenHierarchy(range.startContainer,
+                                   range.endContainer);
+            this.target.focus();
         }
-
-        if (range.startContainer == range.endContainer) {
-            // This range has no formatting
-            return;
-        }
-
-        var iter = range.startContainer;
-        do {
-            iter = iter.nextSibling;
-            if (!iter) {
-                continue;
-            }
-
-            range.startContainer.nodeValue += iter.innerHTML;
-
-            $(iter).remove();
-        } while (iter != range.endContainer);
-
-        this.target.focus();
     },
 
     bold: function() {
-        this.wrapSelection(document.createElement("b"));
+        this._wrapSelection(document.createElement("b"));
         this.target.focus();
     },
 
     strikethrough: function() {
-        this.wrapSelection(document.createElement("strike"));
+        this._wrapSelection(document.createElement("strike"));
         this.target.focus();
     },
 
@@ -72,7 +55,7 @@ var FunCooker = DUI.Class.create({
         var elm = document.createElement("span");
         $(elm).addClass("note-highlight");
 
-        this.wrapSelection(elm);
+        this._wrapSelection(elm);
         this.target.focus();
     },
 
@@ -80,7 +63,7 @@ var FunCooker = DUI.Class.create({
         var elm = document.createElement("span");
         $(elm).addClass("note-monospace");
 
-        this.wrapSelection(elm);
+        this._wrapSelection(elm);
         this.target.focus();
     },
 
@@ -88,19 +71,29 @@ var FunCooker = DUI.Class.create({
         var elm = document.createElement("span");
         $(elm).addClass("note-size-small");
 
-        this.wrapSelection(elm);
+        this._wrapSelection(elm);
         this.target.focus();
     },
 
     normalSize: function() {
-        // TODO:
+        var range = this._getSelectionRange();
+        if (range) {
+            this._flattenHierarchy(
+                range.startContainer, range.endContainer,
+                function(item) {
+                    return (item.tagName == "SPAN"
+                            && item.className.indexOf("note-size") > -1);
+                }
+            );
+            this.target.focus();
+        }
     },
 
     large: function() {
         var elm = document.createElement("span");
         $(elm).addClass("note-size-large");
 
-        this.wrapSelection(elm);
+        this._wrapSelection(elm);
         this.target.focus();
     },
 
@@ -108,16 +101,44 @@ var FunCooker = DUI.Class.create({
         var elm = document.createElement("span");
         $(elm).addClass("note-size-huge");
 
-        this.wrapSelection(elm);
+        this._wrapSelection(elm);
         this.target.focus();
     },
 
-    wrapSelection: function(wrapper) {
-        var range = this.getSelectionRange();
+    _flattenHierarchy: function(start, end, discard_fn) {
+        if (start == end) {
+            return;
+        }
+
+        var trash = [];
+        var iter = start;
+        do {
+            iter = iter.nextSibling;
+            if (!iter) {
+                break;
+            }
+
+            if (!iter.innerHTML) {
+                continue;
+            }
+
+            if (!discard_fn || discard_fn(iter)) {
+                start.nodeValue += iter.innerHTML;
+                trash.push(iter);
+            }
+        } while (iter != end);
+
+        for (var i = 0; i < trash.length; i++) {
+            $(trash[i]).remove();
+        }
+    },
+
+    _wrapSelection: function(wrapper) {
+        var range = this._getSelectionRange();
         if (range) {
             // insure that the selection range is inside of the editor
-            var parent = this.findParentById(range.commonAncestorContainer,
-                                             this.target.id);
+            var parent = this._findParentById(range.commonAncestorContainer,
+                                              this.target.id);
             if (!parent) {
 		// TODO: Fallback behavior should be to move the caret to the
 		// end of the div and wrap it.
@@ -130,7 +151,7 @@ var FunCooker = DUI.Class.create({
         }
     },
 
-    getDocumentSelection: function() {
+    _getDocumentSelection: function() {
         if (window.getSelection) {
             return window.getSelection();
         } else if (document.selection) { // IE
@@ -138,8 +159,8 @@ var FunCooker = DUI.Class.create({
         }
     },
 
-    getSelectionRange: function() {
-        var selection = this.getDocumentSelection();
+    _getSelectionRange: function() {
+        var selection = this._getDocumentSelection();
         if (selection.getRangeAt) {
             return window.getSelection().getRangeAt(0);
         } else { // Safari
@@ -150,7 +171,7 @@ var FunCooker = DUI.Class.create({
         }
     },
 
-    findParentById: function(subject, parentId) {
+    _findParentById: function(subject, parentId) {
         if (subject == null || subject.tagName == "BODY") {
             return false;
         }
@@ -159,6 +180,6 @@ var FunCooker = DUI.Class.create({
             return subject;
         }
         
-        return this.findParentById(subject.parentNode, parentId); 
+        return this._findParentById(subject.parentNode, parentId); 
     },
 });
