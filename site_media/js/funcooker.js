@@ -33,7 +33,29 @@ var FunCooker = DUI.Class.create({
     },
 
     normalStyle: function() {
-        // TODO:
+        var range = this.getSelectionRange();
+        if (!range) {
+            return;
+        }
+
+        if (range.startContainer == range.endContainer) {
+            // This range has no formatting
+            return;
+        }
+
+        var iter = range.startContainer;
+        do {
+            iter = iter.nextSibling;
+            if (!iter) {
+                continue;
+            }
+
+            range.startContainer.nodeValue += iter.innerHTML;
+
+            $(iter).remove();
+        } while (iter != range.endContainer);
+
+        this.target.focus();
     },
 
     bold: function() {
@@ -91,7 +113,7 @@ var FunCooker = DUI.Class.create({
     },
 
     wrapSelection: function(wrapper) {
-        var range = this.getDocumentSelection();
+        var range = this.getSelectionRange();
         if (range) {
             // insure that the selection range is inside of the editor
             var parent = this.findParentById(range.commonAncestorContainer,
@@ -109,8 +131,22 @@ var FunCooker = DUI.Class.create({
     },
 
     getDocumentSelection: function() {
-        if ($.browser.mozilla) {
+        if (window.getSelection) {
+            return window.getSelection();
+        } else if (document.selection) { // IE
+            return document.selection.createRange();
+        }
+    },
+
+    getSelectionRange: function() {
+        var selection = this.getDocumentSelection();
+        if (selection.getRangeAt) {
             return window.getSelection().getRangeAt(0);
+        } else { // Safari
+            var range = document.createRange();
+            range.setStart(selection.anchorNode, selection.anchorOffset);
+            range.setEnd(selection.focusNode, selection.focusOffset);
+            return range;
         }
     },
 
