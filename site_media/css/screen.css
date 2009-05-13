@@ -124,6 +124,11 @@ table#container {
     margin: 0.2em 0 0.5em 0;
 }
 
+#content-layout td {
+    padding: 8px;
+    vertical-align: top;
+}
+
 #toolbar {
     position: relative;
     float: right;
