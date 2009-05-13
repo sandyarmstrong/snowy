@@ -77,14 +77,27 @@ TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, "templates"),
 )
 
+# Add the lib/ directory to the path for external apps
+EXTERNAL_APPS_PATH = os.path.join(PROJECT_ROOT, "lib")
+
+import sys
+sys.path.append(EXTERNAL_APPS_PATH)
+
 INSTALLED_APPS = (
-    'notes',
-    'registration',
+    # System apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+
+    # External apps
+    'registration',
+    'django_evolution',
+    'reversion',
+
+    # Local apps
+    'notes',
 )
 
 ACCOUNT_ACTIVATION_DAYS = 30
