@@ -83,7 +83,7 @@ table#container {
 #sidebar input#search {
     width: 250px;
     margin: 4px;
-    padding: 4px 4px 4px 35px;
+    padding: 3px 3px 3px 30px;
     
     border: 1px solid #bababa;
     background: #73685d url('/site_media/img/search.png') center left no-repeat;
