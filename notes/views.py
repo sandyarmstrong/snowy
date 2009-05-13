@@ -36,7 +36,7 @@ def note_detail(request, note_id,
     
         # libxml2 doesn't munge encodings, so forcibly encode to UTF-8
         # http://mail.gnome.org/archives/xml/2004-February/msg00363.html
-        doc = libxml2.parseDoc(note.body.encode('UTF-8'))
+        doc = libxml2.parseDoc(note.content.encode('UTF-8'))
         result = style.applyStylesheet(doc, None)
     
         # libxml2 doesn't munge encodings, so forcibly decode from UTF-8

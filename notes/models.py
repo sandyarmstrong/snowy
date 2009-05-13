@@ -23,13 +23,24 @@ class Note(models.Model):
         (0, 'Private'), (1, 'Public'), 
     )
 
+    guid = models.CharField(max_length=36)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User)
     title = models.CharField(max_length=128)
-    body = models.TextField(blank=True)
+    content = models.TextField(blank=True)
+    content_version = models.CharField(max_length=10)
+    tags = models.ManyToManyField('NoteTag', null=True, blank=True)
     permissions = models.IntegerField(choices=NOTE_PERMISSIONS,
                                       default=0)
 
     def __unicode__(self):
         return self.title
+
+class NoteTag(models.Model):
+    user = models.ForeignKey(User)
+    name = models.CharField(max_length=256)
+    is_notebook = models.BooleanField()
+
+    def __unicode__(self):
+        return self.name
