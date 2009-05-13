@@ -26,11 +26,11 @@
 <xsl:template name="softbreak">
 	<xsl:param name="text" select="."/>
 	<xsl:choose>
-		<xsl:when test="contains($text, '&#x2028;')">
-			<xsl:value-of select="substring-before($text, '&#x2028;')"/>
+		<xsl:when test="contains($text, '&#x000a;')">
+			<xsl:value-of select="substring-before($text, '&#x000a;')"/>
 			<br/>
 			<xsl:call-template name="softbreak">
-				<xsl:with-param name="text" select="substring-after($text, '&#x2028;')"/>
+				<xsl:with-param name="text" select="substring-after($text, '&#x000a;')"/>
 			</xsl:call-template>
 		</xsl:when>
 		
