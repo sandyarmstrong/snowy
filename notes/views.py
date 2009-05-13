@@ -34,10 +34,13 @@ def note_detail(request, note_id,
         styledoc = libxml2.parseFile('data/note2xhtml.xsl')
         style = libxslt.parseStylesheetDoc(styledoc)
     
-        doc = libxml2.parseDoc(note.body)
+        # libxml2 doesn't munge encodings, so forcibly encode to UTF-8
+        # http://mail.gnome.org/archives/xml/2004-February/msg00363.html
+        doc = libxml2.parseDoc(note.body.encode('UTF-8'))
         result = style.applyStylesheet(doc, None)
     
-        body = style.saveResultToString(result)
+        # libxml2 doesn't munge encodings, so forcibly decode from UTF-8
+        body = unicode(style.saveResultToString(result), 'UTF-8')
     finally:
         if style != None: style.freeStylesheet()
         if doc != None: doc.freeDoc()
