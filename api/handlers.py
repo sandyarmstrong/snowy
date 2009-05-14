@@ -15,27 +15,63 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from piston.handler import AnonymousBaseHandler
-from piston.utils import rc
+from django.contrib.auth.models import User
+
+from piston.handler import AnonymousBaseHandler, BaseHandler
+from piston.utils import rc, HttpStatusCode
 
 from snowy.notes.models import Note
 
+def get_user_or_not_here(username):
+    try:
+        return User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        raise HttpStatusCode('Gone', code=410)
+
+def get_note_or_not_here(note_id):
+    try:
+        return Note.objects.get(pk=note_id)
+    except ObjectDoesNotExist:
+        raise HttpStatusCode('Gone', code=410)
+
 class UserHandler(AnonymousBaseHandler):
     allow_methods = ('GET',)
-    model = User
 
     def read(self, request, username):
-        # TODO: abstract this out
-        try:
-            user = User.objects.get(username=username)
-        except:
-            return rc.NOT_HERE
-        
+        user = get_user_or_not_here(username)
         return {
             'first name': user.first_name,
             'last name': user.last_name,
             'notes-ref': reverse('note_index', kwargs={'username': username}),
-            #'notes-api-ref': reverse('note_api_index', kwargs={'username': username}),
+            'notes-api-ref': reverse('note_api_index', kwargs={'username': username}),
+        }
+
+class ListNoteRefsHandler(BaseHandler):
+    allow_methods = ('GET',)
+
+    def read(self, request, username):
+        user = get_user_or_not_here(username)
+        return {'note-refs': [
+            {'guid': n.guid, 'href': n.get_absolute_url(), 'title': n.title }
+            for n in Note.objects.filter(author=user)
+        ]}
+
+class NoteHandler(BaseHandler):
+    allow_methods = ('GET',)
+    model = Note
+
+    def read(self, request, username, note_id, slug=None):
+        user = get_user_or_not_here(username)
+        note = get_note_or_not_here(note_id)
+        return {
+            'guid': note.guid,
+            'title': note.title,
+            'note-content': note.content,
+            'last-change-date': note.user_modified,
+            'last-metadata-change-date': note.modified,
+            'create-date': note.created,
+            'open-on-startup': note.open_on_startup,
+            'tags': [t.name for t in note.tags.all()],
         }
