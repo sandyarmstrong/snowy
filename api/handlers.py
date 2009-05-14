@@ -15,10 +15,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.conf.urls.defaults import *
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from piston.handler import AnonymousBaseHandler
+from piston.utils import rc
+
 from snowy.notes.models import Note
 
-urlpatterns = patterns('',
-    url(r'^$', 'snowy.notes.views.note_index', name='note_index'),
-    url(r'^(?P<note_id>\d+)/$', 'snowy.notes.views.note_detail', name='note_detail'),
-)
+class UserHandler(AnonymousBaseHandler):
+    allow_methods = ('GET',)
+    model = User
+
+    def read(self, request, username):
+        # TODO: abstract this out
+        try:
+            user = User.objects.get(username=username)
+        except:
+            return rc.NOT_HERE
+        
+        return {
+            'first name': user.first_name,
+            'last name': user.last_name,
+            'notes-ref': reverse('note_index', kwargs={'username': username}),
+            #'notes-api-ref': reverse('note_api_index', kwargs={'username': username}),
+        }

@@ -23,12 +23,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^snowy/', include('snowy.foo.urls')),
-
     (r'^registration/', include('registration.urls')),
 
-    (r'^notes/', include('snowy.notes.urls')),
+    (r'^(?P<username>\w+)/notes/', include('snowy.notes.urls')),
+
+    (r'^api/', include('snowy.api.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

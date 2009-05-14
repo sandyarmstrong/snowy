@@ -16,13 +16,31 @@
 #
 
 from django.template import RequestContext
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 
 from snowy.notes.models import *
 
-def note_detail(request, note_id,
+def note_index(request, username,
+               template_name='note/note_index.html'):
+    user = get_object_or_404(User, username=username)
+
+    # TODO: retrieve the last open note from the user
+    last_modified = Note.objects.filter(author=user) \
+                                .order_by('-user_modified')
+    if last_modified.count() > 0:
+        return HttpResponseRedirect(last_modified[0].get_absolute_url())
+    
+    # Instruction page to tell user to either sync or create a new note
+    return render_to_response(template_name,
+                              {'user': user},
+                              context_instance=RequestContext(request))
+
+def note_detail(request, username, note_id,
                 template_name='notes/note_detail.html'):
-    note = get_object_or_404(Note, pk=note_id)
+    user = get_object_or_404(User, username=username)
+    note = get_object_or_404(Note, pk=note_id, author=user)
     
     # break this out into a function
     import libxslt

@@ -16,9 +16,14 @@
 #
 
 from django.conf.urls.defaults import *
-from snowy.notes.models import Note
+
+from piston.resource import Resource
+from snowy.api.handlers import UserHandler
+
+user_handler = Resource(UserHandler)
 
 urlpatterns = patterns('',
-    url(r'^$', 'snowy.notes.views.note_index', name='note_index'),
-    url(r'^(?P<note_id>\d+)/$', 'snowy.notes.views.note_detail', name='note_detail'),
+    url(r'(?P<username>\w+)/$', user_handler),
+#    url(r'^(?P<username>\w+)/notes$', note_handler),
+#    url(r'^(?P<username>\w+)/notes$', note_handler),
 )

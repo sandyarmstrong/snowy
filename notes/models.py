@@ -48,6 +48,12 @@ class Note(models.Model):
     def __unicode__(self):
         return self.title
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('note_detail', (), {
+            'note_id': self.id, 'username': self.author.username,
+        })
+
 class NoteTag(models.Model):
     author = models.ForeignKey(User)
     name = models.CharField(max_length=256)
