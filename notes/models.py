@@ -43,7 +43,7 @@ class Note(models.Model):
 
     class Meta:
         get_latest_by = 'user_modified'
-        unique_together = ('author', 'title')
+        unique_together = (('author', 'title'), ('author', 'guid'), )
 
     def __unicode__(self):
         return self.title
@@ -61,5 +61,5 @@ class NoteTag(models.Model):
 
     def get_name_for_display(self):
         if self.is_notebook:
-            return self.name.split(':', 3)[-1]
+            return self.name.split(':', 2)[-1]
         return self.name
