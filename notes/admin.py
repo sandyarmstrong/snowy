@@ -16,9 +16,10 @@
 #
 
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 from snowy.notes.models import Note
 
-class NoteAdmin(admin.ModelAdmin):
+class NoteAdmin(VersionAdmin):
     list_display = ('created', 'author', 'title')
     search_fields = ['body', 'title']
 

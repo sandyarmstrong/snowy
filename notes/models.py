@@ -54,6 +54,7 @@ class Note(models.Model):
             'note_id': self.id, 'username': self.author.username,
         })
 
+
 class NoteTag(models.Model):
     author = models.ForeignKey(User)
     name = models.CharField(max_length=256)
@@ -69,3 +70,8 @@ class NoteTag(models.Model):
         if self.is_notebook:
             return self.name.split(':', 2)[-1]
         return self.name
+
+
+class VersionMetadata(models.Model):
+    revision = models.ForeignKey('reversion.Revision')
+    version = models.IntegerField()
