@@ -32,6 +32,7 @@ class Note(models.Model):
     user_modified = models.DateTimeField(auto_now_add=True)
 
     title = models.CharField(max_length=128)
+    slug = models.SlugField(blank=True)
     content = models.TextField(blank=True)
     content_version = models.CharField(max_length=10)
 
@@ -51,7 +52,9 @@ class Note(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('note_detail', (), {
-            'note_id': self.id, 'username': self.author.username,
+            'note_id': self.id,
+            'username': self.author.username,
+            'slug': self.slug,
         })
 
 

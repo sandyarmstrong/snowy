@@ -32,15 +32,18 @@ def note_index(request, username,
     if last_modified.count() > 0:
         return HttpResponseRedirect(last_modified[0].get_absolute_url())
     
-    # Instruction page to tell user to either sync or create a new note
+    # TODO: Instruction page to tell user to either sync or create a new note
     return render_to_response(template_name,
                               {'user': user},
                               context_instance=RequestContext(request))
 
-def note_detail(request, username, note_id,
+def note_detail(request, username, note_id, slug,
                 template_name='notes/note_detail.html'):
     user = get_object_or_404(User, username=username)
     note = get_object_or_404(Note, pk=note_id, author=user)
+
+    if note.slug != slug:
+        return HttpResponseRedirect(note.get_absolute_url())
     
     # break this out into a function
     import libxslt

@@ -20,5 +20,6 @@ from snowy.notes.models import Note
 
 urlpatterns = patterns('',
     url(r'^$', 'snowy.notes.views.note_index', name='note_index'),
-    url(r'^(?P<note_id>\d+)/$', 'snowy.notes.views.note_detail', name='note_detail'),
+    url(r'^(?P<note_id>\d+)/$', 'snowy.notes.views.note_detail'),
+    url(r'^(?P<note_id>\d+)/(?P<slug>[\w-]+)/$', 'snowy.notes.views.note_detail', name='note_detail'),
 )
