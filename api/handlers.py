@@ -67,11 +67,13 @@ class NotesHandler(BaseHandler):
     allow_methods = ('GET',)
 
     # TODO: Handle since param
-    # TODO: Permissions
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
         user = User.objects.get(username=username)
         notes = Note.objects.filter(author=user)
+        if request.user != user:
+            notes.filter(permissions=1) # Public only
+
         if request.GET.has_key('include_notes'):
             return {'notes': [describe_note(n) for n in notes] }
         else:
@@ -81,7 +83,6 @@ class NotesHandler(BaseHandler):
                         'api-ref': reverse('note_api_detail', kwargs={
                             'username': n.author.username,
                             'note_id': n.pk,
-                            'slug': n.slug,
                         }),
                         'href': n.get_absolute_url(),
                     },
@@ -90,7 +91,6 @@ class NotesHandler(BaseHandler):
                 for n in notes
             ]}
 
-    # TODO: Permissions
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     @catch_and_return(KeyError, rc.BAD_REQUEST)
     @transaction.commit_on_success
@@ -99,6 +99,9 @@ class NotesHandler(BaseHandler):
             return parser.parse(date).astimezone(pytz.timezone(settings.TIME_ZONE))
 
         user = User.objects.get(username=username)
+        if request.user != user:
+            return rc.FORBIDDEN
+
         changes = json.loads(request.raw_post_data)['note-changes']
         for c in changes:
             note, created = Note.objects.get_or_create(author=user, guid=c['guid'])
@@ -111,10 +114,10 @@ class NotesHandler(BaseHandler):
                 note.modified = datetime.now()
             if c.has_key('create-date'): note.created = clean_date(c['create-date'])
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == 'true')
-
+            # TODO: tags
             note.save()
 
-# http://domain/api/1.0/user/notes/id/slug
+# http://domain/api/1.0/user/notes/id
 class NoteHandler(BaseHandler):
     allow_methods = ('GET',)
     model = Note
@@ -123,6 +126,8 @@ class NoteHandler(BaseHandler):
     def read(self, request, username, note_id, slug):
         user = User.objects.get(username=username)
         note = Note.objects.get(pk=note_id, slug=slug)
+        if request.user != user and note.permissions == 0:
+            return rc.FORBIDDEN
         return {'note': [describe_note(note)]}
 
 def describe_note(note):

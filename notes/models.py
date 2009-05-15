@@ -51,11 +51,17 @@ class Note(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('note_detail', (), {
-            'note_id': self.id,
-            'username': self.author.username,
-            'slug': self.slug,
-        })
+        if self.slug == "":
+            return ('note_detail_no_slug', (), {
+                'note_id': self.id,
+                'username': self.author.username,
+            })
+        else:
+            return ('note_detail', (), {
+                'note_id': self.id,
+                'username': self.author.username,
+                'slug': self.slug,
+            })
 
 
 class NoteTag(models.Model):

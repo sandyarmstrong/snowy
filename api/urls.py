@@ -17,16 +17,21 @@
 
 from django.conf.urls.defaults import *
 
+from piston.authentication import HttpBasicAuthentication
 from piston.resource import Resource
+
 from snowy.api.handlers import *
 
+auth = HttpBasicAuthentication(realm='Snowy')
+ad = {'authentication': auth}
+
 user_handler = Resource(UserHandler)
-notes_handler = Resource(NotesHandler)
-note_handler = Resource(NoteHandler)
+notes_handler = Resource(handler=NotesHandler, **ad)
+note_handler = Resource(handler=NoteHandler, **ad)
 
 urlpatterns = patterns('',
     # 1.0 API methods
-    url(r'1.0/(?P<username>\w+)/notes/(?P<note_id>\d+)/(?P<slug>[^/]+)/$', note_handler, name='note_api_detail'),
+    url(r'1.0/(?P<username>\w+)/notes/(?P<note_id>\d+)/$', note_handler, name='note_api_detail'),
     url(r'1.0/(?P<username>\w+)/notes/$', notes_handler, name='note_api_index'),
     url(r'1.0/(?P<username>\w+)/$', user_handler),
 )
