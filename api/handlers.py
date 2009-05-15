@@ -18,6 +18,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.db import transaction
 
 from piston.handler import AnonymousBaseHandler, BaseHandler
 from piston.utils import rc, HttpStatusCode
@@ -90,9 +91,9 @@ class NotesHandler(BaseHandler):
             ]}
 
     # TODO: Permissions
-    # TODO: Transactions
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     @catch_and_return(KeyError, rc.BAD_REQUEST)
+    @transaction.commit_on_success
     def update(self, request, username):
         def clean_date(date):
             return parser.parse(date).astimezone(pytz.timezone(settings.TIME_ZONE))

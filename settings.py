@@ -66,6 +66,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.csrf.middleware.CsrfResponseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
 )
 
