@@ -28,13 +28,13 @@ class Note(models.Model):
     author = models.ForeignKey(User)
 
     created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
+    modified = models.DateTimeField(auto_now_add=True)
     user_modified = models.DateTimeField(auto_now_add=True)
 
-    title = models.CharField(max_length=128)
+    title = models.CharField(max_length=128, blank=True)
     slug = models.SlugField(blank=True)
     content = models.TextField(blank=True)
-    content_version = models.CharField(max_length=10)
+    content_version = models.CharField(max_length=10, blank=True)
 
     tags = models.ManyToManyField('NoteTag', null=True, blank=True)
     permissions = models.IntegerField(choices=NOTE_PERMISSIONS,

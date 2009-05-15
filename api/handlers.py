@@ -22,7 +22,13 @@ from django.contrib.auth.models import User
 from piston.handler import AnonymousBaseHandler, BaseHandler
 from piston.utils import rc, HttpStatusCode
 
+from datetime import datetime
+from dateutil import parser
+
 from snowy.notes.models import Note
+from snowy import settings
+
+import json, pytz
 
 class catch_and_return(object):
     def __init__(self, err, response):
@@ -37,6 +43,7 @@ class catch_and_return(object):
                 return self.response
         return wrapper
 
+# http://domain/api/1.0/user
 class UserHandler(AnonymousBaseHandler):
     allow_methods = ('GET',)
 
@@ -51,18 +58,23 @@ class UserHandler(AnonymousBaseHandler):
                 'api-ref': reverse('note_api_index', kwargs=reverse_args),
                 'href': reverse('note_index', kwargs=reverse_args),
             },
+            # TODO: friends
         }
 
-class ListNoteRefsHandler(BaseHandler):
+# http://domain/api/1.0/user/notes
+class NotesHandler(BaseHandler):
     allow_methods = ('GET',)
 
+    # TODO: Handle since param
+    # TODO: Permissions
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
         user = User.objects.get(username=username)
+        notes = Note.objects.filter(author=user)
         if request.GET.has_key('include_notes'):
-            return {'notes': [describe_note(n) for n in Note.objects.filter(author=user)] }
+            return {'notes': [describe_note(n) for n in notes] }
         else:
-            return {'note-refs': [{
+            return {'notes': [{
                     'guid': n.guid,
                     'ref': {
                         'api-ref': reverse('note_api_detail', kwargs={
@@ -74,9 +86,34 @@ class ListNoteRefsHandler(BaseHandler):
                     },
                     'title': n.title,
                 }
-                for n in Note.objects.filter(author=user)
+                for n in notes
             ]}
 
+    # TODO: Permissions
+    # TODO: Transactions
+    @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
+    @catch_and_return(KeyError, rc.BAD_REQUEST)
+    def update(self, request, username):
+        def clean_date(date):
+            return parser.parse(date).astimezone(pytz.timezone(settings.TIME_ZONE))
+
+        user = User.objects.get(username=username)
+        changes = json.loads(request.raw_post_data)['note-changes']
+        for c in changes:
+            note, created = Note.objects.get_or_create(author=user, guid=c['guid'])
+            if c.has_key('title'): note.title = c['title']
+            if c.has_key('note-content'): note.content = c['note-content']
+            if c.has_key('last-change-date'): note.user_modified = clean_date(c['last-change-date'])
+            if c.has_key('last-metadata-change-date'):
+                note.modified = clean_date(c['last-metadata-change-date'])
+            else:
+                note.modified = datetime.now()
+            if c.has_key('create-date'): note.created = clean_date(c['create-date'])
+            if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == 'true')
+
+            note.save()
+
+# http://domain/api/1.0/user/notes/id/slug
 class NoteHandler(BaseHandler):
     allow_methods = ('GET',)
     model = Note
@@ -87,15 +124,18 @@ class NoteHandler(BaseHandler):
         note = Note.objects.get(pk=note_id, slug=slug)
         return {'note': [describe_note(note)]}
 
-
 def describe_note(note):
+    def local_iso(date):
+        return date.replace(tzinfo=pytz.timezone(settings.TIME_ZONE)) \
+                   .isoformat()
+
     return {
         'guid': note.guid,
         'title': note.title,
         'note-content': note.content,
-        'last-change-date': note.user_modified,
-        'last-metadata-change-date': note.modified,
-        'create-date': note.created,
+        'last-change-date': local_iso(note.user_modified),
+        'last-metadata-change-date': local_iso(note.modified),
+        'create-date': local_iso(note.created),
         'open-on-startup': note.open_on_startup,
         'tags': [t.name for t in note.tags.all()],
     }
