@@ -24,8 +24,9 @@ user_handler = Resource(UserHandler)
 list_note_refs_handler = Resource(ListNoteRefsHandler)
 note_handler = Resource(NoteHandler)
 
-urlpatterns = patterns('1.0',
-    url(r'(?P<username>\w+)/notes/(?P<note_id>\d+)/(?P<slug>[^/]+)/$', note_handler, name='note_api_detail'),
-    url(r'(?P<username>\w+)/notes/$', list_note_refs_handler, name='note_api_index'),
-    url(r'(?P<username>\w+)/$', user_handler),
+urlpatterns = patterns('',
+    # 1.0 API methods
+    url(r'1.0/(?P<username>\w+)/notes/(?P<note_id>\d+)/(?P<slug>[^/]+)/$', note_handler, name='note_api_detail'),
+    url(r'1.0/(?P<username>\w+)/notes/$', list_note_refs_handler, name='note_api_index'),
+    url(r'1.0/(?P<username>\w+)/$', user_handler),
 )

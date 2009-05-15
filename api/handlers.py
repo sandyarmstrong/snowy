@@ -24,54 +24,78 @@ from piston.utils import rc, HttpStatusCode
 
 from snowy.notes.models import Note
 
-def get_user_or_not_here(username):
-    try:
-        return User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        raise HttpStatusCode('Gone', code=410)
+class catch_and_return(object):
+    def __init__(self, err, response):
+        self.err = err
+        self.response = response
 
-def get_note_or_not_here(note_id):
-    try:
-        return Note.objects.get(pk=note_id)
-    except ObjectDoesNotExist:
-        raise HttpStatusCode('Gone', code=410)
+    def __call__(self, fn):
+        def wrapper(*args, **kwargs):
+            try:
+                return fn(*args, **kwargs)
+            except self.err:
+                return self.response
+        return wrapper
 
 class UserHandler(AnonymousBaseHandler):
     allow_methods = ('GET',)
 
+    @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
-        user = get_user_or_not_here(username)
+        user = User.objects.get(username=username)
+        reverse_args = {'username': username}
         return {
-            'first name': user.first_name,
-            'last name': user.last_name,
-            'notes-ref': reverse('note_index', kwargs={'username': username}),
-            'notes-api-ref': reverse('note_api_index', kwargs={'username': username}),
+            'first-name': user.first_name,
+            'last-name': user.last_name,
+            'notes-ref': {
+                'api-ref': reverse('note_api_index', kwargs=reverse_args),
+                'href': reverse('note_index', kwargs=reverse_args),
+            },
         }
 
 class ListNoteRefsHandler(BaseHandler):
     allow_methods = ('GET',)
 
+    @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
-        user = get_user_or_not_here(username)
-        return {'note-refs': [
-            {'guid': n.guid, 'href': n.get_absolute_url(), 'title': n.title }
-            for n in Note.objects.filter(author=user)
-        ]}
+        user = User.objects.get(username=username)
+        if request.GET.has_key('include_notes'):
+            return {'notes': [describe_note(n) for n in Note.objects.filter(author=user)] }
+        else:
+            return {'note-refs': [{
+                    'guid': n.guid,
+                    'ref': {
+                        'api-ref': reverse('note_api_detail', kwargs={
+                            'username': n.author.username,
+                            'note_id': n.pk,
+                            'slug': n.slug,
+                        }),
+                        'href': n.get_absolute_url(),
+                    },
+                    'title': n.title,
+                }
+                for n in Note.objects.filter(author=user)
+            ]}
 
 class NoteHandler(BaseHandler):
     allow_methods = ('GET',)
     model = Note
 
-    def read(self, request, username, note_id, slug=None):
-        user = get_user_or_not_here(username)
-        note = get_note_or_not_here(note_id)
-        return {
-            'guid': note.guid,
-            'title': note.title,
-            'note-content': note.content,
-            'last-change-date': note.user_modified,
-            'last-metadata-change-date': note.modified,
-            'create-date': note.created,
-            'open-on-startup': note.open_on_startup,
-            'tags': [t.name for t in note.tags.all()],
-        }
+    @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
+    def read(self, request, username, note_id, slug):
+        user = User.objects.get(username=username)
+        note = Note.objects.get(pk=note_id, slug=slug)
+        return {'note': [describe_note(note)]}
+
+
+def describe_note(note):
+    return {
+        'guid': note.guid,
+        'title': note.title,
+        'note-content': note.content,
+        'last-change-date': note.user_modified,
+        'last-metadata-change-date': note.modified,
+        'create-date': note.created,
+        'open-on-startup': note.open_on_startup,
+        'tags': [t.name for t in note.tags.all()],
+    }
