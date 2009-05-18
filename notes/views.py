@@ -20,6 +20,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 
+from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
 from snowy.notes.models import *
 
 def note_index(request, username,
@@ -55,12 +56,10 @@ def note_detail(request, username, note_id, slug='',
         styledoc = libxml2.parseFile('data/note2xhtml.xsl')
         style = libxslt.parseStylesheetDoc(styledoc)
     
-        # libxml2 doesn't munge encodings, so forcibly encode to UTF-8
-        # http://mail.gnome.org/archives/xml/2004-February/msg00363.html
-        # TODO: Check note.content_version so we can hypothetically apply different XSLT
-        content_to_parse = '<note-content version="1.0" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">' + note.content + '</note-content>'
-        doc = libxml2.parseDoc(content_to_parse.encode('UTF-8'))
+        template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
+        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content))
         result = style.applyStylesheet(doc, None)
+
         # libxml2 doesn't munge encodings, so forcibly decode from UTF-8
         body = unicode(style.saveResultToString(result), 'UTF-8')
     finally:

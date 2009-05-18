@@ -96,6 +96,7 @@
 <xsl:template match="link:url">
 	<a style="color:#3465A4" href="{node()}"><xsl:value-of select="node()"/></a>
 </xsl:template>
+-->
 
 <xsl:template match="tomboy:list">
 	<ul>
@@ -114,7 +115,6 @@
 		<xsl:apply-templates select="node()" />
 	</li>
 </xsl:template>
--->
 
 <!-- Evolution.dll Plugin -->
 <!--
