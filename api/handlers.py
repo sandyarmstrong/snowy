@@ -68,13 +68,14 @@ class UserHandler(AnonymousBaseHandler):
 class NotesHandler(BaseHandler):
     allow_methods = ('GET', 'PUT')
 
-    # TODO: Handle since param
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
         user = User.objects.get(username=username)
         notes = Note.objects.filter(author=user)
         if request.user != user:
             notes.filter(permissions=1) # Public only
+        if request.GET.has_key('since'):
+            notes=notes.filter(last_sync_rev__gt = int(request.GET['since']))
 
         if request.GET.has_key('include_notes'):
             return {'notes': [describe_note(n) for n in notes] }
