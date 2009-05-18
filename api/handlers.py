@@ -28,6 +28,7 @@ from datetime import datetime
 from dateutil import parser
 
 from snowy.notes.models import Note
+from snowy.notes.models import NoteTag
 from snowy import settings
 
 import json, pytz
@@ -133,6 +134,13 @@ class NotesHandler(BaseHandler):
                 note.modified = datetime.now()
             if c.has_key('create-date'): note.created = clean_date(c['create-date'])
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == 'true')
+            if c.has_key('tags'):
+                for tagName in c['tags']:
+                    is_notebook = tagName.startswith('system:notebook:')
+                    tag, created = NoteTag.objects.get_or_create(author=user,
+                                                                 name=tagName,
+                                                                 is_notebook=is_notebook)
+                    note.tags.add(tag)
 
             note.last_sync_rev = new_sync_rev
 
