@@ -143,5 +143,6 @@ def describe_note(note):
         'last-metadata-change-date': local_iso(note.modified),
         'create-date': local_iso(note.created),
         'open-on-startup': note.open_on_startup,
+        'last-sync-revision': note.last_sync_rev,
         'tags': [t.name for t in note.tags.all()],
     }

@@ -41,6 +41,8 @@ class Note(models.Model):
                                       default=0)
 
     open_on_startup = models.BooleanField(default=False)
+    
+    last_sync_rev = models.IntegerField(default=-1)
 
     class Meta:
         get_latest_by = 'user_modified'
