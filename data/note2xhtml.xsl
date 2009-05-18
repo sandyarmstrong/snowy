@@ -41,7 +41,7 @@
 </xsl:template>
 
 <xsl:template match="tomboy:note-content">
-	<div class="note">
+	<div>
 		<xsl:apply-templates select="node()" />
 	</div>
 </xsl:template>

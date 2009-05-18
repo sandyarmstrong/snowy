@@ -15,9 +15,9 @@
 {% block content %}
 <table id="content-layout" cellspacing="0" cellpadding="0">
     <tr>
-        <td>
+        <td id="note">
+            <h1>{{ note.title }}</h1>
             <div id="funcooker">
-                <h1>{{ note.title }}</h1>
                 {{ body|safe }}
             </div>
         </td>
