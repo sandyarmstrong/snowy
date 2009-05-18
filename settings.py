@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     'django_evolution',
     'reversion',
     'gravatar',
+    'autoslug',
 
     # Local apps
     'notes',

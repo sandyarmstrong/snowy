@@ -19,6 +19,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
+from autoslug.fields import AutoSlugField
+
 class Note(models.Model):
     NOTE_PERMISSIONS = (
         (0, 'Private'), (1, 'Public'), 
@@ -33,7 +35,8 @@ class Note(models.Model):
     user_modified = models.DateTimeField(auto_now_add=True)
 
     title = models.CharField(max_length=128, blank=True)
-    slug = models.SlugField(blank=True)
+    slug = AutoSlugField(unique_with='author', populate_from='title',
+                         editable=True)
     content = models.TextField(blank=True)
     content_version = models.CharField(max_length=10, blank=True)
 
