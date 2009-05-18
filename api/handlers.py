@@ -183,7 +183,7 @@ def simple_describe_note(note):
     }
 
 def get_latest_sync_rev(user):
-    max_rev = Note.objects.filter(author=user)
+    max_rev = Note.objects.filter(author=user) \
                           .aggregate(Max('last_sync_rev')) \
                           ['last_sync_rev__max']
     return max_rev if max_rev != None else -1
