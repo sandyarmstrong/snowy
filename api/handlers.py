@@ -136,6 +136,7 @@ class NotesHandler(BaseHandler):
             if c.has_key('create-date'): note.created = clean_date(c['create-date'])
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == True)
             if c.has_key('tags'):
+                note.tags.clear()
                 for tagName in c['tags']:
                     is_notebook = tagName.startswith('system:notebook:')
                     tag, created = NoteTag.objects.get_or_create(author=user,
