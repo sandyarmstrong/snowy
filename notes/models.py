@@ -17,6 +17,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 class Note(models.Model):
     NOTE_PERMISSIONS = (
@@ -83,6 +84,16 @@ class NoteTag(models.Model):
         return self.name
 
 
-class VersionMetadata(models.Model):
-    revision = models.ForeignKey('reversion.Revision')
-    version = models.IntegerField()
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    latest_sync_rev = models.IntegerField(default=-1)
+
+def _create_profile(sender, instance, created, **kwargs):
+    """
+    Create a UserProfile object in response to a new User being created.
+    """
+    if not created: return
+    UserProfile.objects.create(user=instance)
+
+post_save.connect(_create_profile, sender=User,
+                  dispatch_uid='django.contrib.auth.models.User')

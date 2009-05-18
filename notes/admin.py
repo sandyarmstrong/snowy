@@ -17,7 +17,7 @@
 
 from django.contrib import admin
 from reversion.admin import VersionAdmin
-from snowy.notes.models import Note
+from snowy.notes.models import *
 
 class NoteAdmin(VersionAdmin):
     list_display = ('created', 'author', 'title')
@@ -25,3 +25,5 @@ class NoteAdmin(VersionAdmin):
     prepopulated_fields = {"slug": ("title",)}
 
 admin.site.register(Note, NoteAdmin)
+admin.site.register(NoteTag)
+admin.site.register(UserProfile)

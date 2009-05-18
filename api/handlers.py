@@ -60,7 +60,7 @@ class UserHandler(AnonymousBaseHandler):
                 'api-ref': reverse('note_api_index', kwargs=reverse_args),
                 'href': reverse('note_index', kwargs=reverse_args),
             },
-            'latest-sync-revision' : get_latest_sync_rev(user)
+            'latest-sync-revision' : user.get_profile().latest_sync_rev,
             # TODO: friends
         }
 
@@ -79,7 +79,7 @@ class NotesHandler(BaseHandler):
         if request.GET.has_key('since'):
             notes = notes.filter(last_sync_rev__gt=int(request.GET['since']))
 
-        response = {'latest-sync-revision': get_latest_sync_rev(user)}
+        response = {'latest-sync-revision': user.get_profile().latest_sync_rev}
         if request.GET.has_key('include_notes'):
             response['notes'] = [describe_note(n) for n in notes]
         else:
@@ -93,13 +93,16 @@ class NotesHandler(BaseHandler):
         def clean_date(date):
             return parser.parse(date).astimezone(pytz.timezone(settings.TIME_ZONE))
 
+        def clean_content(content):
+            return content.split('\n', 1)[-1]
+
         user = User.objects.get(username=username)
         if request.user != user:
             return rc.FORBIDDEN
 
         update = json.loads(request.raw_post_data)
 
-        current_sync_rev = get_latest_sync_rev(user)
+        current_sync_rev = user.get_profile().latest_sync_rev
         new_sync_rev = current_sync_rev + 1
 
         if update.has_key('latest-sync-revision'):
@@ -118,7 +121,7 @@ class NotesHandler(BaseHandler):
                 continue
 
             if c.has_key('title'): note.title = c['title']
-            if c.has_key('note-content'): note.content = c['note-content']
+            if c.has_key('note-content'): note.content = clean_content(c['note-content'])
             if c.has_key('note-content-version'): note.content_version = c['note-content-version']
             if c.has_key('last-change-date'): note.user_modified = clean_date(c['last-change-date'])
             if c.has_key('last-metadata-change-date'):
@@ -133,10 +136,14 @@ class NotesHandler(BaseHandler):
             # TODO: tags
             note.save()
 
+        profile = user.get_profile()
+        profile.latest_sync_rev = new_sync_rev
+        profile.save()
+
         # TODO: Would like to be able to return this. Why does it break the update?
         #       Is it related to how the transaction is handled?
         #       Must we commit manually first?
-#        return {'latest-sync-revision': get_latest_sync_rev(user),
+#        return {'latest-sync-revision': new_sync_rev,
 #                 'notes': [simple_describe_note(n) for n in notes]}
 
 # http://domain/api/1.0/user/notes/id
@@ -181,9 +188,3 @@ def simple_describe_note(note):
         },
         'title': note.title
     }
-
-def get_latest_sync_rev(user):
-    max_rev = Note.objects.filter(author=user) \
-                          .aggregate(Max('last_sync_rev')) \
-                          ['last_sync_rev__max']
-    return max_rev if max_rev != None else -1
