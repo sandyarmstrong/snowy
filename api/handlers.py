@@ -60,7 +60,7 @@ class UserHandler(AnonymousBaseHandler):
                 'api-ref': reverse('note_api_index', kwargs=reverse_args),
                 'href': reverse('note_index', kwargs=reverse_args),
             },
-            'latest-sync-revision' : Note.objects.filter(author=user).aggregate(Max('last_sync_rev'))['last_sync_rev__max']
+            'latest-sync-revision' : get_latest_sync_rev(user)
             # TODO: friends
         }
 
@@ -77,22 +77,12 @@ class NotesHandler(BaseHandler):
         if request.GET.has_key('since'):
             notes=notes.filter(last_sync_rev__gt = int(request.GET['since']))
 
+        response = {'latest-sync-revision': get_latest_sync_rev(user)}
         if request.GET.has_key('include_notes'):
-            return {'notes': [describe_note(n) for n in notes] }
+            response['notes'] = [describe_note(n) for n in notes]
         else:
-            return {'notes': [{
-                    'guid': n.guid,
-                    'ref': {
-                        'api-ref': reverse('note_api_detail', kwargs={
-                            'username': n.author.username,
-                            'note_id': n.pk,
-                        }),
-                        'href': n.get_absolute_url(),
-                    },
-                    'title': n.title,
-                }
-                for n in notes
-            ]}
+            response['notes'] = [simple_describe_note(n) for n in notes]
+        return response
 
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     @catch_and_return(KeyError, rc.BAD_REQUEST)
@@ -119,6 +109,12 @@ class NotesHandler(BaseHandler):
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == 'true')
             # TODO: tags
             note.save()
+
+        # TODO: Would like to be able to return this. Why does it break the update?
+        #       Is it related to how the transaction is handled?
+        #       Must we commit manually first?
+#        return {'latest-sync-revision': get_latest_sync_rev(user),
+#                 'notes': [simple_describe_note(n) for n in notes]}
 
 # http://domain/api/1.0/user/notes/id
 class NoteHandler(BaseHandler):
@@ -149,3 +145,22 @@ def describe_note(note):
         'last-sync-revision': note.last_sync_rev,
         'tags': [t.name for t in note.tags.all()],
     }
+
+def simple_describe_note(note):
+    return {
+        'guid': note.guid,
+        'ref': {
+            'api-ref': reverse('note_api_detail', kwargs={
+                'username': note.author.username,
+                'note_id': note.pk,
+            }),
+            'href': note.get_absolute_url(),
+        },
+        'title': note.title
+    }
+
+def get_latest_sync_rev(user):
+    max_rev = Note.objects.filter(author=user).aggregate(Max('last_sync_rev'))['last_sync_rev__max']
+    if max_rev is None:
+        return -1
+    return max_rev
