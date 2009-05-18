@@ -72,10 +72,12 @@ class NotesHandler(BaseHandler):
     def read(self, request, username):
         user = User.objects.get(username=username)
         notes = Note.objects.filter(author=user)
+
         if request.user != user:
             notes.filter(permissions=1) # Public only
+
         if request.GET.has_key('since'):
-            notes=notes.filter(last_sync_rev__gt = int(request.GET['since']))
+            notes = notes.filter(last_sync_rev__gt=int(request.GET['since']))
 
         response = {'latest-sync-revision': get_latest_sync_rev(user)}
         if request.GET.has_key('include_notes'):
@@ -98,20 +100,23 @@ class NotesHandler(BaseHandler):
         update = json.loads(request.raw_post_data)
 
         current_sync_rev = get_latest_sync_rev(user)
+        new_sync_rev = current_sync_rev + 1
+
         if update.has_key('latest-sync-revision'):
             new_sync_rev = update['latest-sync-revision']
-        else:
-            new_sync_rev = current_sync_rev + 1
 
         if new_sync_rev != current_sync_rev + 1:
             # TODO: Return a more useful error response?
             return rc.BAD_REQUEST
 
         for c in update['note-changes']:
-            note, created = Note.objects.get_or_create(author=user, guid=c['guid'])
+            note, created = Note.objects.get_or_create(author=user,
+                                                       guid=c['guid'])
+
             if c.has_key('command') and c['command'] == 'delete':
                 note.delete()
                 continue
+
             if c.has_key('title'): note.title = c['title']
             if c.has_key('note-content'): note.content = c['note-content']
             if c.has_key('note-content-version'): note.content_version = c['note-content-version']
@@ -122,8 +127,9 @@ class NotesHandler(BaseHandler):
                 note.modified = datetime.now()
             if c.has_key('create-date'): note.created = clean_date(c['create-date'])
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == 'true')
+
             note.last_sync_rev = new_sync_rev
-            # TODO: if User model gets a latest_sync_rev field, update it, too
+
             # TODO: tags
             note.save()
 
@@ -177,7 +183,7 @@ def simple_describe_note(note):
     }
 
 def get_latest_sync_rev(user):
-    max_rev = Note.objects.filter(author=user).aggregate(Max('last_sync_rev'))['last_sync_rev__max']
-    if max_rev is None:
-        return -1
-    return max_rev
+    max_rev = Note.objects.filter(author=user)
+                          .aggregate(Max('last_sync_rev')) \
+                          ['last_sync_rev__max']
+    return max_rev if max_rev != None else -1
