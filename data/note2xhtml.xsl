@@ -46,11 +46,6 @@
 	</div>
 </xsl:template>
 
-<xsl:template match="tomboy:note-content/*[1]/text()[1]">
-	<h1><xsl:value-of select="substring-before(., $newline)"/></h1>
-	<xsl:value-of select="substring-after(., $newline)"/>
-</xsl:template>
-
 <xsl:template match="tomboy:bold">
 	<b><xsl:apply-templates select="node()"/></b>
 </xsl:template>
