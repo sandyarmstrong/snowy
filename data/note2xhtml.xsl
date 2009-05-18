@@ -16,7 +16,7 @@
 <xsl:param name="newline" select="'&#xA;'" />
 
 <xsl:template match="/">
-	<xsl:apply-templates select="tomboy:note"/>
+	<xsl:apply-templates select="tomboy:note-content"/>
 </xsl:template>
 
 <xsl:template match="text()">
@@ -40,26 +40,13 @@
 	</xsl:choose>
 </xsl:template>
 
-<xsl:template match="tomboy:note">
-	<xsl:apply-templates select="tomboy:text"/>
-</xsl:template>
-
-<xsl:template match="tomboy:text">
-	<div class="note" 
-	     id="{/tomboy:note/tomboy:title}">
-		<a name="#{/tomboy:note/tomboy:title}" />
+<xsl:template match="tomboy:note-content">
+	<div class="note">
 		<xsl:apply-templates select="node()" />
 	</div>
-	
-	<xsl:if test="$export-linked and ((not($export-linked-all) and /tomboy:note/tomboy:title/text() = $root-note) or $export-linked-all)">
-		<xsl:for-each select=".//link:internal/text()">
-			<!-- Load in the linked note's XML for processing. -->
-			<xsl:apply-templates select="document(.)/node()"/>
-		</xsl:for-each>
-	</xsl:if>
 </xsl:template>
 
-<xsl:template match="tomboy:note/tomboy:text/*[1]/text()[1]">
+<xsl:template match="tomboy:note-content/*[1]/text()[1]">
 	<h1><xsl:value-of select="substring-before(., $newline)"/></h1>
 	<xsl:value-of select="substring-after(., $newline)"/>
 </xsl:template>
