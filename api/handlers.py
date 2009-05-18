@@ -95,8 +95,19 @@ class NotesHandler(BaseHandler):
         if request.user != user:
             return rc.FORBIDDEN
 
-        changes = json.loads(request.raw_post_data)['note-changes']
-        for c in changes:
+        update = json.loads(request.raw_post_data)
+
+        current_sync_rev = get_latest_sync_rev(user)
+        if update.has_key('latest-sync-revision'):
+            new_sync_rev = update['latest-sync-revision']
+        else:
+            new_sync_rev = current_sync_rev + 1
+
+        if new_sync_rev != current_sync_rev + 1:
+            # TODO: Return a more useful error response?
+            return rc.BAD_REQUEST
+
+        for c in update['note-changes']:
             note, created = Note.objects.get_or_create(author=user, guid=c['guid'])
             if c.has_key('command') and c['command'] == 'delete':
                 note.delete()
@@ -111,6 +122,8 @@ class NotesHandler(BaseHandler):
                 note.modified = datetime.now()
             if c.has_key('create-date'): note.created = clean_date(c['create-date'])
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == 'true')
+            note.last_sync_rev = new_sync_rev
+            # TODO: if User model gets a latest_sync_rev field, update it, too
             # TODO: tags
             note.save()
 
