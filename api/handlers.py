@@ -98,6 +98,9 @@ class NotesHandler(BaseHandler):
         changes = json.loads(request.raw_post_data)['note-changes']
         for c in changes:
             note, created = Note.objects.get_or_create(author=user, guid=c['guid'])
+            if c.has_key('command') and c['command'] == 'delete':
+                note.delete()
+                continue
             if c.has_key('title'): note.title = c['title']
             if c.has_key('note-content'): note.content = c['note-content']
             if c.has_key('last-change-date'): note.user_modified = clean_date(c['last-change-date'])
