@@ -37,7 +37,7 @@ def note_index(request, username,
                               {'user': user},
                               context_instance=RequestContext(request))
 
-def note_detail(request, username, note_id, slug,
+def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
     user = get_object_or_404(User, username=username)
     note = get_object_or_404(Note, pk=note_id, author=user)
