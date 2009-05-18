@@ -19,6 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Max
 
 from piston.handler import AnonymousBaseHandler, BaseHandler
 from piston.utils import rc, HttpStatusCode
@@ -59,6 +60,7 @@ class UserHandler(AnonymousBaseHandler):
                 'api-ref': reverse('note_api_index', kwargs=reverse_args),
                 'href': reverse('note_index', kwargs=reverse_args),
             },
+            'latest-sync-revision' : Note.objects.filter(author=user).aggregate(Max('last_sync_rev'))['last_sync_rev__max']
             # TODO: friends
         }
 
