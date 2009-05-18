@@ -190,6 +190,10 @@ table#content-layout {
 }
 
 /* Note-specific styles */
+#funcooker h1 {
+    text-decoration: underline;
+}
+
 .note-highlight {
     background-color: yellow;
 }
