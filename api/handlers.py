@@ -64,7 +64,7 @@ class UserHandler(AnonymousBaseHandler):
 
 # http://domain/api/1.0/user/notes
 class NotesHandler(BaseHandler):
-    allow_methods = ('GET',)
+    allow_methods = ('GET', 'PUT')
 
     # TODO: Handle since param
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
