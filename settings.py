@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     'registration',
     'django_evolution',
     'reversion',
+    'gravatar',
 
     # Local apps
     'notes',

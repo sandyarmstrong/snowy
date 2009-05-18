@@ -1,3 +1,4 @@
+{% load gravatar %}
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
 
@@ -23,7 +24,7 @@
         </div>
         <div id="header-avatar">
 {% if user.is_authenticated %}
-            <img src="{{ MEDIA_URL }}img/blank-avatar.png" width="48" height="48" alt="Your Avatar"/>
+            {% gravatar_img_for_user user 64 %}
 {% endif %}
         </div>
         <div id="header-auth">
