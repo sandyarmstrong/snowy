@@ -103,6 +103,7 @@ class NotesHandler(BaseHandler):
                 continue
             if c.has_key('title'): note.title = c['title']
             if c.has_key('note-content'): note.content = c['note-content']
+            if c.has_key('note-content-version'): note.content_version = c['note-content-version']
             if c.has_key('last-change-date'): note.user_modified = clean_date(c['last-change-date'])
             if c.has_key('last-metadata-change-date'):
                 note.modified = clean_date(c['last-metadata-change-date'])
