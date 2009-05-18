@@ -37,7 +37,7 @@ h1 {
     vertical-align: middle;
 
     font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
-    whitespace: nowrap;
+    white-space: nowrap;
 }
 
 #header-auth p, #header-auth h3 {
@@ -132,6 +132,10 @@ table#container {
 #content-layout td {
     padding: 8px;
     vertical-align: top;
+}
+
+table#content-layout {
+    width: 100%;
 }
 
 #toolbar {
