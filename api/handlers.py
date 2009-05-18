@@ -101,6 +101,9 @@ class NotesHandler(BaseHandler):
             return rc.FORBIDDEN
 
         update = json.loads(request.raw_post_data)
+        changes = update['note-changes']
+        if len(changes) == 0:
+            return
 
         current_sync_rev = user.get_profile().latest_sync_rev
         new_sync_rev = current_sync_rev + 1
@@ -112,7 +115,7 @@ class NotesHandler(BaseHandler):
             # TODO: Return a more useful error response?
             return rc.BAD_REQUEST
 
-        for c in update['note-changes']:
+        for c in changes:
             note, created = Note.objects.get_or_create(author=user,
                                                        guid=c['guid'])
 
