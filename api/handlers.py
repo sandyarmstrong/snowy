@@ -104,8 +104,6 @@ class NotesHandler(BaseHandler):
 
         update = json.loads(request.raw_post_data)
         changes = update['note-changes']
-        if len(changes) == 0:
-            return
 
         current_sync_rev = user.get_profile().latest_sync_rev
         new_sync_rev = current_sync_rev + 1
@@ -146,14 +144,15 @@ class NotesHandler(BaseHandler):
             note.save()
 
         profile = user.get_profile()
-        profile.latest_sync_rev = new_sync_rev
-        profile.save()
+        if len(changes) > 0:
+            profile.latest_sync_rev = new_sync_rev
+            profile.save()
+        
+        return {
+            'latest-sync-revision': profile.latest_sync_rev,
+            'notes': [simple_describe_note(n) for n in Note.objects.filter(author=user)]
+        }
 
-        # TODO: Would like to be able to return this. Why does it break the update?
-        #       Is it related to how the transaction is handled?
-        #       Must we commit manually first?
-#        return {'latest-sync-revision': new_sync_rev,
-#                 'notes': [simple_describe_note(n) for n in notes]}
 
 # http://domain/api/1.0/user/notes/id
 class NoteHandler(BaseHandler):
