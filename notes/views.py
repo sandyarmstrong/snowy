@@ -22,6 +22,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 
 from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
 from snowy.notes.models import *
+from snowy import settings
 
 def note_index(request, username,
                template_name='note/note_index.html'):
@@ -67,6 +68,16 @@ def note_detail(request, username, note_id, slug='',
         if doc != None: doc.freeDoc()
         if result != None: result.freeDoc()
 
+    # TODO: pinned notes
+    all_notes = Note.objects.filter(author=user) \
+                            .order_by('-user_modified')
+    if request.user != user:
+        all_notes = all_notes.filter(permissions=1) # Public
+
+    all_notes = all_notes[:settings.SNOWY_LIST_MAX_NOTES]
+    all_notebooks = NoteTag.objects.filter(author=user, is_notebook=True)[:5]
     return render_to_response(template_name,
-                              {'note': note, 'body': body },
+                              {'note': note, 'body': body,
+                               'all_notes': all_notes,
+                               'all_notebooks': all_notebooks},
                               context_instance=RequestContext(request))

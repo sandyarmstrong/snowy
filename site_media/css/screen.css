@@ -60,10 +60,9 @@ table#container {
     border: 0;
 }
 
-#sidebar-container {
+td#sidebar-container {
     width: 20%;
     min-width: 250px;
-    max-width: 500px;
     
     margin: 0;
     vertical-align: top;
@@ -71,8 +70,11 @@ table#container {
 
 #sidebar {
     margin-top: 20px;
+    padding-bottom: 20px;
+
     background-color: #403b33;
     font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
+    font-size: 1.05em;
 }
 
 #sidebar h3 {
@@ -105,17 +107,76 @@ table#container {
     color: #000000;
 }
 
-#sidebar #notebooks {
+#sidebar hr {
+    height: 1px;
+    margin: 0.6em 0;
+    background-color: #aba49e;
+    border: 0;
+}
+
+#sidebar ul {
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar li {
+    margin: 0 0 0.5em 0;
+    padding: 0;
+    position: relative;
+    left: 24px;
+}
+
+#sidebar li a {
+    position: relative;
+    top: -0.2em;
+
+    color: #ffffff;
+    text-decoration: none;
+}
+
+#sidebar .more-item {
+    list-style-type: none; 
+}
+
+#sidebar .more-item a {
+    text-decoration: underline;
+}
+
+#sidebar-note-list, #sidebar-notebook-list {
+    margin: 7px 0 0 0;
+    padding: 3px 14px;
+}
+
+#sidebar-note-list .note-item {
+    list-style-image: url('/site_media/img/note_16.png'); 
+}
+
+#sidebar-note-list #new-note {
+    list-style-image: url('/site_media/img/note-new_16.png'); 
+}
+
+#sidebar-note-list .more-item a {
+    color: #8c8985;
+}
+
+#sidebar-notebook-list {
+    margin: 0;
     background-color: #8ecbd2;
     color: #ffffff;
 }
 
-#sidebar #notebooks h3 {
+#sidebar-notebook-list h3 {
+    margin: 0.3em 0;
+    font-size: 1.0em;
     color: #578186;
 }
 
-#sidebar #notebooks .more {
-    color: #b8dee3;
+#sidebar-notebook-list .notebook-item {
+    list-style-image: url('/site_media/img/notebook_16.png'); 
+}
+
+#sidebar-notebook-list .more-item a {
+    color: #bbe0e4;
 }
 
 #content {

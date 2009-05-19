@@ -1,5 +1,7 @@
 {% extends 'notes/base.html' %}
 
+{% load i18n %}
+
 {% block extra_head %}
     <script type="text/javascript" src="{{ MEDIA_URL }}js/DUI.js" charset="utf-8"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/funcooker.js" charset="utf-8"></script>
@@ -10,6 +12,27 @@
 
 {% block sidebar %}
 {{ block.super }}
+<div id="sidebar-note-list">
+    <ul>
+{% for n in all_notes %}
+        <li class="note-item"><a href="{{ n.get_absolute_url }}">{{ n.title }}</a></li>
+{% endfor %}
+        <li class="more-item"><a href="#">{% trans "More Notes..." %}</a></li>
+    </ul>
+    <hr />
+    <ul>
+        <li id="new-note"><a href="#">New Note...</a></li>
+    </ul>
+</div>
+<div id="sidebar-notebook-list">
+    <h3>{% trans "Notebooks" %}</h3>
+    <ul>
+{% for n in all_notebooks %}
+        <li class="notebook-item"><a href="#">{{ n.get_name_for_display }}</a></li>
+{% endfor %}
+        <li class="more-item"><a href="#">{% trans "More Notebooks..." %}</a></li>
+    </ul>
+</div>
 {% endblock %}
 
 {% block content %}
