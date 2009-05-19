@@ -53,6 +53,7 @@ class UserHandler(AnonymousBaseHandler):
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
         user = User.objects.get(username=username)
+        profile = user.get_profile()
         reverse_args = {'username': username}
         return {
             'first-name': user.first_name,
@@ -61,7 +62,8 @@ class UserHandler(AnonymousBaseHandler):
                 'api-ref': reverse('note_api_index', kwargs=reverse_args),
                 'href': reverse('note_index', kwargs=reverse_args),
             },
-            'latest-sync-revision' : user.get_profile().latest_sync_rev,
+            'latest-sync-revision' : profile.latest_sync_rev,
+            'current-sync-guid' : profile.current_sync_uuid
             # TODO: friends
         }
 

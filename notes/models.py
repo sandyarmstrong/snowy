@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import uuid
+
 from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import User
 from django.db import models
@@ -98,8 +100,12 @@ pre_save.connect(_update_is_notebook, sender=NoteTag,
 
 
 class UserProfile(models.Model):
+    def _create_uuid():
+        return str(uuid.uuid4())
+
     user = models.ForeignKey(User, unique=True)
     latest_sync_rev = models.IntegerField(default=-1)
+    current_sync_uuid = models.CharField(max_length=36, default=_create_uuid)
 
 def _create_profile(sender, instance, created, **kwargs):
     """
