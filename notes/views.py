@@ -68,9 +68,8 @@ def note_detail(request, username, note_id, slug='',
         if doc != None: doc.freeDoc()
         if result != None: result.freeDoc()
 
-    # TODO: pinned notes
     all_notes = Note.objects.filter(author=user) \
-                            .order_by('-user_modified')
+                            .order_by('-pinned', '-user_modified')
     if request.user != user:
         all_notes = all_notes.filter(permissions=1) # Public
 

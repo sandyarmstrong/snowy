@@ -150,6 +150,10 @@ td#sidebar-container {
     list-style-image: url('/site_media/img/note_16.png'); 
 }
 
+#sidebar-note-list .pinned {
+    list-style-image: url('/site_media/img/pin-down_16.png'); 
+}
+
 #sidebar-note-list #new-note {
     list-style-image: url('/site_media/img/note-new_16.png'); 
 }

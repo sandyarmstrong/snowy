@@ -15,7 +15,7 @@
 <div id="sidebar-note-list">
     <ul>
 {% for n in all_notes %}
-        <li class="note-item"><a href="{{ n.get_absolute_url }}">{{ n.title }}</a></li>
+        <li class="note-item{% if n.pinned %} pinned{% endif %}"><a href="{{ n.get_absolute_url }}">{{ n.title }}</a></li>
 {% endfor %}
         <li class="more-item"><a href="#">{% trans "More Notes..." %}</a></li>
     </ul>
