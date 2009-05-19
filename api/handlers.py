@@ -133,6 +133,7 @@ class NotesHandler(BaseHandler):
                 note.modified = datetime.now()
             if c.has_key('create-date'): note.created = clean_date(c['create-date'])
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == True)
+            if c.has_key('pinned'): note.pinned = (c['pinned'] == True)
             if c.has_key('tags'):
                 note.tags.clear()
                 for tag_name in c['tags']:
@@ -181,6 +182,7 @@ def describe_note(note):
         'last-metadata-change-date': local_iso(note.modified),
         'create-date': local_iso(note.created),
         'open-on-startup': note.open_on_startup,
+        'pinned': note.pinned,
         'last-sync-revision': note.last_sync_rev,
         'tags': [t.name for t in note.tags.all()],
     }
