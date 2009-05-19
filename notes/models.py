@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.db import models
+from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db import models
 
 from autoslug.fields import AutoSlugField
 
@@ -85,6 +85,15 @@ class NoteTag(models.Model):
         if self.is_notebook:
             return self.name.split(':', 2)[-1]
         return self.name
+
+def _update_is_notebook(sender, instance, **kwargs):
+    """
+    Update is_notebook based upon the NoteTag name.
+    """
+    instance.is_notebook = instance.name.startswith('system:notebook:')
+
+pre_save.connect(_update_is_notebook, sender=NoteTag,
+                 dispatch_uid='snowy.notes.models.NoteTag')
 
 
 class UserProfile(models.Model):

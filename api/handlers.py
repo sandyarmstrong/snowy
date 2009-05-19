@@ -137,16 +137,12 @@ class NotesHandler(BaseHandler):
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == True)
             if c.has_key('tags'):
                 note.tags.clear()
-                for tagName in c['tags']:
-                    is_notebook = tagName.startswith('system:notebook:')
+                for tag_name in c['tags']:
                     tag, created = NoteTag.objects.get_or_create(author=user,
-                                                                 name=tagName,
-                                                                 is_notebook=is_notebook)
+                                                                 name=tag_name)
                     note.tags.add(tag)
 
             note.last_sync_rev = new_sync_rev
-
-            # TODO: tags
             note.save()
 
         profile = user.get_profile()
