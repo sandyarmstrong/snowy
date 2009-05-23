@@ -8,7 +8,7 @@
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.scrollfollow.js" charset="utf-8"></script>
 {% endblock %}
 
-{% block title %}{{ note.title }} | Notes | {{ block.super }}{% endblock %}
+{% block title %}{{ title|safe }} | Notes | {{ block.super }}{% endblock %}
 
 {% block sidebar %}
 {{ block.super }}
@@ -39,7 +39,7 @@
 <table id="content-layout" cellspacing="0" cellpadding="0">
     <tr>
         <td id="note">
-            <h1>{{ note.title }}</h1>
+            <h1>{{ title|safe }}</h1>
             <div id="funcooker">
                 {{ body|safe }}
             </div>

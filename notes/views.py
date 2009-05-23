@@ -31,6 +31,8 @@ def note_index(request, username,
     # TODO: retrieve the last open note from the user
     last_modified = Note.objects.filter(author=user) \
                                 .order_by('-user_modified')
+    if request.user != user:
+        last_modified = last_modified.filter(permissions=1)
     if last_modified.count() > 0:
         return HttpResponseRedirect(last_modified[0].get_absolute_url())
     
@@ -43,8 +45,10 @@ def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
     user = get_object_or_404(User, username=username)
     note = get_object_or_404(Note, pk=note_id, author=user)
+    public = True if request.user == user or note.permissions == 1 else False
 
-    if note.slug != slug:
+    # TODO: Some sort of redirect if !public
+    if public and note.slug != slug:
         return HttpResponseRedirect(note.get_absolute_url())
     
     # break this out into a function
@@ -58,7 +62,7 @@ def note_detail(request, username, note_id, slug='',
         style = libxslt.parseStylesheetDoc(styledoc)
     
         template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
-        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content))
+        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content if public else ""))
         result = style.applyStylesheet(doc, None)
 
         # libxml2 doesn't munge encodings, so forcibly decode from UTF-8
@@ -76,7 +80,8 @@ def note_detail(request, username, note_id, slug='',
     all_notes = all_notes[:settings.SNOWY_LIST_MAX_NOTES]
     all_notebooks = NoteTag.objects.filter(author=user, is_notebook=True)[:5]
     return render_to_response(template_name,
-                              {'note': note, 'body': body,
+                              {'title': note.title if public else "",
+                               'note': note, 'body': body,
                                'all_notes': all_notes,
                                'all_notebooks': all_notebooks},
                               context_instance=RequestContext(request))

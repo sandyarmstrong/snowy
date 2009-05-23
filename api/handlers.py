@@ -77,7 +77,7 @@ class NotesHandler(BaseHandler):
         notes = Note.objects.filter(author=user)
 
         if request.user != user:
-            notes.filter(permissions=1) # Public only
+            notes = notes.filter(permissions=1) # Public only
 
         if request.GET.has_key('since'):
             notes = notes.filter(last_sync_rev__gt=int(request.GET['since']))
