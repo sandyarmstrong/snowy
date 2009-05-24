@@ -17,8 +17,8 @@
 
 from django.template import RequestContext
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
+from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
 
 from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
 from snowy.notes.models import *
@@ -45,10 +45,11 @@ def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
     user = get_object_or_404(User, username=username)
     note = get_object_or_404(Note, pk=note_id, author=user)
-    public = True if request.user == user or note.permissions == 1 else False
 
-    # TODO: Some sort of redirect if !public
-    if public and note.slug != slug:
+    if request.user != user and note.permissions == 0:
+        return HttpResponseForbidden()
+        
+    if note.slug != slug:
         return HttpResponseRedirect(note.get_absolute_url())
     
     # break this out into a function
@@ -62,7 +63,7 @@ def note_detail(request, username, note_id, slug='',
         style = libxslt.parseStylesheetDoc(styledoc)
     
         template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
-        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content if public else ""))
+        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content))
         result = style.applyStylesheet(doc, None)
 
         # libxml2 doesn't munge encodings, so forcibly decode from UTF-8
@@ -80,7 +81,7 @@ def note_detail(request, username, note_id, slug='',
     all_notes = all_notes[:settings.SNOWY_LIST_MAX_NOTES]
     all_notebooks = NoteTag.objects.filter(author=user, is_notebook=True)[:5]
     return render_to_response(template_name,
-                              {'title': note.title if public else "",
+                              {'title': note.title,
                                'note': note, 'body': body,
                                'all_notes': all_notes,
                                'all_notebooks': all_notebooks},
