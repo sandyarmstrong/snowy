@@ -36,7 +36,7 @@ class Note(models.Model):
     modified = models.DateTimeField(auto_now_add=True)
     user_modified = models.DateTimeField(auto_now_add=True)
 
-    title = models.CharField(max_length=128, blank=True)
+    title = models.TextField(blank=True)
     slug = AutoSlugField(unique_with='author', populate_from='title',
                          editable=True)
     content = models.TextField(blank=True)
