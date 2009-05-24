@@ -96,10 +96,6 @@ class NotesHandler(BaseHandler):
         def clean_date(date):
             return parser.parse(date).astimezone(pytz.timezone(settings.TIME_ZONE))
 
-        def clean_content(content):
-            pieces = content.split('\n', 1)
-            return pieces[-1] if len(pieces) > 1 else ''
-
         user = User.objects.get(username=username)
         if request.user != user:
             return rc.FORBIDDEN
@@ -126,7 +122,7 @@ class NotesHandler(BaseHandler):
                 continue
 
             if c.has_key('title'): note.title = c['title']
-            if c.has_key('note-content'): note.content = clean_content(c['note-content'])
+            if c.has_key('note-content'): note.content = c['note-content']
             if c.has_key('note-content-version'): note.content_version = c['note-content-version']
             if c.has_key('last-change-date'): note.user_modified = clean_date(c['last-change-date'])
             if c.has_key('last-metadata-change-date'):
@@ -178,8 +174,7 @@ def describe_note(note):
     return {
         'guid': note.guid,
         'title': note.title,
-        # TODO: Not entirely sure why I need '\n\n'; where did the leading '\n' go?
-        'note-content': note.title + '\n\n' + note.content,
+        'note-content': note.content,
         'last-change-date': local_iso(note.user_modified),
         'last-metadata-change-date': local_iso(note.modified),
         'create-date': local_iso(note.created),
