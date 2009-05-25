@@ -1,0 +1,61 @@
+TODO
+========================
+ * General
+   - Replace django-evolution with South (http://south.aeracode.org)
+   - Create a NoteManager to handle permissions in one place and unit test
+   - More complicated permissions to allow for sharing
+   - Configurable project name to allow Snowy and Tomboy Online to use roughly
+     the same codebase
+   - Sitemap
+   - Ponies
+
+ * Design
+   - Consistent design throughout site
+   - iPhone/G1 skin/theme
+   - Printable CSS for notes
+   - Snowy logo
+   - Design for _list pages
+
+ * I18N
+   - Audit translatable strings
+   - Interface for detecting/selecting preferred language
+
+ * Accounts
+   - Username blacklist (e.g.: no "admin", "accounts", "registration", etc)
+   - Verify password sanity/strength
+   - Add recaptcha to prevent spammy accounts
+   - Preferences page (what would we use it for?)
+
+ * REST API
+   - Investigate/use OAuth
+   - Audit data leakage
+   - Unit tests
+   - User agent type thing for clients using REST API
+   - Documentation via Piston
+
+ * Note View
+   - Links need to be replaced with note.pk references on import, and
+     replaced back with <link:*/> on sync.
+   - Show which notebooks a note is part of
+   - Note searching
+   - Better page to show when current user can't view a note
+
+ * Note Editing
+   - Delete note link
+   - History viewer
+   - Sharing UI
+   - New note page
+
+ * Note Editor (Funcooker)
+   - Refactor to use customCommand
+   - Link editor UI
+   - Fix bugs when assigning more than one tag to something
+     (e.g.: highlight + large)
+   - Bullets, Increase/Decrease indent buttons
+   - AJAX save every 4 seconds
+   - Translate XHTML back to Tomboy XML for saving
+     + Needs to work in IE7/IE8, Opera, Safari 3/4, FF 3.0/3.5/3.6, Chrome
+
+ * Notebooks
+   - List/detail pages
+   - Add notes to a notebook
