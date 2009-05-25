@@ -1,0 +1,31 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+{% if form.errors %}
+<p>{% trans "Your username and password didn't match. Please try again." %}</p>
+{% endif %}
+<h3>{% trans "Log in" %}</h3>
+
+<form method="post" action=".">
+<table>
+<tr>
+    <td>{{ form.username.label_tag }}</td>
+    <td>{{ form.username }}</td>
+</tr>
+<tr>
+    <td>{{ form.password.label_tag }}</td>
+    <td>{{ form.password }}</td>
+</tr>
+</table>
+
+<input type="submit" value="login" />
+{% if next %}
+<input type="hidden" name="next" value="{{ next }}" />
+{% else %}
+<input type="hidden" name="next" value="/" />
+{% endif %}
+</form>
+{% endblock %}
+

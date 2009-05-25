@@ -1,9 +1,22 @@
 {% extends 'site_base.html' %}
 
-{% block body %}
-<form method='POST'>
-{{ form.as_p }}
+{% load i18n %}
 
-<input method="submit" type="submit">
+{% block content %}
+<h1>{% trans "Create an account" %}</h1>
+<form method='POST'>
+    <table class="form-field">
+        <tbody>
+            {{ form.as_table }}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th></th>
+                <td>
+                    <input method="submit" type="submit" value="Create Account"/>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
 </form>
 {% endblock %}

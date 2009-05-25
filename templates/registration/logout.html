@@ -1,0 +1,12 @@
+{% extends "site_base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+<h3>{{ title }}</h3>
+<p>{% blocktrans %}You have been successfully logged out.  You're coming back, right?{% endblocktrans %}</p>
+<p>
+<a href="{% url django.contrib.auth.views.login %}">{% trans "Log in again" %}</a>
+</p>
+{% endblock %}
+
