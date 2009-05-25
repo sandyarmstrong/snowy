@@ -23,6 +23,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^$', 'django.views.generic.simple.direct_to_template', {'template': 'index.html'}),
+
     (r'^registration/', include('registration.urls')),
 
     (r'^(?P<username>\w+)/notes/', include('snowy.notes.urls')),

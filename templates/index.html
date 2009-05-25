@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+{% blocktrans %}
+<h1>Welcome to Snowy!</h1>
+<p>Snowy is Tomboy's best friend on the web.  Snowy is an online service that
+allows you to view, edit and share the notes you create in Tomboy on your
+desktop computer.  Powered by <a
+href="http://www.djangoproject.com">Django</a>, it features a REST-based API
+for synchronizing notes, an intuitive editor and moxie; lots of moxie.</p>
+
+<p>Thank you for your interest in Snowy.  Snowy is currently under heavy
+development and is <strike>not ready</strike><b>REALLY</b> not ready for
+production use.  Like any good K9 companion, Snowy will file your taxes
+improperly, reconsile with your ex-girlfriends and burn risotto if not watched
+carefully.</p>
+
+<p>If you want to house-train Snowy and teach him some new tricks, check out
+the TODO and start contributing.  P.S., Have I told you how much you rock?</p>
+{% endblocktrans %}
+{% endblock %}
