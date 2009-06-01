@@ -73,16 +73,8 @@ def note_detail(request, username, note_id, slug='',
         if doc != None: doc.freeDoc()
         if result != None: result.freeDoc()
 
-    all_notes = Note.objects.filter(author=user) \
-                            .order_by('-pinned', '-user_modified')
-    if request.user != user:
-        all_notes = all_notes.filter(permissions=1) # Public
-
-    all_notes = all_notes[:settings.SNOWY_LIST_MAX_NOTES]
-    all_notebooks = NoteTag.objects.filter(author=user, is_notebook=True)[:5]
     return render_to_response(template_name,
                               {'title': note.title,
                                'note': note, 'body': body,
-                               'all_notes': all_notes,
-                               'all_notebooks': all_notebooks},
+                               'request': request, 'user': user},
                               context_instance=RequestContext(request))
