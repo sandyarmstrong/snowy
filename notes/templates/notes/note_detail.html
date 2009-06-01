@@ -13,7 +13,7 @@
 
 {% block sidebar %}
 {{ block.super }}
-{% user_notes_list request user as all_notes %}
+{% user_notes_list request author as all_notes %}
 <div id="sidebar-note-list">
     <ul>
 {% for n in all_notes %}
@@ -29,7 +29,7 @@
 <div id="sidebar-notebook-list">
     <h3>{% trans "Notebooks" %}</h3>
     <ul> 
-{% user_notebook_list request user as all_notebooks %}
+{% user_notebook_list request author as all_notebooks %}
 {% for n in all_notebooks %}
         <li class="notebook-item"><a href="#">{{ n.get_name_for_display }}</a></li>
 {% endfor %}

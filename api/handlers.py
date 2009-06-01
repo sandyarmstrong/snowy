@@ -73,16 +73,13 @@ class NotesHandler(BaseHandler):
 
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
-        user = User.objects.get(username=username)
-        notes = Note.objects.filter(author=user)
-
-        if request.user != user:
-            notes = notes.filter(permissions=1) # Public only
+        author = User.objects.get(username=username)
+        notes = Note.objects.user_viewable(request.user, author)
 
         if request.GET.has_key('since'):
             notes = notes.filter(last_sync_rev__gt=int(request.GET['since']))
 
-        response = {'latest-sync-revision': user.get_profile().latest_sync_rev}
+        response = {'latest-sync-revision': author.get_profile().latest_sync_rev}
         if request.GET.has_key('include_notes'):
             response['notes'] = [describe_note(n) for n in notes]
         else:
@@ -96,14 +93,14 @@ class NotesHandler(BaseHandler):
         def clean_date(date):
             return parser.parse(date).astimezone(pytz.timezone(settings.TIME_ZONE))
 
-        user = User.objects.get(username=username)
-        if request.user != user:
+        author = User.objects.get(username=username)
+        if request.user != author:
             return rc.FORBIDDEN
 
         update = json.loads(request.raw_post_data)
         changes = update['note-changes']
 
-        current_sync_rev = user.get_profile().latest_sync_rev
+        current_sync_rev = author.get_profile().latest_sync_rev
         new_sync_rev = current_sync_rev + 1
 
         if update.has_key('latest-sync-revision'):
@@ -114,7 +111,7 @@ class NotesHandler(BaseHandler):
             return rc.BAD_REQUEST
 
         for c in changes:
-            note, created = Note.objects.get_or_create(author=user,
+            note, created = Note.objects.get_or_create(author=author,
                                                        guid=c['guid'])
 
             if c.has_key('command') and c['command'] == 'delete':
@@ -135,21 +132,21 @@ class NotesHandler(BaseHandler):
             if c.has_key('tags'):
                 note.tags.clear()
                 for tag_name in c['tags']:
-                    tag, created = NoteTag.objects.get_or_create(author=user,
+                    tag, created = NoteTag.objects.get_or_create(author=author,
                                                                  name=tag_name)
                     note.tags.add(tag)
 
             note.last_sync_rev = new_sync_rev
             note.save()
 
-        profile = user.get_profile()
+        profile = author.get_profile()
         if len(changes) > 0:
             profile.latest_sync_rev = new_sync_rev
             profile.save()
         
         return {
             'latest-sync-revision': profile.latest_sync_rev,
-            'notes': [simple_describe_note(n) for n in Note.objects.filter(author=user)]
+            'notes': [simple_describe_note(n) for n in Note.objects.filter(author=author)]
         }
 
 
@@ -160,9 +157,9 @@ class NoteHandler(BaseHandler):
 
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username, note_id, slug):
-        user = User.objects.get(username=username)
+        author = User.objects.get(username=username)
         note = Note.objects.get(pk=note_id, slug=slug)
-        if request.user != user and note.permissions == 0:
+        if request.user != author and note.permissions == 0:
             return rc.FORBIDDEN
         return {'note': [describe_note(note)]}
 

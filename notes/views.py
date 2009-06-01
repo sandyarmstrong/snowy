@@ -26,27 +26,25 @@ from snowy import settings
 
 def note_index(request, username,
                template_name='note/note_index.html'):
-    user = get_object_or_404(User, username=username)
+    author = get_object_or_404(User, username=username)
 
     # TODO: retrieve the last open note from the user
-    last_modified = Note.objects.filter(author=user) \
+    last_modified = Note.objects.user_viewable(request.user, author) \
                                 .order_by('-user_modified')
-    if request.user != user:
-        last_modified = last_modified.filter(permissions=1)
     if last_modified.count() > 0:
         return HttpResponseRedirect(last_modified[0].get_absolute_url())
     
     # TODO: Instruction page to tell user to either sync or create a new note
     return render_to_response(template_name,
-                              {'user': user},
+                              {'author': author},
                               context_instance=RequestContext(request))
 
 def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
-    user = get_object_or_404(User, username=username)
-    note = get_object_or_404(Note, pk=note_id, author=user)
+    author = get_object_or_404(User, username=username)
+    note = get_object_or_404(Note, pk=note_id, author=author)
 
-    if request.user != user and note.permissions == 0:
+    if request.user != author and note.permissions == 0:
         return HttpResponseForbidden()
         
     if note.slug != slug:
@@ -76,5 +74,5 @@ def note_detail(request, username, note_id, slug='',
     return render_to_response(template_name,
                               {'title': note.title,
                                'note': note, 'body': body,
-                               'request': request, 'user': user},
+                               'request': request, 'author': author},
                               context_instance=RequestContext(request))

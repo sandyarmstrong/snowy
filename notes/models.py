@@ -23,6 +23,8 @@ from django.db import models
 
 from autoslug.fields import AutoSlugField
 
+from snowy.notes.managers import NoteManager
+
 class Note(models.Model):
     NOTE_PERMISSIONS = (
         (0, 'Private'), (1, 'Public'), 
@@ -50,6 +52,8 @@ class Note(models.Model):
     pinned = models.BooleanField(default=False)
     
     last_sync_rev = models.IntegerField(default=-1)
+
+    objects = NoteManager()
 
     class Meta:
         get_latest_by = 'user_modified'
