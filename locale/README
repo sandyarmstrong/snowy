@@ -1,0 +1,8 @@
+To make translations:
+
+Read: http://docs.djangoproject.com/en/dev/topics/i18n/#id1
+
+Basically, you just need to run a command like this:
+django-admin.py makemessages -l fr_FR
+
+Then edit locale/fr_FR/LC_MESSAGES/django.po to add your translations.
