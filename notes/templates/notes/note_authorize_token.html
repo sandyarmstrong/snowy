@@ -1,0 +1,13 @@
+{% extends 'notes/base.html' %}
+
+{% block title %}Notes | {{ block.super }}{% endblock %}
+{% block content %}
+<p>
+        <form action="{% url piston.authentication.oauth_user_auth %}" method="POST">
+            <table>
+            {{ form.as_table }}
+            </table>
+            <input type="submit">
+        </form>
+{% endblock %}
+
