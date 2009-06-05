@@ -17,13 +17,14 @@
 
 from django.conf.urls.defaults import *
 
-from piston.authentication import HttpBasicAuthentication
+from piston.authentication import HttpBasicAuthentication, OAuthAuthentication
 from piston.resource import Resource
 
 from snowy.api.handlers import *
 
 auth = HttpBasicAuthentication(realm='Snowy')
-ad = {'authentication': auth}
+authoauth = OAuthAuthentication(realm='Snowy')
+ad = {'authentication': authoauth}
 
 user_handler = Resource(UserHandler)
 notes_handler = Resource(handler=NotesHandler, **ad)

@@ -24,6 +24,8 @@ from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
 from snowy.notes.models import *
 from snowy import settings
 
+from piston import forms as piston_forms
+
 def note_index(request, username,
                template_name='note/note_index.html'):
     author = get_object_or_404(User, username=username)
@@ -76,3 +78,11 @@ def note_detail(request, username, note_id, slug='',
                                'note': note, 'body': body,
                                'request': request, 'author': author},
                               context_instance=RequestContext(request))
+    
+def note_oauth_auth_view(request, token, callback, params):
+    form = piston_forms.OAuthAuthenticationForm(initial={
+        'oauth_token': token.key,
+        'oauth_callback': callback,
+        })
+    return render_to_response('notes/note_authorize_token.html',
+            { 'form': form }, RequestContext(request))

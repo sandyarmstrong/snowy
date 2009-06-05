@@ -99,6 +99,7 @@ INSTALLED_APPS = (
     'reversion',
     'gravatar',
     'autoslug',
+    'piston',
 
     # Local apps
     'notes',
