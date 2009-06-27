@@ -46,6 +46,19 @@ class catch_and_return(object):
                 return self.response
         return wrapper
 
+# http://domain/api/1.0
+class RootHandler(BaseHandler):
+    allow_methods = ('GET')
+
+    def read(self, request):
+        return {
+            'user-ref': {
+                'api-ref' : 'http://%s%s' % (settings.DOMAIN_NAME, '/api/1.0/' + request.user.username),
+                'href' : 'http://%s%s' % (settings.DOMAIN_NAME, '/' + request.user.username)
+            },
+            'api-version': '1.0'
+        }
+
 # http://domain/api/1.0/user
 class UserHandler(AnonymousBaseHandler):
     allow_methods = ('GET',)
@@ -56,6 +69,7 @@ class UserHandler(AnonymousBaseHandler):
         profile = user.get_profile()
         reverse_args = {'username': username}
         return {
+            'user-name': user.username,
             'first-name': user.first_name,
             'last-name': user.last_name,
             'notes-ref': {

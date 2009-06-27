@@ -26,6 +26,7 @@ auth = HttpBasicAuthentication(realm='Snowy')
 authoauth = OAuthAuthentication(realm='Snowy')
 ad = {'authentication': authoauth}
 
+root_handler = Resource(handler=RootHandler, **ad)
 user_handler = Resource(UserHandler)
 notes_handler = Resource(handler=NotesHandler, **ad)
 note_handler = Resource(handler=NoteHandler, **ad)
@@ -35,4 +36,5 @@ urlpatterns = patterns('',
     url(r'1.0/(?P<username>\w+)/notes/(?P<note_id>\d+)/$', note_handler, name='note_api_detail'),
     url(r'1.0/(?P<username>\w+)/notes/$', notes_handler, name='note_api_index'),
     url(r'1.0/(?P<username>\w+)/$', user_handler),
+    url(r'1.0/$', root_handler),
 )
