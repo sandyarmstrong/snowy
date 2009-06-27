@@ -9,6 +9,8 @@ Running Snowy From Your Git Checkout
 
 2. Set up your local settings file (in your snowy git checkout):
 	cp local_settings.py.in local_settings.py
+	(Make sure to set DOMAIN_NAME appropriately in this file. It should come
+	from http://DOMAIN_NAME/myusername/notes , and defaults to 'localhost:8000'.)
 
 3. Setup snowy database (in your snowy git checkout):
 	python manage.py syncdb
@@ -17,10 +19,10 @@ Running Snowy From Your Git Checkout
 	python manage.py runserver
 
 5. Admin your snowy:
-	http://127.0.0.1:8000/admin (you can add notes here for now)
+	http://localhost:8000/admin
 
 6. Play with snowy:
-	http://127.0.0.1:8000/notes/1 (for example)
+	http://localhost:8000/myusername/notes (for example)
 
 
 Installing/Deploying Snowy
