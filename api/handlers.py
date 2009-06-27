@@ -59,8 +59,8 @@ class UserHandler(AnonymousBaseHandler):
             'first-name': user.first_name,
             'last-name': user.last_name,
             'notes-ref': {
-                'api-ref': reverse('note_api_index', kwargs=reverse_args),
-                'href': reverse('note_index', kwargs=reverse_args),
+                'api-ref': 'http://%s%s' % (settings.DOMAIN_NAME, reverse('note_api_index', kwargs=reverse_args)),
+                'href': 'http://%s%s' % (settings.DOMAIN_NAME, reverse('note_index', kwargs=reverse_args)),
             },
             'latest-sync-revision' : profile.latest_sync_rev,
             'current-sync-guid' : profile.current_sync_uuid
@@ -185,11 +185,11 @@ def simple_describe_note(note):
     return {
         'guid': note.guid,
         'ref': {
-            'api-ref': reverse('note_api_detail', kwargs={
+            'api-ref': 'http://%s%s' % (settings.DOMAIN_NAME, reverse('note_api_detail', kwargs={
                 'username': note.author.username,
                 'note_id': note.pk,
-            }),
-            'href': note.get_absolute_url(),
+            })),
+            'href': 'http://%s%s' % (settings.DOMAIN_NAME, note.get_absolute_url()),
         },
         'title': note.title
     }

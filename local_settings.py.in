@@ -7,3 +7,4 @@ DATABASE_ENGINE = 'sqlite3'    # 'postgresql_psycopg2', 'postgresql', 'mysql', '
 DATABASE_NAME = 'snowy.db'  # Or path to database file if using sqlite3.
 
 OAUTH_AUTH_VIEW = "notes.views.note_oauth_auth_view"
+DOMAIN_NAME = 'localhost:8000'
