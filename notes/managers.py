@@ -22,5 +22,5 @@ class NoteManager(models.Manager):
         notes = self.filter(author=author)
         if request_user != author:
             # Public notes only
-            notes.filter(permissions=1) 
+            notes = notes.filter(permissions=1) 
         return notes
