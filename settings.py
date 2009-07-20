@@ -38,6 +38,11 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
+LANGUAGES = (
+    ('ru', 'Russian'),
+    ('en', 'English'),
+)
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'site_media')
@@ -75,6 +80,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.csrf.middleware.CsrfViewMiddleware',
     'django.contrib.csrf.middleware.CsrfResponseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
