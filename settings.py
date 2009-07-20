@@ -95,7 +95,7 @@ INSTALLED_APPS = (
 
     # External apps
     'registration',
-    'django_evolution',
+    'south',
     'reversion',
     'gravatar',
     'autoslug',
