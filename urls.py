@@ -15,17 +15,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.conf.urls.defaults import *
 from django.views.generic.list_detail import object_list, object_detail
+from django.views.generic.simple import direct_to_template
+from django.contrib.auth import views as auth_views
+from django.conf.urls.defaults import *
+
+from snowy.users.forms import RegistrationFormUniqueUser
 from snowy.notes.models import Note
+
+from registration.views import activate
+from registration.views import register
 
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^$', 'django.views.generic.simple.direct_to_template', {'template': 'index.html'}),
-
-    (r'^registration/', include('registration.urls')),
 
     (r'^(?P<username>\w+)/notes/', include('snowy.notes.urls')),
 
@@ -37,6 +42,30 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
+)
+
+# Registration URLs
+urlpatterns += patterns('',
+    url(r'^registration/activate/(?P<activation_key>\w+)/$', activate, name='registration_activate'),
+    url(r'^registration/login/$', auth_views.login, {'template_name': 'registration/login.html'},
+        name='auth_login'),
+    url(r'^registration/logout/$', auth_views.logout, {'template_name': 'registration/logout.html'},
+        name='auth_logout'),
+    url(r'^registration/password/change/$', auth_views.password_change, name='auth_password_change'),
+    url(r'^registration/password/change/done/$', auth_views.password_change_done,
+        name='auth_password_change_done'),
+    url(r'^registration/password/reset/$', auth_views.password_reset, name='auth_password_reset'),
+    url(r'^registration/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        auth_views.password_reset_confirm, name='auth_password_reset_confirm'),
+    url(r'^registration/password/reset/complete/$', auth_views.password_reset_complete,
+        name='auth_password_reset_complete'),
+    url(r'^registration/password/reset/done/$', auth_views.password_reset_done,
+        name='auth_password_reset_done'),
+    url(r'^registration/register/$', register, {'form_class': RegistrationFormUniqueUser},
+        name='registration_register'),
+    url(r'^registration/register/complete/$', direct_to_template,
+        {'template': 'registration/registration_complete.html'},
+        name='registration_complete'),
 )
 
 from django.conf import settings

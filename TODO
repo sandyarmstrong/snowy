@@ -20,7 +20,6 @@ TODO
    - Interface for detecting/selecting preferred language
 
  * Accounts
-   - Username blacklist (e.g.: no "admin", "accounts", "registration", etc)
    - Verify password sanity/strength
    - Add recaptcha to prevent spammy accounts
    - Preferences page (what would we use it for?)

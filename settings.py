@@ -108,7 +108,7 @@ INSTALLED_APPS = (
 # Maximum number of notes to show on the notes_detail list.
 SNOWY_LIST_MAX_NOTES = 18
 
-ACCOUNT_ACTIVATION_DAYS = 30
+ACCOUNT_ACTIVATION_DAYS = 15
 
 AUTH_PROFILE_MODULE = 'notes.UserProfile'
 
