@@ -22,7 +22,7 @@ from snowy.notes.models import *
 class NoteAdmin(VersionAdmin):
     list_display = ('created', 'author', 'title')
     search_fields = ['body', 'title']
-    prepopulated_fields = {"slug": ("title",)}
+    prepopulated_fields = {'slug': ('title',)}
 
 admin.site.register(Note, NoteAdmin)
 admin.site.register(NoteTag)
