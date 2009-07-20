@@ -3,8 +3,6 @@ TODO
  * General
    - Create a NoteManager to handle permissions in one place and unit test
    - More complicated permissions to allow for sharing
-   - Configurable project name to allow Snowy and Tomboy Online to use roughly
-     the same codebase
    - Sitemap
    - Ponies
 
