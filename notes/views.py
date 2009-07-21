@@ -63,7 +63,7 @@ def note_detail(request, username, note_id, slug='',
         style = libxslt.parseStylesheetDoc(styledoc)
     
         template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
-        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content))
+        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content.encode('UTF-8')))
         result = style.applyStylesheet(doc, None)
 
         # libxml2 doesn't munge encodings, so forcibly decode from UTF-8
