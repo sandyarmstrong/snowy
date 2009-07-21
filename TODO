@@ -9,7 +9,6 @@ TODO
  * Design
    - Consistent design throughout site
    - iPhone/G1 skin/theme
-   - Printable CSS for notes
    - Snowy logo
    - Design for _list pages
 
@@ -23,7 +22,6 @@ TODO
    - Preferences page (what would we use it for?)
 
  * REST API
-   - Investigate/use OAuth
    - Audit data leakage
    - Unit tests
    - User agent type thing for clients using REST API
