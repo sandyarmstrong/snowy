@@ -1,0 +1,8 @@
+Hello {{ user }},
+
+Access to Snowy via {{ consumer }} has been discontinued.  You can no longer
+use it to access Snowy.
+
+Best regards,
+
+The Snowy Team

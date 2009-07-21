@@ -119,6 +119,7 @@ INSTALLED_APPS = (
 
     # Local apps
     'notes',
+    'api',
 )
 
 # Maximum number of notes to show on the notes_detail list.

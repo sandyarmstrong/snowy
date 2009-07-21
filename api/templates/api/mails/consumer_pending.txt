@@ -1,0 +1,8 @@
+Hello {{ user }},
+
+We have received your application to access Snowy with {{ consumer }}.  We are
+currently reviewing it; you will receive an email as soon as it is accepted.
+
+Best regards,
+
+The Snowy Team

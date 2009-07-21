@@ -1,0 +1,7 @@
+Hello {{ user }},
+
+Good news!  You can now use {{ consumer }} to access Snowy.
+
+Best regards,
+
+The Snowy Team
