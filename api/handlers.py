@@ -31,7 +31,13 @@ from snowy.notes.models import Note
 from snowy.notes.models import NoteTag
 from snowy import settings
 
-import json, pytz
+import pytz
+
+# Use simplejson or Python 2.6 json, prefer simplejson.
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 class catch_and_return(object):
     def __init__(self, err, response):
