@@ -78,11 +78,3 @@ def note_detail(request, username, note_id, slug='',
                                'note': note, 'body': body,
                                'request': request, 'author': author},
                               context_instance=RequestContext(request))
-    
-def note_oauth_auth_view(request, token, callback, params):
-    form = piston_forms.OAuthAuthenticationForm(initial={
-        'oauth_token': token.key,
-        'oauth_callback': callback,
-        })
-    return render_to_response('notes/note_authorize_token.html',
-            { 'form': form }, RequestContext(request))
