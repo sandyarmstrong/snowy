@@ -102,6 +102,10 @@ import sys
 sys.path.append(EXTERNAL_APPS_PATH)
 
 INSTALLED_APPS = (
+    # Local apps
+    'api',
+    'notes',
+
     # System apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -116,10 +120,6 @@ INSTALLED_APPS = (
     'gravatar',
     'autoslug',
     'piston',
-
-    # Local apps
-    'notes',
-    'api',
 )
 
 # Maximum number of notes to show on the notes_detail list.

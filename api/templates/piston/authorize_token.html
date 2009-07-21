@@ -1,13 +1,18 @@
 {% extends 'notes/base.html' %}
 
-{% block title %}Notes | {{ block.super }}{% endblock %}
+{% block title %}Allow Access? | {{ block.super }}{% endblock %}
 {% block content %}
-<p>
+        <h1>Allow Access?</h1>
+        <p>Permitting this application to access {{ PROJECT_NAME }} will allow
+        it to view, edit and delete your information on {{ PROJECT_NAME }}.  Access can
+        be revoked at any time on the Preferences page.</p>
         <form action="{% url piston.authentication.oauth_user_auth %}" method="POST">
-            <table>
-            {{ form.as_table }}
-            </table>
-            <input type="submit">
+            {{ form.oauth_token }}
+            {{ form.oauth_callback }}
+            {{ form.csrf_signature }}
+            <input type="hidden" name="authorize_access" value="on">
+            <br />
+            <input type="submit" value="Allow"> or <a href="{% url snowy_index %}">cancel</a>
         </form>
 {% endblock %}
 
