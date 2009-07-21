@@ -176,9 +176,9 @@ class NoteHandler(BaseHandler):
     model = Note
 
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
-    def read(self, request, username, note_id, slug):
+    def read(self, request, username, note_id):
         author = User.objects.get(username=username)
-        note = Note.objects.get(pk=note_id, slug=slug)
+        note = Note.objects.get(pk=note_id, author=author)
         if request.user != author and note.permissions == 0:
             return rc.FORBIDDEN
         return {'note': [describe_note(note)]}
