@@ -1,0 +1,104 @@
+html, body {
+    background-color: #FFFFFF;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #000000;
+    font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
+}
+
+img {
+    border: none;
+}
+
+.clear {
+    clear: both;
+}
+
+#header-container {
+    margin: 10px;
+}
+
+#header-logo {
+    float: left;
+}
+
+#header-auth {
+    display: none;
+}
+
+#header-avatar {
+    display: none;
+}
+
+table#container {
+    padding: 5px 3px 0 3px;
+    width: 100%;
+    border: 0;
+}
+
+td#sidebar-container {
+    width: 0%;
+    margin: 0;
+    vertical-align: top;
+}
+
+#sidebar {
+    display: none;
+    margin: 0;
+    padding: 0;
+}
+
+#content {
+    background-color: #FFFFFF;
+    font-family: Candara, Verdana, Tahmoa, Arial, sans-serif;
+}
+
+#content h1 {
+    margin: 0.2em 0 0.2em 0;
+}
+
+#content-layout td {
+    padding: 8px;
+    vertical-align: top;
+}
+
+table#content-layout {
+    width: 100%;
+}
+
+#toolbar {
+    display: none;
+}
+
+#footer {
+    display: none;
+}
+
+.form-field th {
+    text-align: left;
+}
+
+/* Note-specific styles */
+
+.note-highlight {
+    background-color: yellow;
+}
+
+.note-monospace {
+    font-family: Consolas, monospace;
+}
+
+.note-size-small {
+    font-size: 0.8em;
+}
+
+.note-size-large {
+    font-size: 1.5em;
+}
+
+.note-size-huge {
+    font-size: 2.0em;
+}
