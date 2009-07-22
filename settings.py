@@ -40,6 +40,7 @@ USE_I18N = True
 
 LANGUAGES = (
     ('ru', 'Russian'),
+    ('zh_CH', 'Chinese (Simplified)'),
     ('en', 'English'),
 )
 
