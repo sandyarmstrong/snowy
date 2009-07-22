@@ -26,18 +26,18 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
     Subclass of ``RegistrationFormUniqueEmail`` which verifies usernames
     against a blacklist.
     """
+    captcha = ReCaptchaField(label=_(u'Word Verification'))
+
     username_blacklist = ['about', 'accounts', 'admin', 'api', 'blog',
                           'contact', 'css', 'friends', 'images', 'index.html',
                           'news', 'notes', 'oauth', 'pony', 'register',
                           'registration', 'site_media', 'snowy', 'tomboy']
 
     def __init__(self, *args, **kwargs):
-        # This must be done before we init our base class so that the field can
-        # be properly initialized in the base __init__.
-        if settings.RECAPTCHA_ENABLED:
-            self.captcha = ReCaptchaField(label=_(u'Word Verification'))
-        
         super(RegistrationFormUniqueUser, self).__init__(*args, **kwargs)
+
+        if not settings.RECAPTCHA_ENABLED:
+            del self.fields['captcha']
         
         self.fields['username'].label = _(u'Username:')
         self.fields['username'].help_text = _(u'Maximum of 30 characters in length.')
