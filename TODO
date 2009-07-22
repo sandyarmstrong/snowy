@@ -19,7 +19,9 @@ TODO
  * Accounts
    - Verify password sanity/strength
    - Add recaptcha to prevent spammy accounts
-   - Preferences page (what would we use it for?)
+   - Preferences page
+     + Language selection
+     + API access
 
  * REST API
    - Audit data leakage
