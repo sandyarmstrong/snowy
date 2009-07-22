@@ -7,12 +7,12 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TOMBOY_0_15_1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-05 10:56-0700\n"
+"POT-Creation-Date: 2009-07-22 09:39-0400\n"
 "PO-Revision-Date: 2009-06-05 23:42+0400\n"
 "Last-Translator: Viatcheslav Ivanov <amikeco@gmail.com>\n"
 "Language-Team: Russian <ru@example.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: utf-8\n"
 
 #: lib/registration/forms.py:36
@@ -47,13 +47,17 @@ msgstr "Я прочитал условия и согласен с ними."
 msgid ""
 "This email address is already in use. Please supply a different email "
 "address."
-msgstr "Такой адрес электронной почты уже занят другим пользователем. Пожалуйста, попробуйте другой."
+msgstr ""
+"Такой адрес электронной почты уже занят другим пользователем. Пожалуйста, "
+"попробуйте другой."
 
 #: lib/registration/forms.py:133
 msgid ""
 "Registration using free email addresses is prohibited. Please supply a "
 "different email address."
-msgstr "Регистрация с использованием адрес с бесплатных почтовых серверов запрещена. Воспользуйтесь другим адресом почты."
+msgstr ""
+"Регистрация с использованием адрес с бесплатных почтовых серверов запрещена. "
+"Воспользуйтесь другим адресом почты."
 
 #: lib/registration/models.py:218
 msgid "user"
@@ -188,71 +192,79 @@ msgstr "Блокноты"
 msgid "More Notebooks..."
 msgstr "Остальные блокноты..."
 
-#: templates/base.html:25
+#: templates/base.html:26
 msgid "tomboy: simple note-taking."
 msgstr "tomboy: простые заметки."
 
-#: templates/base.html:36
+#: templates/base.html:37
 msgid "preferences"
 msgstr "параметры"
 
-#: templates/base.html:36
+#: templates/base.html:37
 msgid "log out"
 msgstr "выйти"
 
-#: templates/base.html:38
+#: templates/base.html:39
 msgid "hello stranger! care to "
 msgstr "Здравствуй, незнакомец! Хочешь "
 
-#: templates/base.html:38
+#: templates/base.html:39
 msgid "log in"
 msgstr "войти"
 
-#: templates/base.html:38
+#: templates/base.html:39
 msgid "?"
 msgstr "?"
 
-#: templates/base.html:39
+#: templates/base.html:40
 msgid "not a member yet?"
 msgstr "Нет регистрации?"
 
-#: templates/base.html:39
+#: templates/base.html:40
 msgid "Sign up."
 msgstr "Зарегистрироваться."
 
 #: templates/index.html:6
+#, fuzzy, python-format
 msgid ""
 "\n"
-"<h1>Welcome to Snowy!</h1>\n"
-"<p>Snowy is Tomboy's best friend on the web.  Snowy is an online service "
-"that\n"
-"allows you to view, edit and share the notes you create in Tomboy on your\n"
-"desktop computer.  Powered by <a\n"
+"<h1>Welcome to %(PROJECT_NAME)s!</h1>\n"
+"<p>%(PROJECT_NAME)s is Tomboy's best friend on the web.  %(PROJECT_NAME)s\n"
+"is an online service that allows you to view, edit and share the notes you\n"
+"create in Tomboy on your desktop computer.  Powered by <a\n"
 "href=\"http://www.djangoproject.com\">Django</a>, it features a REST-based "
 "API\n"
 "for synchronizing notes, an intuitive editor and moxie; lots of moxie.</p>\n"
 "\n"
-"<p>Thank you for your interest in Snowy.  Snowy is currently under heavy\n"
-"development and is <strike>not ready</strike><b>REALLY</b> not ready for\n"
-"production use.  Like any good K9 companion, Snowy will file your taxes\n"
-"improperly, reconcile with your ex-girlfriends and burn risotto if not "
-"watched\n"
-"carefully.</p>\n"
+"<p>Thank you for your interest in %(PROJECT_NAME)s.  %(PROJECT_NAME)s is\n"
+"currently under heavy development and is <strike>not\n"
+"ready</strike><b>REALLY</b> not ready for production use.  Like any good K9\n"
+"companion, %(PROJECT_NAME)s will file your taxes improperly, reconcile with\n"
+"your ex-girlfriends and burn risotto if not watched carefully.</p>\n"
 "\n"
-"<p>If you want to house-train Snowy and teach him some new tricks, check "
-"out\n"
-"the TODO and start contributing.  P.S., Have I told you how much you rock?</"
-"p>\n"
+"<p>If you want to house-train %(PROJECT_NAME)s and teach him some new "
+"tricks,\n"
+"check out the TODO and start contributing.  P.S., Have I told you how much "
+"you\n"
+"rock?</p>\n"
 msgstr ""
 "\n"
 "<h1>Добро пожаловать в Snowy</h1>\n"
 "<p>Snowy лучший друг для Tomboy в Сети. Snowy -- онлайновая служба, которая\n"
-"помогает просматривать, редактировать и показывать другим заметки, созданные в Tomboy на вашем компьютере. Основанный на <a\n"
-"href=\"http://www.djangoproject.com\">Django</a> интерфейс позволяет синхронизировать заметки, предоставляет интуитивно понятный редактор и вселяет уверенность.</p>\n"
+"помогает просматривать, редактировать и показывать другим заметки, созданные "
+"в Tomboy на вашем компьютере. Основанный на <a\n"
+"href=\"http://www.djangoproject.com\">Django</a> интерфейс позволяет "
+"синхронизировать заметки, предоставляет интуитивно понятный редактор и "
+"вселяет уверенность.</p>\n"
 "\n"
-"<p>Спасибо за интерес к Snowy. В настоящее время Snowy находится на стадии активной разработки и ДЕЙСТВИТЕЛЬНО не подходит для продуктивного использования. Если за Snowy не присматривать, то гавайская смесь точно пригорит, а документы в налоговую будут заполнены криво :)</p>\n"
+"<p>Спасибо за интерес к Snowy. В настоящее время Snowy находится на стадии "
+"активной разработки и ДЕЙСТВИТЕЛЬНО не подходит для продуктивного "
+"использования. Если за Snowy не присматривать, то гавайская смесь точно "
+"пригорит, а документы в налоговую будут заполнены криво :)</p>\n"
 "\n"
-"<p>Если вы хотите приручить Snowy и научить его новым трюкам, посмотрите в наш todo список и подключайтесь. ЗЫ: Я уже сказал, что в восторге от вас?</p>\n"
+"<p>Если вы хотите приручить Snowy и научить его новым трюкам, посмотрите в "
+"наш todo список и подключайтесь. ЗЫ: Я уже сказал, что в восторге от вас?</"
+"p>\n"
 "\n"
 "<p></p>\n"
 
@@ -275,3 +287,8 @@ msgstr "Войти снова"
 #: templates/registration/registration_form.html:6
 msgid "Create an account"
 msgstr "Создать учётную запись"
+
+#: users/forms.py:38
+#, fuzzy
+msgid "This username has been reserved.  Please choose another."
+msgstr "Такой логин уже занят, выберите другой."

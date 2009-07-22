@@ -1,4 +1,5 @@
 *~
 *.pyc
+*.mo
 snowy.db
 local_settings.py
