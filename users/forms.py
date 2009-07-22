@@ -26,7 +26,7 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
     Subclass of ``RegistrationFormUniqueEmail`` which verifies usernames
     against a blacklist.
     """
-    captcha = ReCaptchaField(label=_(u'Word Verification'))
+    captcha = ReCaptchaField(label=_(u'Verify words:'))
 
     username_blacklist = ['about', 'accounts', 'admin', 'api', 'blog',
                           'contact', 'css', 'friends', 'images', 'index.html',

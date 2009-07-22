@@ -2,10 +2,12 @@
 
 {% load i18n %}
 
+{% block title %}{% trans "Create an account" %} | {{ block.super }}{% endblock %}
+
 {% block content %}
 <h1>{% trans "Create an account" %}</h1>
 <form method='POST'>
-    <table class="form-field">
+    <table class="input-form">
         <tbody>
             {{ form.as_table }}
         </tbody>
@@ -13,7 +15,7 @@
             <tr>
                 <th></th>
                 <td>
-                    <input method="submit" type="submit" value="Create Account"/>
+                    <input method="submit" type="submit" value="{% trans "Create Account" %}"/>
                 </td>
             </tr>
         </tfoot>

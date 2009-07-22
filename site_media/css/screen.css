@@ -292,3 +292,21 @@ a.link-broken {
 a.link-url {
     color: #3465A4;
 }
+
+table.input-form {
+    border-spacing: 13px;
+}
+
+.input-form label {
+    text-align: left;
+    float: left;
+}
+
+.input-form th {
+    vertical-align: top;
+}
+
+.input-form td {
+    font-size: 0.7em;
+    vertical-align: top;
+}
