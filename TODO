@@ -17,8 +17,6 @@ TODO
    - Interface for detecting/selecting preferred language
 
  * Accounts
-   - Verify password sanity/strength
-   - Add recaptcha to prevent spammy accounts
    - Preferences page
      + Language selection
      + API access

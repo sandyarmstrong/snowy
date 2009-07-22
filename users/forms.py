@@ -17,6 +17,8 @@
 
 from registration.forms import RegistrationFormUniqueEmail
 from django.utils.translation import ugettext_lazy as _
+from recaptcha_django import ReCaptchaField
+from django.conf import settings
 from django import forms
 
 class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
@@ -27,7 +29,25 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
     username_blacklist = ['about', 'accounts', 'admin', 'api', 'blog',
                           'contact', 'css', 'friends', 'images', 'index.html',
                           'news', 'notes', 'oauth', 'pony', 'register',
-                          'registration', 'site_media', 'snowy', 'tomboy' ]
+                          'registration', 'site_media', 'snowy', 'tomboy']
+
+    def __init__(self, *args, **kwargs):
+        # This must be done before we init our base class so that the field can
+        # be properly initialized in the base __init__.
+        if settings.RECAPTCHA_ENABLED:
+            self.captcha = ReCaptchaField(label=_(u'Word Verification'))
+        
+        super(RegistrationFormUniqueUser, self).__init__(*args, **kwargs)
+        
+        self.fields['username'].label = _(u'Username:')
+        self.fields['username'].help_text = _(u'Maximum of 30 characters in length.')
+
+        self.fields['email'].label = _(u'Email address:')
+
+        self.fields['password1'].label = _(u'Choose a password:')
+        self.fields['password1'].help_text = _(u'Minimum of 6 characters in length.')
+
+        self.fields['password2'].label = _(u'Re-enter password:')
 
     def clean_username(self):
         """
@@ -37,3 +57,13 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
         if username in self.username_blacklist:
             raise forms.ValidationError(_(u'This username has been reserved.  Please choose another.'))
         return username
+
+    def clean_password1(self):
+        """
+        Validate that the password is at least 6 characters long.
+        """
+        password = self.cleaned_data['password1']
+        if len(password) < 6:
+            raise forms.ValidationError(_(u'Your password must be at least 6 characters long.'))
+
+        return password

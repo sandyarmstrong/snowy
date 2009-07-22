@@ -19,6 +19,10 @@ DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
+RECAPTCHA_ENABLED = False
+RECAPTCHA_PUBLIC_KEY = ''
+RECAPTCHA_PRIVATE_KEY = ''
+
 PROJECT_NAME = 'Snowy'
 
 # Local time zone for this installation. Choices can be found here:
@@ -85,6 +89,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
+    'recaptcha_django.middleware.ReCaptchaMiddleware',
 )
 
 ROOT_URLCONF = 'snowy.urls'
