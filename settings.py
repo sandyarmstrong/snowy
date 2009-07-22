@@ -105,6 +105,7 @@ sys.path.append(EXTERNAL_APPS_PATH)
 INSTALLED_APPS = (
     # Local apps
     'api',
+    'users',
     'notes',
 
     # System apps
