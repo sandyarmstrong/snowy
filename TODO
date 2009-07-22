@@ -30,13 +30,12 @@ TODO
    - Documentation via Piston
 
  * Note View
-   - Links need to be replaced with note.pk references on import, and
-     replaced back with <link:*/> on sync.
    - Show which notebooks a note is part of
    - Note searching
    - Better page to show when current user can't view a note
 
  * Note Editing
+   - Renaming (incl. altering internal links)
    - Delete note link
    - History viewer
    - Sharing UI

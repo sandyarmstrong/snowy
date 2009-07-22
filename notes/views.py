@@ -15,16 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.template import RequestContext
-from django.contrib.auth.models import User
-from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
+from django.shortcuts import render_to_response, get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from django.template import RequestContext
 
 from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
 from snowy.notes.models import *
 from snowy import settings
-
-from piston import forms as piston_forms
 
 def note_index(request, username,
                template_name='note/note_index.html'):
@@ -43,6 +43,27 @@ def note_index(request, username,
 
 def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
+    def clean_content(xml, author):
+        """
+        Adds an id attribute to <link:internal> tags so that URLs can be
+        constructed by the XSLT.
+        """
+        from xml.dom import minidom
+        doc = minidom.parseString(xml)
+
+        for link in doc.getElementsByTagName('link:internal'):
+            if not link.hasChildNodes: continue
+
+            title = link.childNodes[0].nodeValue
+            try:
+                note = Note.objects.get(author=author, title=title)
+            except ObjectDoesNotExist:
+                continue
+
+            link.setAttribute("id", str(note.pk))
+        
+        return doc.toxml()
+
     author = get_object_or_404(User, username=username)
     note = get_object_or_404(Note, pk=note_id, author=author)
 
@@ -63,8 +84,12 @@ def note_detail(request, username, note_id, slug='',
         style = libxslt.parseStylesheetDoc(styledoc)
     
         template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
-        doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%', note.content.encode('UTF-8')))
-        result = style.applyStylesheet(doc, None)
+        complete_xml = template.replace('%%%CONTENT%%%', note.content.encode('UTF-8'))
+        doc = libxml2.parseDoc(clean_content(complete_xml, author))
+
+        result = style.applyStylesheet(doc,
+            {'base-user-url': "'%s'" % reverse('note_index', kwargs={'username': author.username})}
+        )
 
         # libxml2 doesn't munge encodings, so forcibly decode from UTF-8
         body = unicode(style.saveResultToString(result), 'UTF-8')

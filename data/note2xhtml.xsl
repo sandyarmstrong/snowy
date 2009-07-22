@@ -8,10 +8,7 @@
 <xsl:output method="html" indent="no" />
 <xsl:preserve-space elements="*" />
 
-<xsl:param name="font" />
-<xsl:param name="export-linked" />
-<xsl:param name="export-linked-all" />
-<xsl:param name="root-note" />
+<xsl:param name="base-user-url" />
 
 <xsl:param name="newline" select="'&#xA;'" />
 
@@ -80,23 +77,30 @@
 	<span class="note-size-huge"><xsl:apply-templates select="node()"/></span>
 </xsl:template>
 
-<!-- TODO:
 <xsl:template match="link:broken">
-	<span style="color:#555753;text-decoration:underline">
+	<span class="link-broken">
 		<xsl:value-of select="node()"/>
 	</span>
 </xsl:template>
 
 <xsl:template match="link:internal">
-	<a style="color:#204A87" href="#{node()}">
-		<xsl:value-of select="node()"/>
-	</a>
+	<xsl:choose>
+		<xsl:when test="@id">
+			<a href="{$base-user-url}{@id}" class="link-internal">
+				<xsl:value-of select="node()"/>
+			</a>
+		</xsl:when>
+		<xsl:otherwise>
+			<span class="link-broken">
+				<xsl:value-of select="node()"/>
+			</span>
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 <xsl:template match="link:url">
-	<a style="color:#3465A4" href="{node()}"><xsl:value-of select="node()"/></a>
+	<a href="{node()}" class="link-url"><xsl:value-of select="node()"/></a>
 </xsl:template>
--->
 
 <xsl:template match="tomboy:list">
 	<ul>

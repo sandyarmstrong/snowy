@@ -280,3 +280,15 @@ table#content-layout {
 .note-size-huge {
     font-size: 2.0em;
 }
+
+a.link-internal {
+    color: #204A87;
+}
+
+a.link-broken {
+    color: #555753;
+}
+
+a.link-url {
+    color: #3465A4;
+}
