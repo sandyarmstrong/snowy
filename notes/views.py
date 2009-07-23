@@ -85,7 +85,7 @@ def note_detail(request, username, note_id, slug='',
     
         template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
         complete_xml = template.replace('%%%CONTENT%%%', note.content.encode('UTF-8'))
-        doc = libxml2.parseDoc(clean_content(complete_xml, author))
+        doc = libxml2.parseDoc(clean_content(complete_xml, author).encode('UTF-8'))
 
         result = style.applyStylesheet(doc,
             {'base-user-url': "'%s'" % reverse('note_index', kwargs={'username': author.username})}
