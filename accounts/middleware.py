@@ -15,16 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from snowy.accounts.models import UserProfile
-from snowy.notes.models import Note, NoteTag
-from reversion.admin import VersionAdmin
-from django.contrib import admin
+from django.middleware.common import CommonMiddleware
+from django.utils import translation
 
-class NoteAdmin(VersionAdmin):
-    list_display = ('created', 'author', 'title')
-    search_fields = ['body', 'title']
-    prepopulated_fields = {'slug': ('title',)}
-
-admin.site.register(Note, NoteAdmin)
-admin.site.register(NoteTag)
-admin.site.register(UserProfile)
+class LocaleMiddleware():
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if request.user.is_authenticated():
+            profile = request.user.get_profile()
+            if profile.language:
+                translation.activate(profile.language)
+        return None

@@ -25,6 +25,9 @@ from registration.views import activate
 from registration.views import register
 
 urlpatterns = patterns('',
+    url(r'^preferences/$', 'snowy.accounts.views.accounts_preferences',
+        name='preferences'),
+
     # Registration URLs
     url(r'^activate/(?P<activation_key>\w+)/$', activate, name='registration_activate'),
     url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'},

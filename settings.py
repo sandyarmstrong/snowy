@@ -86,6 +86,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.csrf.middleware.CsrfResponseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'snowy.accounts.middleware.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
@@ -135,7 +136,7 @@ SNOWY_LIST_MAX_NOTES = 18
 
 ACCOUNT_ACTIVATION_DAYS = 15
 
-AUTH_PROFILE_MODULE = 'notes.UserProfile'
+AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.

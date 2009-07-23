@@ -67,3 +67,10 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
             raise forms.ValidationError(_(u'Your password must be at least 6 characters long.'))
 
         return password
+
+from snowy.accounts.models import UserProfile
+
+class InternationalizationForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ('language',)
