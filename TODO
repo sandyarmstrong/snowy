@@ -14,7 +14,6 @@ TODO
 
  * I18N
    - Audit translatable strings
-   - Interface for detecting/selecting preferred language
 
  * Accounts
    - Preferences page
