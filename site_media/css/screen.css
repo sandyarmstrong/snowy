@@ -1,5 +1,5 @@
 html, body {
-    background-color: #94c7b6;
+    background-color: #4e6960;
     margin: 0;
     padding: 0;
 }
@@ -22,16 +22,21 @@ h1 {
     clear: both;
 }
 
-#header-container {
-    margin: 20px;
+#body {
+    background-color: #94c7b6;
+    padding: 10px;
+}
+
+#header {
+    width: 100%;
+    border-spacing: 10px;
 }
 
 #header-logo {
-    float: left;
+    width: 251px;
 }
 
 #header-auth {
-    float: right;
     margin: 0.5em 1em 0 0;
     text-align: right;
     vertical-align: middle;
@@ -46,16 +51,16 @@ h1 {
 }
 
 #header-avatar {
-    float: right;
     margin-left: 5px;
+    width: 64px;
 }
 
 #header-avatar img {
     border: 2px solid #FFFFFF;
 }
 
-table#container {
-    padding: 20px;
+table#content-container {
+    padding: 0 10px 20px 10px;
     width: 100%;
     border: 0;
 }
@@ -249,8 +254,7 @@ table#content-layout {
 }
 
 #footer {
-    height: 500px;
-    background-color: #4e6960;
+    height: 50px;
 }
 
 .form-field th {

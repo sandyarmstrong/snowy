@@ -20,43 +20,44 @@
 </head>
 
 <body>
-    <div id="header-container">
-        <div id="header-logo">
-            <a href="/">
-                <img src="{{ MEDIA_URL }}img/tomboy-logo.png" alt="{% trans "tomboy: simple note-taking." %}"/>
-            </a>
-        </div>
-        <div id="header-avatar">
+    <div id="body">
+        <table id="header" cellpadding="0" cellspacing="0">
+            <tr>
+                <td id="header-logo">
+                    <a href="/">
+                        <img src="{{ MEDIA_URL }}img/tomboy-logo.png" alt="{% trans "tomboy: simple note-taking." %}"/>
+                    </a>
+                </td>
+                <td id="header-auth">
 {% if user.is_authenticated %}
-            <a href="{% url notes.views.note_index user.username %}">{% gravatar_img_for_user user 64 %}</a>
-{% endif %}
-        </div>
-        <div id="header-auth">
-{% if user.is_authenticated %}
-            <h3>{{ user }}</h3>
-            <p><a href="">{% trans "preferences" %}</a> / <a href="{% url django.contrib.auth.views.logout %}">{% trans "log out" %}</a></p>
+                    <h3>{{ user }}</h3>
+                    <p><a href="">{% trans "preferences" %}</a> / <a href="{% url django.contrib.auth.views.logout %}">{% trans "log out" %}</a></p>
 {% else %}
-            <p>{% trans "hello stranger! care to " %}<a href="{% url django.contrib.auth.views.login %}">{% trans "log in" %}</a>{% trans "?" %}</p>
-            <p><small>{% trans "not a member yet?" %} <a href="{% url registration.views.register %}">{% trans "Sign up." %}</a></small></p>
+                    <p>{% trans "hello stranger! care to " %}<a href="{% url django.contrib.auth.views.login %}">{% trans "log in" %}</a>{% trans "?" %}</p>
+                    <p><small>{% trans "not a member yet?" %} <a href="{% url registration.views.register %}">{% trans "Sign up." %}</a></small></p>
 {% endif %}
-        </div>
-        <div class="clear"></div>
-        </div>
-    </div>
-    <table id="container" cellspacing="0" cellpadding="0">
-        <tr>
-            <td id="sidebar-container">
-                <div id="sidebar">
+                </td>
+                <td id="header-avatar">
+{% if user.is_authenticated %}
+                    <a href="{% url notes.views.note_index user.username %}">{% gravatar_img_for_user user 64 %}</a>
+{% endif %}
+                </td>
+            </tr>
+        </table>
+        <table id="content-container" cellspacing="0" cellpadding="0">
+            <tr>
+                <td id="sidebar-container">
+                    <div id="sidebar">
 {% block sidebar %}
 {% endblock %}
-                </div>
-            </td>
-            <td id="content">
+                    </div>
+                </td>
+                <td id="content">
 {% block content %}
 {% endblock %}
-            </td>
-        </tr>
-    </table>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div id="footer">
