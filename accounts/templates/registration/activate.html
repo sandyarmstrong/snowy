@@ -1,0 +1,30 @@
+{% extends 'site_base.html' %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Registration complete" %} | {{ block.super }}{% endblock %}
+
+{% block content %}
+{% if account %}
+{% url auth_login as login_url %}
+{% blocktrans with PROJECT_NAME as p and login_url as u %}
+<h1>Welcome to {{ p }}!</h1>
+<p>Your registration is now complete.  You may now <a href="{{ u }}">log in</a></p>
+<p>To get more use out of your {{ p }} account, you can configure Tomboy to
+synchronize notes between {{ p }} and your computer.
+<a href="">Find out how</a>.</p>
+{% endblocktrans %}
+{% else %}
+{% blocktrans count expiration_days as days %}
+<h1>Activation failed!</h1>
+Sorry, we were unable to activate your account.  Either your activation link
+was incorrect, or the activation key for your account expired.  Activation keys
+are only valid for {{ days }} day after registration.
+{% plural %}
+<h1>Activation failed!</h1>
+Sorry, we were unable to activate your account.  Either your activation link
+was incorrect, or the activation key for your account expired.  Activation keys
+are only valid for {{ days }} days after registration.
+{% endblocktrans %}
+{% endif %}
+{% endblock %}

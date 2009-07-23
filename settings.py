@@ -110,11 +110,12 @@ sys.path.append(EXTERNAL_APPS_PATH)
 INSTALLED_APPS = (
     # Local apps
     'api',
-    'users',
+    'accounts',
     'notes',
 
     # System apps
     'django.contrib.admin',
+    'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

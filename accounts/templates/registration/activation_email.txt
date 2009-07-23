@@ -1,0 +1,22 @@
+{% load i18n %}
+{% blocktrans with site.name as n %}Hello from {{ n }}!{% endblocktrans %}
+
+{% blocktrans %}In order to use your new account, you need to confirm that your email address
+is correct.  We'll use this address to send information about your account, and
+announcements of cool new features.{% endblocktrans %}
+
+{% trans "To confirm your email address, go to:" %}
+
+http://{{ site.domain }}{% url registration_activate activation_key %}
+
+{% blocktrans count expiration_days as days %}If you don't, or think you've recieved this email by mistake, the temporary
+account we created for you will be automatically deleted in {{ expiration_days }} day.
+{% plural %}If you don't, or think you've recieved this email by mistake, the temporary
+account we created for you will be automatically deleted in {{ expiration_days }} days.
+{% endblocktrans %}
+
+{% blocktrans with site.name as n %}
+Hope to see you soon!
+
+The {{ n }} Team
+{% endblocktrans %}
