@@ -185,6 +185,7 @@ td#sidebar-container {
 #content {
     padding: 12px;
     background-color: #edece6;
+    vertical-align: top;
     font-family: Candara, Verdana, Tahmoa, Arial, sans-serif;
 }
 
