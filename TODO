@@ -5,6 +5,7 @@ TODO
    - More complicated permissions to allow for sharing
    - Sitemap
    - Ponies
+   - Populate Site as management function
 
  * Design
    - Consistent design throughout site
@@ -17,7 +18,6 @@ TODO
 
  * Accounts
    - Preferences page
-     + Language selection
      + API access
 
  * REST API
