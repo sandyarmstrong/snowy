@@ -5,8 +5,11 @@
 
 {% block extra_head %}
     <script type="text/javascript" src="{{ MEDIA_URL }}js/DUI.js" charset="utf-8"></script>
+{# Disable funcooker for now #}
+{% comment %}
     <script type="text/javascript" src="{{ MEDIA_URL }}js/funcooker.js" charset="utf-8"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.scrollfollow.js" charset="utf-8"></script>
+{% endcomment %}
 {% endblock %}
 
 {% block title %}{{ title|safe }} | Notes | {{ block.super }}{% endblock %}
@@ -48,6 +51,8 @@
             </div>
         </td>
         <td>
+{# Disable funcooker for now #}
+{% comment %}
             <div id="toolbar">
                 <h3>Text</h3>
                 <p id="toolbar-text">
@@ -72,9 +77,11 @@
                 <p><a href="#">History</a></p>
                 <p><a href="#">Sharing</a></p>
             </div>
+{% endcomment %}
         </td>
     </br>
 </table>
+{% comment %}
 <script type="text/javascript">
 var fc = null;
 $(document).ready(function() {
@@ -87,4 +94,5 @@ $(document).ready(function() {
     });
 });
 </script>
+{% endcomment %}
 {% endblock %}
