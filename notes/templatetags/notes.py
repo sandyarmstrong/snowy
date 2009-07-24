@@ -45,7 +45,7 @@ class UserNotesListNode(template.Node):
 
     def render(self, context):
         request = self.request.resolve(context)
-	author = self.author.resolve(context)
+        author = self.author.resolve(context)
 
         # XXX: Replace this with a NotesManager
         all_notes = Note.objects.filter(author=author) \
@@ -80,7 +80,7 @@ class UserNotebookListNode(template.Node):
 
     def render(self, context):
         request = self.request.resolve(context)
-	author = self.author.resolve(context)
+        author = self.author.resolve(context)
 
         context[self.dest] = NoteTag.objects.filter(author=author,
 	                                            is_notebook=True)[:5]

@@ -35,6 +35,6 @@ urlpatterns = patterns('',
     # 1.0 API methods
     url(r'1.0/(?P<username>\w+)/notes/(?P<note_id>\d+)/$', note_handler, name='note_api_detail'),
     url(r'1.0/(?P<username>\w+)/notes/$', notes_handler, name='note_api_index'),
-    url(r'1.0/(?P<username>\w+)/$', user_handler),
+    url(r'1.0/(?P<username>\w+)/$', user_handler, name='user_api_index'),
     url(r'1.0/$', root_handler),
 )

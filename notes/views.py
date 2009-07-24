@@ -52,7 +52,7 @@ def note_detail(request, username, note_id, slug='',
         doc = minidom.parseString(xml)
 
         for link in doc.getElementsByTagName('link:internal'):
-            if not link.hasChildNodes: continue
+            if len(link.childNodes) < 1: continue
 
             title = link.childNodes[0].nodeValue
             try:

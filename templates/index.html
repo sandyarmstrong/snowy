@@ -1,23 +1,24 @@
 {% extends "base.html" %}
 
 {% load i18n %}
+{% load urlresolvers %}
 
 {% block content %}
-{% blocktrans %}
-<h1>Welcome to {{ PROJECT_NAME }}!</h1>
-<p>{{ PROJECT_NAME }} is Tomboy's best friend on the web.  {{ PROJECT_NAME }}
-is an online service that allows you to view, edit and share the notes you
-create in Tomboy on your desktop computer.  Powered by <a
+{% blocktrans with site.name as n %}
+<h1>Welcome to {{ n }}!</h1>
+<p>{{ n }} is Tomboy's best friend on the web.  {{ n }} is an online service
+that allows you to view, edit and share the notes you create in Tomboy on your
+desktop computer.  Powered by <a
 href="http://www.djangoproject.com">Django</a>, it features a REST-based API
 for synchronizing notes, an intuitive editor and moxie; lots of moxie.</p>
 
-<p>Thank you for your interest in {{ PROJECT_NAME }}.  {{ PROJECT_NAME }} is
+<p>Thank you for your interest in {{ n }}.  {{ n }} is
 currently under heavy development and is <strike>not
 ready</strike><b>REALLY</b> not ready for production use.  Like any good K9
-companion, {{ PROJECT_NAME }} will file your taxes improperly, reconcile with
+companion, {{ n }} will file your taxes improperly, reconcile with
 your ex-girlfriends and burn risotto if not watched carefully.</p>
 
-<p>If you want to house-train {{ PROJECT_NAME }} and teach him some new tricks,
+<p>If you want to house-train {{ n }} and teach him some new tricks,
 check out the TODO and start contributing.  P.S., Have I told you how much you
 rock?</p>
 {% endblocktrans %}

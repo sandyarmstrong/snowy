@@ -15,7 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.contrib.sites.models import Site
 from django.conf import settings
 
-def project_name(context):
-    return { 'PROJECT_NAME': settings.PROJECT_NAME }
+def current_site(context):
+    site = Site.objects.get_current()
+    return { 'site': site }

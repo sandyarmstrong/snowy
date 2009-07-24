@@ -15,14 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.views.generic.simple import direct_to_template
+from django.views.generic.simple import direct_to_template, redirect_to
+from django.core.urlresolvers import reverse
 from django.conf.urls.defaults import *
 
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'django.views.generic.simple.direct_to_template', {'template': 'index.html'},
+    url(r'^$', direct_to_template, {'template': 'index.html'},
         name='snowy_index'),
 
     (r'^api/', include('snowy.api.urls')),
@@ -30,6 +31,9 @@ urlpatterns = patterns('',
 
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
+
+    url(r'^(?P<username>\w+)/$', redirect_to,
+        {'url': None, 'permanent': False}, name='user_index'),
 
     (r'^(?P<username>\w+)/notes/', include('snowy.notes.urls')),
 )
@@ -49,4 +53,3 @@ urlpatterns += patterns('piston.authentication',
     url(r'^oauth/authenticate/$', 'oauth_user_auth'),
     url(r'^oauth/access_token/$', 'oauth_access_token'),
 )
-

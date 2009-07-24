@@ -16,7 +16,6 @@
 #
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Max
@@ -27,6 +26,7 @@ from piston.utils import rc, HttpStatusCode
 from datetime import datetime
 from dateutil import parser
 
+from snowy.core.urlresolvers import reverse_full
 from snowy.notes.models import Note
 from snowy.notes.models import NoteTag
 from snowy import settings
@@ -57,10 +57,11 @@ class RootHandler(BaseHandler):
     allow_methods = ('GET')
 
     def read(self, request):
+        kwargs = {'username': request.user.username}
         return {
             'user-ref': {
-                'api-ref' : 'http://%s%s' % (settings.DOMAIN_NAME, '/api/1.0/' + request.user.username),
-                'href' : 'http://%s%s' % (settings.DOMAIN_NAME, '/' + request.user.username)
+                'api-ref' : reverse_full('user_api_index', kwargs=kwargs),
+                'href' : reverse_full('user_index', kwargs=kwargs),
             },
             'api-version': '1.0'
         }
@@ -73,14 +74,14 @@ class UserHandler(AnonymousBaseHandler):
     def read(self, request, username):
         user = User.objects.get(username=username)
         profile = user.get_profile()
-        reverse_args = {'username': username}
+        kwargs = {'username': username}
         return {
             'user-name': user.username,
             'first-name': user.first_name,
             'last-name': user.last_name,
             'notes-ref': {
-                'api-ref': 'http://%s%s' % (settings.DOMAIN_NAME, reverse('note_api_index', kwargs=reverse_args)),
-                'href': 'http://%s%s' % (settings.DOMAIN_NAME, reverse('note_index', kwargs=reverse_args)),
+                'api-ref': reverse_full('note_api_index', kwargs=kwargs),
+                'href': reverse_full('note_index', kwargs=kwargs),
             },
             'latest-sync-revision' : profile.latest_sync_rev,
             'current-sync-guid' : profile.current_sync_uuid
@@ -202,14 +203,12 @@ def describe_note(note):
     }
 
 def simple_describe_note(note):
+    kwargs = {'username': note.author.username, 'note_id': note.pk}
     return {
         'guid': note.guid,
         'ref': {
-            'api-ref': 'http://%s%s' % (settings.DOMAIN_NAME, reverse('note_api_detail', kwargs={
-                'username': note.author.username,
-                'note_id': note.pk,
-            })),
-            'href': 'http://%s%s' % (settings.DOMAIN_NAME, note.get_absolute_url()),
+            'api-ref': reverse_full('note_api_detail', kwargs=kwargs),
+            'href': reverse_full('note_detail_no_slug', kwargs=kwargs),
         },
         'title': note.title
     }

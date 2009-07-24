@@ -23,7 +23,7 @@ RECAPTCHA_ENABLED = False
 RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''
 
-PROJECT_NAME = 'Snowy'
+URI_SCHEME = 'http'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -77,7 +77,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
-    'snowy.notes.context_processors.project_name',
+    'snowy.core.context_processors.current_site',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -110,6 +110,7 @@ sys.path.append(EXTERNAL_APPS_PATH)
 
 INSTALLED_APPS = (
     # Local apps
+    'core',
     'api',
     'accounts',
     'notes',
