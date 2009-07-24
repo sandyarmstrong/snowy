@@ -82,6 +82,15 @@ table#content-layout {
 }
 
 /* Note-specific styles */
+#note h1 {
+    text-decoration: underline;
+}
+
+.note-datetime {
+    color: #666666;
+    font-style: italic;
+    font-size: 0.8em;
+}
 
 .note-highlight {
     background-color: yellow;

@@ -1,5 +1,6 @@
 html, body {
     background-color: #4e6960;
+    font-size: 0.95em;
     margin: 0;
     padding: 0;
 }
@@ -264,6 +265,12 @@ table#content-layout {
 /* Note-specific styles */
 #note h1 {
     text-decoration: underline;
+}
+
+.note-datetime {
+    color: #666666;
+    font-style: italic;
+    font-size: 0.8em;
 }
 
 .note-highlight {
