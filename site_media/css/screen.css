@@ -74,7 +74,7 @@ td#sidebar-container {
 }
 
 #sidebar {
-    margin-top: 20px;
+    margin: 20px 0 20px 0;
     padding-bottom: 20px;
 
     background-color: #403b33;
