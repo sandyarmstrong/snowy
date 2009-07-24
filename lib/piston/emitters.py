@@ -1,6 +1,4 @@
-from __future__ import generators
-
-import decimal, re, inspect
+import types, decimal, types, re, inspect
 
 try:
     # yaml isn't standard with python.  It shouldn't be required if it
@@ -9,16 +7,6 @@ try:
 except ImportError:
     yaml = None
 
-# Fallback since `any` isn't in Python <2.5
-try:
-    any
-except NameError:
-    def any(iterable):
-        for element in iterable:
-            if element:
-                return True
-        return False
-
 from django.db.models.query import QuerySet
 from django.db.models import Model, permalink
 from django.utils import simplejson
@@ -26,9 +14,8 @@ from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import smart_unicode
 from django.core.serializers.json import DateTimeAwareJSONEncoder
 from django.http import HttpResponse
-from django.core import serializers
 
-from utils import HttpStatusCode, Mimer
+from utils import HttpStatusCode
 
 try:
     import cStringIO as StringIO
@@ -60,19 +47,6 @@ class Emitter(object):
         if isinstance(self.data, Exception):
             raise
     
-    def method_fields(self, data, fields):
-        if not data:
-            return { }
-
-        has = dir(data)
-        ret = dict()
-            
-        for field in fields:
-            if field in has:
-                ret[field] = getattr(data, field)
-        
-        return ret
-    
     def construct(self):
         """
         Recursively serialize a lot of types, and
@@ -87,9 +61,7 @@ class Emitter(object):
             """
             ret = None
             
-            if isinstance(thing, QuerySet):
-                ret = _qs(thing, fields=fields)
-            elif isinstance(thing, (tuple, list)):
+            if isinstance(thing, (tuple, list, QuerySet)):
                 ret = _list(thing)
             elif isinstance(thing, dict):
                 ret = _dict(thing)
@@ -98,14 +70,10 @@ class Emitter(object):
             elif isinstance(thing, Model):
                 ret = _model(thing, fields=fields)
             elif isinstance(thing, HttpResponse):
-                raise HttpStatusCode(thing)
-            elif inspect.isfunction(thing):
+                raise HttpStatusCode(thing.content, code=thing.status_code)
+            elif isinstance(thing, types.FunctionType):
                 if not inspect.getargspec(thing)[0]:
                     ret = _any(thing())
-            elif hasattr(thing, '__emittable__'):
-                f = thing.__emittable__
-                if inspect.ismethod(f) and len(inspect.getargspec(f)[0]) == 1:
-                    ret = _any(f())
             else:
                 ret = smart_unicode(thing, strings_only=True)
 
@@ -135,10 +103,9 @@ class Emitter(object):
             `exclude` on the handler (see `typemapper`.)
             """
             ret = { }
-            handler = self.in_typemapper(type(data), self.anonymous)
-            get_absolute_uri = False
             
-            if handler or fields:
+            if self.in_typemapper(type(data), self.anonymous) or fields:
+
                 v = lambda f: getattr(data, f.attname)
 
                 if not fields:
@@ -148,10 +115,7 @@ class Emitter(object):
                     """
                     mapped = self.in_typemapper(type(data), self.anonymous)
                     get_fields = set(mapped.fields)
-                    exclude_fields = set(mapped.exclude).difference(get_fields)
-
-                    if 'absolute_uri' in get_fields:
-                        get_absolute_uri = True
+                    exclude_fields = set(mapped.exclude)
                 
                     if not get_fields:
                         get_fields = set([ f.attname.replace("_id", "", 1)
@@ -161,7 +125,6 @@ class Emitter(object):
                     for exclude in exclude_fields:
                         if isinstance(exclude, basestring):
                             get_fields.discard(exclude)
-                            
                         elif isinstance(exclude, re._pattern_type):
                             for field in get_fields.copy():
                                 if exclude.match(field):
@@ -170,10 +133,8 @@ class Emitter(object):
                 else:
                     get_fields = set(fields)
 
-                met_fields = self.method_fields(handler, get_fields)
-
                 for f in data._meta.local_fields:
-                    if f.serialize and not any([ p in met_fields for p in [ f.attname, f.name ]]):
+                    if f.serialize:
                         if not f.rel:
                             if f.attname in get_fields:
                                 ret[f.attname] = _any(v(f))
@@ -184,14 +145,14 @@ class Emitter(object):
                                 get_fields.remove(f.name)
                 
                 for mf in data._meta.many_to_many:
-                    if mf.serialize and mf.attname not in met_fields:
+                    if mf.serialize:
                         if mf.attname in get_fields:
                             ret[mf.name] = _m2m(data, mf)
                             get_fields.remove(mf.name)
                 
                 # try to get the remainder of fields
                 for maybe_field in get_fields:
-                    
+
                     if isinstance(maybe_field, (list, tuple)):
                         model, fields = maybe_field
                         inst = getattr(data, model, None)
@@ -199,31 +160,19 @@ class Emitter(object):
                         if inst:
                             if hasattr(inst, 'all'):
                                 ret[model] = _related(inst, fields)
-                            elif callable(inst):
-                                if len(inspect.getargspec(inst)[0]) == 1:
-                                    ret[model] = _any(inst(), fields)
                             else:
                                 ret[model] = _model(inst, fields)
-
-                    elif maybe_field in met_fields:
-                        # Overriding normal field which has a "resource method"
-                        # so you can alter the contents of certain fields without
-                        # using different names.
-                        ret[maybe_field] = _any(met_fields[maybe_field](data))
 
                     else:                    
                         maybe = getattr(data, maybe_field, None)
                         if maybe:
-                            if callable(maybe):
-                                if len(inspect.getargspec(maybe)[0]) == 1:
-                                    ret[maybe_field] = _any(maybe())
-                            else:
+                            if isinstance(maybe, (int, basestring)):
                                 ret[maybe_field] = _any(maybe)
                         else:
-                            handler_f = getattr(handler or self.handler, maybe_field, None)
+                            handler_f = getattr(self.handler, maybe_field, None)
 
                             if handler_f:
-                                ret[maybe_field] = _any(handler_f(data))
+                                ret[maybe_field] = handler_f(data)
 
             else:
                 for f in data._meta.fields:
@@ -236,8 +185,8 @@ class Emitter(object):
                     ret[k] = _any(getattr(data, k))
             
             # resouce uri
-            if self.in_typemapper(type(data), self.anonymous):
-                handler = self.in_typemapper(type(data), self.anonymous)
+            if type(data) in self.typemapper.keys():
+                handler = self.typemapper.get(type(data))
                 if hasattr(handler, 'resource_uri'):
                     url_id, fields = handler.resource_uri()
                     ret['resource_uri'] = permalink( lambda: (url_id, 
@@ -248,18 +197,12 @@ class Emitter(object):
                 except: pass
             
             # absolute uri
-            if hasattr(data, 'get_absolute_url') and get_absolute_uri:
+            if hasattr(data, 'get_absolute_url'):
                 try: ret['absolute_uri'] = data.get_absolute_url()
                 except: pass
             
             return ret
         
-        def _qs(data, fields=()):
-            """
-            Querysets.
-            """
-            return [ _any(v, fields) for v in data ]
-                
         def _list(data):
             """
             Lists.
@@ -286,15 +229,6 @@ class Emitter(object):
         this is a job for the specific emitter below.
         """
         raise NotImplementedError("Please implement render.")
-        
-    def stream_render(self, request, stream=True):
-        """
-        Tells our patched middleware not to look
-        at the contents, and returns a generator
-        rather than the buffered string. Should be
-        more memory friendly for large datasets.
-        """
-        yield self.render(request)
         
     @classmethod
     def get(cls, format):
@@ -330,9 +264,7 @@ class XMLEmitter(Emitter):
     def _to_xml(self, xml, data):
         if isinstance(data, (list, tuple)):
             for item in data:
-                xml.startElement("resource", {})
                 self._to_xml(xml, item)
-                xml.endElement("resource")
         elif isinstance(data, dict):
             for key, value in data.iteritems():
                 xml.startElement(key, {})
@@ -356,7 +288,6 @@ class XMLEmitter(Emitter):
         return stream.getvalue()
 
 Emitter.register('xml', XMLEmitter, 'text/xml; charset=utf-8')
-Mimer.register(lambda *a: None, ('text/xml',))
 
 class JSONEmitter(Emitter):
     """
@@ -364,7 +295,7 @@ class JSONEmitter(Emitter):
     """
     def render(self, request):
         cb = request.GET.get('callback')
-        seria = simplejson.dumps(self.construct(), cls=DateTimeAwareJSONEncoder, ensure_ascii=False, indent=4)
+        seria = simplejson.dumps(self.construct(), cls=DateTimeAwareJSONEncoder)
 
         # Callback
         if cb:
@@ -373,7 +304,6 @@ class JSONEmitter(Emitter):
         return seria
     
 Emitter.register('json', JSONEmitter, 'application/json; charset=utf-8')
-Mimer.register(simplejson.loads, ('application/json',))
     
 class YAMLEmitter(Emitter):
     """
@@ -385,7 +315,6 @@ class YAMLEmitter(Emitter):
 
 if yaml:  # Only register yaml if it was import successfully.
     Emitter.register('yaml', YAMLEmitter, 'application/x-yaml; charset=utf-8')
-    Mimer.register(yaml.load, ('application/x-yaml',))
 
 class PickleEmitter(Emitter):
     """
@@ -394,21 +323,4 @@ class PickleEmitter(Emitter):
     def render(self, request):
         return pickle.dumps(self.construct())
         
-Emitter.register('pickle', PickleEmitter, 'application/python-pickle')
-Mimer.register(pickle.loads, ('application/python-pickle',))
-
-class DjangoEmitter(Emitter):
-    """
-    Emitter for the Django serialized format.
-    """
-    def render(self, request, format='xml'):
-        if isinstance(self.data, HttpResponse):
-            return self.data
-        elif isinstance(self.data, (int, str)):
-            response = self.data
-        else:
-            response = serializers.serialize(format, self.data, indent=True)
-
-        return response
-        
-Emitter.register('django', DjangoEmitter, 'text/xml; charset=utf-8')
+Emitter.register('pickle', PickleEmitter, 'application/octet-stream')

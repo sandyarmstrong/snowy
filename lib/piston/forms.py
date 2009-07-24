@@ -1,4 +1,5 @@
-import hmac, base64
+import hmac
+import base64
 
 from django import forms
 from django.conf import settings
@@ -23,7 +24,7 @@ class ModelForm(forms.ModelForm):
 
 class OAuthAuthenticationForm(forms.Form):
     oauth_token = forms.CharField(widget=forms.HiddenInput)
-    oauth_callback = forms.CharField(widget=forms.HiddenInput)
+    oauth_callback = forms.URLField(widget=forms.HiddenInput)
     authorize_access = forms.BooleanField(required=True)
     csrf_signature = forms.CharField(widget=forms.HiddenInput)
 
