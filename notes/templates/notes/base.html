@@ -3,7 +3,9 @@
 {% load i18n %}
 
 {% block sidebar %}
-<input type="text" id="search" class="dim" name="search" accesskey="s" value="{% trans "Search your notes" %}">
+<form method="GET" name="searchForm" action="{% url note_search request.user.username %}">
+    <input type="text" id="search" class="dim" name="query" accesskey="s" value="{% trans "Search your notes" %}">
+</form>
 {% endblock %}
 
 {% block extra_body %}
@@ -15,6 +17,13 @@ $(document).ready(function() {
                     .unbind("focus", undim);
     }
     $("#search").bind("focus", undim);
+
+    $('#search').keyup(function(e) {
+        // enter key
+        if (e.keyCode == 13) {
+            document.searchForm.submit();
+        }
+    });
 });
 </script>
 {% endblock %}

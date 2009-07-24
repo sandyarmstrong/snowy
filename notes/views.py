@@ -17,13 +17,15 @@
 
 from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.shortcuts import render_to_response, get_object_or_404
-from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.template import RequestContext
+from django.db.models import Q
 
 from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
+from snowy.notes.forms import SearchForm
 from snowy.notes.models import *
 from snowy import settings
 
@@ -45,10 +47,27 @@ def note_index(request, username,
 def note_list(request, username,
               template_name='notes/note_list.html'):
     author = get_object_or_404(User, username=username)
-    notes = Note.objects.user_viewable(request.user, author) \
-                        .order_by('-user_modified')
+    notes = Note.objects.user_viewable(request.user, author)
     return render_to_response(template_name,
                               {'notes': notes},
+                              context_instance=RequestContext(request))
+
+def note_search(request, username,
+                template_name='notes/note_search.html'):
+    author = get_object_or_404(User, username=username)
+    notes = []
+    if request.method == 'GET':
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = request.GET['query']
+            notes = Note.objects.user_viewable(request.user, author) \
+                                .filter(Q(title__icontains=query) \
+                                        | Q(content__icontains=query))
+    else:
+        form = SearchForm()
+
+    return render_to_response(template_name,
+                              {'notes': notes, 'form': form},
                               context_instance=RequestContext(request))
 
 def note_detail(request, username, note_id, slug='',

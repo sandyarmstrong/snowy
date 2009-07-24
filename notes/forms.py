@@ -15,13 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.conf.urls.defaults import *
-from snowy.notes.models import Note
+from django import forms
 
-urlpatterns = patterns('',
-    url(r'^$', 'snowy.notes.views.note_index', name='note_index'),
-    url(r'^list/$', 'snowy.notes.views.note_list', name='note_list'),
-    url(r'^search/$', 'snowy.notes.views.note_search', name='note_search'),
-    url(r'^(?P<note_id>\d+)/$', 'snowy.notes.views.note_detail', name='note_detail_no_slug'),
-    url(r'^(?P<note_id>\d+)/(?P<slug>[^/]+)/$', 'snowy.notes.views.note_detail', name='note_detail'),
-)
+class SearchForm(forms.Form):
+    """
+    Form that allows users to search for text in the body and title of their
+    notes.
+    """
+    query = forms.fields.CharField(min_length=2, max_length=30)
