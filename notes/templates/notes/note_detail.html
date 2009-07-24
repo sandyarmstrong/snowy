@@ -22,7 +22,7 @@
 {% for n in all_notes %}
         <li class="note-item{% if n.pinned %} pinned{% endif %}"><a href="{{ n.get_absolute_url }}">{{ n.title }}</a></li>
 {% endfor %}
-        <li class="more-item"><a href="#">{% trans "More Notes..." %}</a></li>
+        <li class="more-item"><a href="{% url note_list author.username %}">{% trans "More Notes..." %}</a></li>
     </ul>
     <hr />
     <ul>

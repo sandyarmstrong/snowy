@@ -83,7 +83,7 @@ td#sidebar-container {
 }
 
 #sidebar h3 {
-    font-family: Verdana, Candara, Tahmoa, Arial, sans-serif;
+    font-family: Verdana, Candara, Tahoma, Arial, sans-serif;
     text-transform: uppercase;
 }
 
@@ -322,3 +322,51 @@ table.input-form {
     font-size: 0.7em;
     vertical-align: top;
 }
+
+.object_list {
+    width: 800px;
+}
+
+.object_list thead tr {
+    background-color: #73685d;
+    font-family: Verdana, Candara, Tahoma, Arial, sans-serif;
+    text-transform: uppercase;
+    color: #FFFFFF;
+}
+
+.object_list tfoot tr {
+    background-color: #403b33;
+    text-align: center;
+    color: #ffffff;
+    height: 1.7em;
+}
+
+.object_list tfoot a {
+    color: #8ecbd2;
+}
+
+.object_list td {
+    padding: 5px 3px;
+}
+
+.row-even {
+    background-color: #d4e1d9;
+}
+
+.row-odd {
+    background-color: #edece6;
+}
+
+.object_list td.icon {
+    padding: 0;
+    text-align: center;
+}
+
+.object_list td.icon img {
+    vertical-align: middle;
+}
+
+.object_list div.paginator {
+    text-align: center;
+}
+

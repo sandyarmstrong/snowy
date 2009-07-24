@@ -17,6 +17,7 @@
 
 from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.shortcuts import render_to_response, get_object_or_404
+from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -39,6 +40,15 @@ def note_index(request, username,
     # TODO: Instruction page to tell user to either sync or create a new note
     return render_to_response(template_name,
                               {'author': author},
+                              context_instance=RequestContext(request))
+
+def note_list(request, username,
+              template_name='notes/note_list.html'):
+    author = get_object_or_404(User, username=username)
+    notes = Note.objects.user_viewable(request.user, author) \
+                        .order_by('-user_modified')
+    return render_to_response(template_name,
+                              {'notes': notes},
                               context_instance=RequestContext(request))
 
 def note_detail(request, username, note_id, slug='',

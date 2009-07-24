@@ -77,6 +77,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
+    'django.core.context_processors.request',
     'snowy.core.context_processors.current_site',
 )
 
@@ -91,6 +92,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'recaptcha_django.middleware.ReCaptchaMiddleware',
+    'pagination.middleware.PaginationMiddleware',
 )
 
 ROOT_URLCONF = 'snowy.urls'
@@ -122,6 +124,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.humanize',
 
     # External apps
     'registration',
@@ -130,6 +133,7 @@ INSTALLED_APPS = (
     'gravatar',
     'autoslug',
     'piston',
+    'pagination',
 )
 
 # Maximum number of notes to show on the notes_detail list.

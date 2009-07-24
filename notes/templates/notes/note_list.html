@@ -1,14 +1,45 @@
 {% extends 'notes/base.html' %}
 
-{% block title %}Notes | {{ block.super }}{% endblock %}
-{% block body %}
+{% load i18n %}
+{% load humanize %}
+{% load pagination_tags %}
 
-{% if object_list %}
-    {% for object in object_list %}
-        <p><a href="{% url note_detail object.id %}">{{ object.title }}</a></p>
-    {% endfor %}
+{% block title %}{% trans "All Notes" %} | {{ block.super }}{% endblock %}
+
+{% block content-container %}
+<h1>{% trans "All Notes" %}</h1>
+<table class="object_list" cellspacing="0" cellpadding="0">
+    <thead>
+        <tr>
+            <th></th>
+            <th>{% trans "Title" %}</th>
+            <th>{% trans "Last Modified" %}</th>
+            <th>{% trans "Visibility" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+{% autopaginate notes %}
+{% for note in notes %}
+        <tr class="{% cycle 'row-odd' 'row-even' %}">
+{% if note.pinned %}
+            <td class="icon"><img src="{{ MEDIA_URL }}img/pin-down_16.png" width="16" height="16" alt="Pinned"/></td>
 {% else %}
-No notes yet!
+            <td class="icon"><img src="{{ MEDIA_URL }}img/note_16.png" width="16" height="16" alt="Not pinned"/></td>
 {% endif %}
-
+            <td><a href="{{ note.get_absolute_url }}">{{ note.title }}</a></td>
+            <td>{{ note.user_modified|naturalday|title }}</td>
+            <td>{{ note.get_permissions_display }}</td>
+        </tr>
+{% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+{% ifnotequal paginator.num_pages 1 %}
+            <td colspan="4">{% paginate %}</td>
+{% else %}
+            <td colspan="4">{% trans "Page 1 of 1" %}</td>
+{% endifnotequal %}
+        </tr>
+    </tfoot>
+</table>
 {% endblock %}

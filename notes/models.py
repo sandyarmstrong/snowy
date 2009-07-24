@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import pre_save
 from django.contrib.auth.models import User
 from django.db import models
@@ -25,7 +26,7 @@ from snowy.notes.managers import NoteManager
 
 class Note(models.Model):
     NOTE_PERMISSIONS = (
-        (0, 'Private'), (1, 'Public'), 
+        (0, _(u'Private')), (1, _(u'Public')), 
     )
 
     guid = models.CharField(max_length=36)
