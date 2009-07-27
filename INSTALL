@@ -1,6 +1,7 @@
 Running Snowy From Your Git Checkout
 --
-0. Install python-libxslt, python-libxml2, python-pytz, and python-sqlite, python-dateutil
+0. Install python-libxslt, python-libxml2, python-pytz, and python-sqlite,
+   python-dateutil, python-pkg-resources
    (package names somewhat different from distro to distro).
 
 1. Install django from SVN:
