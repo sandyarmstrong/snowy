@@ -4,8 +4,19 @@ Snowy is a web-based viewer for your Tomboy notes written in Django.
 
 Requirements
 =================
- * Python 2.6
+ * Python >= 2.4
    - python-libxslt
    - python-libxml2
    - python-pytz
    - python-sqlite
+
+Under RedHat/CentOS 5.3, these packages are:
+
+   - python-lxml
+   - python-tz
+   - python-sqlite2
+   - python-dateutil
+   - python-setuptools
+   - python-uuid
+   - python-simplejson
+

@@ -18,7 +18,7 @@
 from django.middleware.common import CommonMiddleware
 from django.utils import translation
 
-class LocaleMiddleware():
+class LocaleMiddleware:
     def process_view(self, request, view_func, view_args, view_kwargs):
         if request.user.is_authenticated():
             profile = request.user.get_profile()

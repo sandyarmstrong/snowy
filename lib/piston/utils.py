@@ -1,4 +1,7 @@
-from functools import wraps
+try:
+    from functools import wraps
+except ImportError:
+    from django.utils.functional import wraps   # Python 2.3, 2.4 fallback
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
