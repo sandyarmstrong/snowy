@@ -3,8 +3,8 @@
 {% block title %}Allow Access? | {{ block.super }}{% endblock %}
 {% block content %}
         <h1>Allow Access?</h1>
-        <p>Permitting this application to access {{ PROJECT_NAME }} will allow
-        it to view, edit and delete your information on {{ PROJECT_NAME }}.  Access can
+        <p>Permitting this application to access {{ site.name }} will allow
+        it to view, edit and delete your information on {{ site.name }}.  Access can
         be revoked at any time on the Preferences page.</p>
         <form action="{% url piston.authentication.oauth_user_auth %}" method="POST">
             {{ form.oauth_token }}
