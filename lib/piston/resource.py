@@ -1,24 +1,19 @@
 import sys, inspect
 
-from django.http import HttpResponse, Http404, HttpResponseNotAllowed, HttpResponseForbidden
+from django.http import (HttpResponse, Http404, HttpResponseNotAllowed,
+    HttpResponseForbidden, HttpResponseServerError)
 from django.views.debug import ExceptionReporter
 from django.views.decorators.vary import vary_on_headers
 from django.conf import settings
 from django.core.mail import send_mail, EmailMessage
+from django.db.models.query import QuerySet
 
 from emitters import Emitter
 from handler import typemapper
 from doc import HandlerMethod
-from utils import coerce_put_post, FormValidationError, HttpStatusCode, rc, format_error
-
-class NoAuthentication(object):
-    """
-    Authentication handler that always returns
-    True, so no authentication is needed, nor
-    initiated (`challenge` is missing.)
-    """
-    def is_authenticated(self, request):
-        return True
+from authentication import NoAuthentication
+from utils import coerce_put_post, FormValidationError, HttpStatusCode
+from utils import rc, format_error, translate_mime, MimerDataException
 
 class Resource(object):
     """
@@ -45,6 +40,44 @@ class Resource(object):
         # Erroring
         self.email_errors = getattr(settings, 'PISTON_EMAIL_ERRORS', True)
         self.display_errors = getattr(settings, 'PISTON_DISPLAY_ERRORS', True)
+        self.stream = getattr(settings, 'PISTON_STREAM_OUTPUT', False)
+
+    def determine_emitter(self, request, *args, **kwargs):
+        """
+        Function for determening which emitter to use
+        for output. It lives here so you can easily subclass
+        `Resource` in order to change how emission is detected.
+
+        You could also check for the `Accept` HTTP header here,
+        since that pretty much makes sense. Refer to `Mimer` for
+        that as well.
+        """
+        em = kwargs.pop('emitter_format', None)
+        
+        if not em:
+            em = request.GET.get('format', 'json')
+
+        return em
+    
+    @property
+    def anonymous(self):
+        """
+        Gets the anonymous handler. Also tries to grab a class
+        if the `anonymous` value is a string, so that we can define
+        anonymous handlers that aren't defined yet (like, when
+        you're subclassing your basehandler into an anonymous one.)
+        """
+        if hasattr(self.handler, 'anonymous'):
+            anon = self.handler.anonymous
+            
+            if callable(anon):
+                return anon
+
+            for klass in typemapper.keys():
+                if anon == klass.__name__:
+                    return klass
+            
+        return None
     
     @vary_on_headers('Authorization')
     def __call__(self, request, *args, **kwargs):
@@ -52,33 +85,44 @@ class Resource(object):
         NB: Sends a `Vary` header so we don't cache requests
         that are different (OAuth stuff in `Authorization` header.)
         """
+        rm = request.method.upper()
+
+        # Django's internal mechanism doesn't pick up
+        # PUT request, so we trick it a little here.
+        if rm == "PUT":
+            coerce_put_post(request)
+
         if not self.authentication.is_authenticated(request):
-            if self.handler.anonymous and callable(self.handler.anonymous):
-                handler = self.handler.anonymous()
+            if self.anonymous and \
+                rm in self.anonymous.allowed_methods:
+
+                handler = self.anonymous()
                 anonymous = True
             else:
                 return self.authentication.challenge()
         else:
             handler = self.handler
-            anonymous = False
+            anonymous = handler.is_anonymous
         
-        rm = request.method.upper()
-        
-        # Django's internal mechanism doesn't pick up
-        # PUT request, so we trick it a little here.
-        if rm == "PUT":
-            coerce_put_post(request)
+        # Translate nested datastructs into `request.data` here.
+        if rm in ('POST', 'PUT'):
+            try:
+                translate_mime(request)
+            except MimerDataException:
+                return rc.BAD_REQUEST
         
         if not rm in handler.allowed_methods:
             return HttpResponseNotAllowed(handler.allowed_methods)
         
-        meth = getattr(handler, Resource.callmap.get(rm), None)
+        meth = getattr(handler, self.callmap.get(rm), None)
         
         if not meth:
             raise Http404
 
         # Support emitter both through (?P<emitter_format>) and ?format=emitter.
-        em_format = kwargs.pop('emitter_format', request.GET.get('format', 'json'))
+        em_format = self.determine_emitter(request, *args, **kwargs)
+
+        kwargs.pop('emitter_format', None)
         
         # Clean up the request object a bit, since we might
         # very well have `oauth_`-headers in there, and we
@@ -87,9 +131,9 @@ class Resource(object):
         
         try:
             result = meth(request, *args, **kwargs)
-        except FormValidationError, form:
+        except FormValidationError, e:
             # TODO: Use rc.BAD_REQUEST here
-            return HttpResponse("Bad Request: %s" % form.errors, status=400)
+            return HttpResponse("Bad Request: %s" % e.form.errors, status=400)
         except TypeError, e:
             result = rc.BAD_REQUEST
             hm = HandlerMethod(meth)
@@ -107,7 +151,8 @@ class Resource(object):
                 
             result.content = format_error(msg)
         except HttpStatusCode, e:
-            result = e
+            #result = e ## why is this being passed on and not just dealt with now?
+            return e.response
         except Exception, e:
             """
             On errors (like code errors), we'd like to be able to
@@ -123,24 +168,41 @@ class Resource(object):
             If `PISTON_DISPLAY_ERRORS` is not enabled, the caller will
             receive a basic "500 Internal Server Error" message.
             """
+            exc_type, exc_value, tb = sys.exc_info()
+            rep = ExceptionReporter(request, exc_type, exc_value, tb.tb_next)
             if self.email_errors:
-                exc_type, exc_value, tb = sys.exc_info()
-                rep = ExceptionReporter(request, exc_type, exc_value, tb.tb_next)
-
                 self.email_exception(rep)
-
             if self.display_errors:
-                result = format_error('\n'.join(rep.format_exception()))
+                return HttpResponseServerError(
+                    format_error('\n'.join(rep.format_exception())))
             else:
                 raise
 
         emitter, ct = Emitter.get(em_format)
-        srl = emitter(result, typemapper, handler, handler.fields, anonymous)
-        
+        fields = handler.fields
+        if hasattr(handler, 'list_fields') and (
+                isinstance(result, list) or isinstance(result, QuerySet)):
+            fields = handler.list_fields
+
+        srl = emitter(result, typemapper, handler, fields, anonymous)
+
         try:
-            return HttpResponse(srl.render(request), mimetype=ct)
+            """
+            Decide whether or not we want a generator here,
+            or we just want to buffer up the entire result
+            before sending it to the client. Won't matter for
+            smaller datasets, but larger will have an impact.
+            """
+            if self.stream: stream = srl.stream_render(request)
+            else: stream = srl.render(request)
+
+            resp = HttpResponse(stream, mimetype=ct)
+
+            resp.streaming = self.stream
+
+            return resp
         except HttpStatusCode, e:
-            return HttpResponse(e.message, status=e.code)
+            return e.response
 
     @staticmethod
     def cleanup_request(request):
