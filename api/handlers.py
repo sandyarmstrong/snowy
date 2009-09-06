@@ -53,18 +53,34 @@ class catch_and_return(object):
         return wrapper
 
 # http://domain/api/1.0
-class RootHandler(BaseHandler):
+class RootHandlerAnonymous(AnonymousBaseHandler):
     allow_methods = ('GET')
 
     def read(self, request):
         kwargs = {'username': request.user.username}
-        return {
-            'user-ref': {
+        return basic_root()
+
+# http://domain/api/1.0
+class RootHandler(BaseHandler):
+    allow_methods = ('GET')
+    anonymous = RootHandlerAnonymous
+
+    def read(self, request):
+        kwargs = {'username': request.user.username}
+        root = basic_root()
+        root['user-ref'] = {
                 'api-ref' : reverse_full('user_api_index', kwargs=kwargs),
                 'href' : reverse_full('user_index', kwargs=kwargs),
-            },
-            'api-version': '1.0'
-        }
+            }
+        return root
+
+def basic_root():
+    return {
+        'oauth_request_token_url': reverse_full('oauth_request_token'),
+        'oauth_authorize_url': reverse_full('oauth_user_auth'),
+        'oauth_access_token_url': reverse_full('oauth_access_token'),
+        'api-version': '1.0'
+    }
 
 # http://domain/api/1.0/user
 class UserHandler(AnonymousBaseHandler):
