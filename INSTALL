@@ -9,15 +9,20 @@ Running Snowy From Your Git Checkout
    python-lxml, python-tz, python-sqlite2, python-dateutil, python-setuptools,
    python-uuid, python-simplejson
 
-1. Install django from SVN:
-	svn co http://code.djangoproject.com/svn/django/trunk/ django
-	cd django && sudo python setup.py install
+1. Install django 1.1. If your distro does not have packages for 1.1, then
+   download the tarball and install it like so:
+	wget http://www.djangoproject.com/download/1.1/tarball/
+	tar zxvf Django-1.1.tar.gz
+	cd Django-1.1
+	sudo python setup.py install
 
 2. Set up your local settings file (in your snowy git checkout):
 	cp local_settings.py.in local_settings.py
 
 3. Setup snowy database (in your snowy git checkout):
 	python manage.py syncdb
+
+	NOTE: Don't name your admin user 'admin'
 
 4. Start local snowy (in your snowy git checkout):
 	python manage.py runserver
@@ -29,6 +34,12 @@ Running Snowy From Your Git Checkout
 
 		Domain name:  localhost:8000
 		Display name: Snowy
+
+	- In the Consumers table, make sure the 'anyone' consumer is set up:
+
+	        Key: anyone
+		Secret: anyone
+		Status: Accepted
 
 6. Play with snowy:
 	http://localhost:8000/myusername/notes (for example)
