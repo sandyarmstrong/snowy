@@ -1,1 +1,1 @@
-[{"pk": 1, "model": "piston.consumer", "fields": {"status": "accepted", "name": "Tomboy", "secret": "1234567", "user": null, "key": "abcdefg", "description": "Tomboy"}}]
+[{"pk": 1, "model": "piston.consumer", "fields": {"status": "accepted", "name": "Any Application", "secret": "anyone", "user": null, "key": "anyone", "description": "All implementations of the Tomboy web sync API must allow this consumer pair."}}]
