@@ -17,7 +17,7 @@
 {% else %}
             <td class="icon"><img src="{{ MEDIA_URL }}img/note_16.png" width="16" height="16" alt="Not pinned"/></td>
 {% endif %}
-            <td><a href="{{ note.get_absolute_url }}">{{ note.title }}</a></td>
+            <td><a href="{{ note.get_absolute_url }}">{{ note.title|safe }}</a></td>
             <td>{{ note.user_modified|naturalday|title }}</td>
             <td>{{ note.get_permissions_display }}</td>
         </tr>
