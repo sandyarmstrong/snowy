@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ItemType>PythonProject</ItemType>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{16E61EAD-5B9D-4697-9480-67FF695B7C62}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>Debug</OutputPath>
+    <Build>
+      <Build Optimize="false" />
+    </Build>
+    <Runtime>
+      <Runtime Module="main" PythonOptions="">
+        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime" />
+      </Runtime>
+    </Runtime>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>Release</OutputPath>
+    <Build>
+      <Build Optimize="true" />
+    </Build>
+    <Runtime>
+      <Runtime Module="main" PythonOptions="">
+        <Interpreter path="/usr/bin/python2.6" ctype="Python26Runtime" />
+      </Runtime>
+    </Runtime>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="manage.py" />
+    <Compile Include="settings.py" />
+    <Compile Include="urls.py" />
+    <Compile Include="api\handlers.py" />
+    <Compile Include="api\__init__.py" />
+    <Compile Include="api\models.py" />
+    <Compile Include="api\tests.py" />
+    <Compile Include="api\urls.py" />
+    <Compile Include="local_settings.py" />
+    <Compile Include="test_settings.py" />
+    <Compile Include="core\context_processors.py" />
+    <Compile Include="core\__init__.py" />
+    <Compile Include="core\urlresolvers.py" />
+    <Compile Include="core\templatetags\__init__.py" />
+    <Compile Include="core\templatetags\truncate.py" />
+    <Compile Include="core\templatetags\urlresolvers.py" />
+    <Compile Include="notes\admin.py" />
+    <Compile Include="notes\forms.py" />
+    <Compile Include="notes\__init__.py" />
+    <Compile Include="notes\managers.py" />
+    <Compile Include="notes\models.py" />
+    <Compile Include="notes\templates.py" />
+    <Compile Include="notes\tests.py" />
+    <Compile Include="notes\urls.py" />
+    <Compile Include="notes\views.py" />
+    <Compile Include="notes\templatetags\__init__.py" />
+    <Compile Include="notes\templatetags\notes.py" />
+    <Compile Include="accounts\forms.py" />
+    <Compile Include="accounts\__init__.py" />
+    <Compile Include="accounts\middleware.py" />
+    <Compile Include="accounts\models.py" />
+    <Compile Include="accounts\urls.py" />
+    <Compile Include="accounts\views.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="api\templates\api\mails\consumer_accepted.txt" />
+    <None Include="api\templates\api\mails\consumer_canceled.txt" />
+    <None Include="api\templates\api\mails\consumer_pending.txt" />
+    <None Include="api\templates\oauth\challenge.html" />
+    <None Include="api\templates\piston\authorize_token.html" />
+    <None Include="api\fixtures\basic.json" />
+    <None Include="api\fixtures\initial_data.json" />
+    <None Include="INSTALL" />
+    <None Include="local_settings.py.in" />
+    <None Include="README" />
+    <None Include="snowy.doap" />
+    <None Include="TODO" />
+    <None Include="data\html2body.xsl" />
+    <None Include="data\note2xhtml.xsl" />
+    <None Include="notes\templates\notes\base.html" />
+    <None Include="notes\templates\notes\note_detail.html" />
+    <None Include="notes\templates\notes\note_list.html" />
+    <None Include="notes\templates\notes\note_list_snippet.html" />
+    <None Include="notes\templates\notes\note_search.html" />
+    <None Include="site_media\css\print.css" />
+    <None Include="site_media\css\screen.css" />
+    <None Include="site_media\js\DUI.js" />
+    <None Include="site_media\js\funcooker.js" />
+    <None Include="site_media\js\jquery.js" />
+    <None Include="site_media\js\jquery.min.js" />
+    <None Include="site_media\js\jquery.scrollfollow.js" />
+    <None Include="site_media\js\jquery-ui.js" />
+    <None Include="site_media\js\jquery-ui.min.js" />
+    <None Include="templates\base.html" />
+    <None Include="templates\index.html" />
+    <None Include="templates\site_base.html" />
+    <None Include="accounts\templates\accounts\preferences.html" />
+    <None Include="accounts\templates\registration\activate.html" />
+    <None Include="accounts\templates\registration\activation_email.txt" />
+    <None Include="accounts\templates\registration\activation_email_subject.txt" />
+    <None Include="accounts\templates\registration\login.html" />
+    <None Include="accounts\templates\registration\logout.html" />
+    <None Include="accounts\templates\registration\registration_complete.html" />
+    <None Include="accounts\templates\registration\registration_form.html" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy NoTabsAfterNonTabs="False" inheritsSet="Mono" inheritsScope="text/x-python" scope="text/x-python" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>

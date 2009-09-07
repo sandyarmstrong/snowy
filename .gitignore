@@ -3,3 +3,5 @@
 *.mo
 snowy.db
 local_settings.py
+*.userprefs
+*.pidb
