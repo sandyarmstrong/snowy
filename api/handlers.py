@@ -54,7 +54,7 @@ class catch_and_return(object):
 
 # http://domain/api/1.0
 class RootHandlerAnonymous(AnonymousBaseHandler):
-    allow_methods = ('GET')
+    allowed_methods = ('GET',)
 
     def read(self, request):
         kwargs = {'username': request.user.username}
@@ -62,7 +62,7 @@ class RootHandlerAnonymous(AnonymousBaseHandler):
 
 # http://domain/api/1.0
 class RootHandler(BaseHandler):
-    allow_methods = ('GET')
+    allowed_methods = ('GET',)
     anonymous = RootHandlerAnonymous
 
     def read(self, request):
@@ -84,7 +84,7 @@ def basic_root():
 
 # http://domain/api/1.0/user
 class UserHandler(AnonymousBaseHandler):
-    allow_methods = ('GET',)
+    allowed_methods = ('GET',)
 
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
@@ -106,7 +106,7 @@ class UserHandler(AnonymousBaseHandler):
 
 # http://domain/api/1.0/user/notes
 class NotesHandler(BaseHandler):
-    allow_methods = ('GET', 'PUT')
+    allowed_methods = ('GET', 'PUT')
 
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)
     def read(self, request, username):
@@ -189,7 +189,7 @@ class NotesHandler(BaseHandler):
 
 # http://domain/api/1.0/user/notes/id
 class NoteHandler(BaseHandler):
-    allow_methods = ('GET',)
+    allowed_methods = ('GET',)
     model = Note
 
     @catch_and_return(ObjectDoesNotExist, rc.NOT_HERE)

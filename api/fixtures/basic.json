@@ -1,0 +1,9 @@
+[{"pk": 1, "model": "auth.user", "fields": {"username": "admin", "first_name": "", "last_name": "", "is_active": true, "is_superuser": true, "is_staff": true, "last_login": "2009-07-22 13:18:30", "groups": [], "user_permissions": [], "password": "sha1$5a2b0$db6f412d1b56d44e13d1588442bd604d15d4310b", "email": "admin@snowy.com", "date_joined": "2009-07-22 13:18:04"}},
+ 
+{"pk": 2, "model": "auth.user", "fields": {"username": "test1", "first_name": "John", "last_name": "Doe", "is_active": true, "is_superuser": false, "is_staff": false, "last_login": "2009-07-22 19:44:43", "groups": [], "user_permissions": [], "password": "sha1$05fc9$6cc1e54c73ad45bfbd35b9a5bf6d6c53b4452f86", "email": "john@doe.com", "date_joined": "2009-07-22 19:43:27"}},
+
+{"pk": 1, "model": "accounts.userprofile", "fields": {"latest_sync_rev": -1, "current_sync_uuid": "5ec1f08a-19f1-416a-b086-ff22f6f7c9e8", "user": 1, "language": null}},
+
+{"pk": 2, "model": "accounts.userprofile", "fields": {"latest_sync_rev": -1, "current_sync_uuid": "1886ae92-6c46-43e8-86c0-bb74df89f66c", "user": 2, "language": null}},
+
+{"pk": 1, "model": "piston.consumer", "fields": {"status": "accepted", "name": "Tomboy", "secret": "1234567", "user": null, "key": "abcdefg", "description": "Tomboy"}}]
