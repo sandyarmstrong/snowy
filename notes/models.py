@@ -56,7 +56,7 @@ class Note(models.Model):
 
     class Meta:
         get_latest_by = 'user_modified'
-        unique_together = (('author', 'title'), ('author', 'guid'), )
+        unique_together = (('author', 'guid'), )
 
     def __unicode__(self):
         return self.title
