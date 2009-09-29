@@ -30,7 +30,7 @@ from snowy.notes.models import *
 from snowy import settings
 
 def note_index(request, username,
-               template_name='note/note_index.html'):
+               template_name='notes/note_index.html'):
     author = get_object_or_404(User, username=username)
 
     # TODO: retrieve the last open note from the user

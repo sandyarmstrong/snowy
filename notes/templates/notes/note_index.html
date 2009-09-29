@@ -1,0 +1,54 @@
+{% extends 'notes/base.html' %}
+
+{% load i18n %}
+{% load notes %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block title %}{{ title|safe }} | Notes | {{ block.super }}{% endblock %}
+
+{% block sidebar %}
+{{ block.super }}
+{% user_notes_list request author as all_notes %}
+<div id="sidebar-note-list">
+    <ul>
+{% for n in all_notes %}
+        <li class="note-item{% if n.pinned %} pinned{% endif %}"><a href="{{ n.get_absolute_url }}">{{ n.title|safe }}</a></li>
+{% endfor %}
+        <li class="more-item"><a href="{% url note_list author.username %}">{% trans "More Notes..." %}</a></li>
+    </ul>
+    <hr />
+    <ul>
+{# Enable when we allow editing #}
+{% comment %}
+        <li id="new-note"><a href="#">New Note...</a></li>
+{% endcomment %}
+    </ul>
+</div>
+<div id="sidebar-notebook-list">
+    <h3>{% trans "Notebooks" %}</h3>
+    <ul> 
+{% user_notebook_list request author as all_notebooks %}
+{% for n in all_notebooks %}
+        <li class="notebook-item"><a href="#">{{ n.get_name_for_display }}</a></li>
+{% endfor %}
+        <li class="more-item"><a href="#">{% trans "More Notebooks..." %}</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<table id="content-layout" cellspacing="0" cellpadding="0">
+    <tr>
+        <td id="note">
+            <h1>{% trans "Notice" %}</h1>
+            <div id="funcooker">
+                {% trans "You haven't synced any notes with Snowy yet." %}
+            </div>
+        </td>
+        <td>
+        </td>
+    </br>
+</table>
+{% endblock %}
