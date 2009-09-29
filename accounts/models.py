@@ -34,6 +34,9 @@ class UserProfile(models.Model):
                                 verbose_name=_(u'Application Language'),
                                 null=True, blank=True)
 
+    def __unicode__(self):
+        return str(self.user)
+
 def _create_profile(sender, instance, created, **kwargs):
     """
     Create a UserProfile object in response to a new User being created.
