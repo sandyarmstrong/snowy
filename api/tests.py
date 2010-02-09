@@ -179,10 +179,11 @@ class ApiTestCase(TestCase):
 
     def testUserBadMethods(self):
         # PUT/POST/DELETE are not allowed
-        response = self.admin_requester.put('/api/1.0/admin/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.put('/api/1.0/admin/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-        response = self.admin_requester.post('/api/1.0/admin/', '')
+        response = self.admin_requester.post('/api/1.0/admin/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
         response = self.admin_requester.delete('/api/1.0/admin/')
@@ -236,16 +237,17 @@ class ApiTestCase(TestCase):
 
     def testRootBadMethods(self):
         # PUT/POST/DELETE are not allowed
-        response = self.admin_requester.put('/api/1.0/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.put('/api/1.0/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-        response = self.admin_requester.post('/api/1.0/', '')
+        response = self.admin_requester.post('/api/1.0/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
         response = self.admin_requester.delete('/api/1.0/')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-
+        
     def testNotes(self):
         noteJson = '{"guid": "002e91a2-2e34-4e2d-bf88-21def49a7705",' + \
                    '"title" :"New Note 6",' + \
@@ -305,7 +307,8 @@ class ApiTestCase(TestCase):
 
     def testNotesBadMethods(self):
         # POST/DELETE are not allowed
-        response = self.admin_requester.post('/api/1.0/admin/notes/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.post('/api/1.0/admin/notes/',  '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET, PUT')
         response = self.admin_requester.delete('/api/1.0/admin/notes/')
@@ -318,10 +321,11 @@ class ApiTestCase(TestCase):
 
     def testNoteBadMethods(self):
         # PUT/POST/DELETE are not allowed
-        response = self.admin_requester.put('/api/1.0/admin/notes/1/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.put('/api/1.0/admin/notes/1/',  '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-        response = self.admin_requester.post('/api/1.0/admin/notes/1/', '')
+        response = self.admin_requester.post('/api/1.0/admin/notes/1/',  '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
         response = self.admin_requester.delete('/api/1.0/admin/notes/1/')
