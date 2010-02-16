@@ -316,8 +316,39 @@ class ApiTestCase(TestCase):
         self.assertEqual(response['Allow'], 'GET, PUT')
 
     def testNote(self):
-        # TODO
-        pass
+        note = {
+                    "note-content": "New Note 6\\nDescribe youre note <b>here</b>.", 
+                    "open-on-startup": False, 
+                    "last-metadata-change-date": "2009-04-20T02:29:23.219734-05:00", 
+                    "tags": [
+                        "tag1", 
+                        "tag2"
+                        ], 
+                    "title": "New Note 6", 
+                    "create-date": "2008-03-06T16:44:46.434268-05:00", 
+                    "pinned": False,
+                    "last-sync-revision": 0, 
+                    "last-change-date": "2009-04-20T02:29:23.219734-05:00", 
+                    "guid": "002e91a2-2e34-4e2d-bf88-21def49a7705"
+                }
+
+        singleNote = {
+                         "note": [note, ] 
+                     }
+
+        # Put testing data into the database
+        notesJson = '{"latest-sync-revision" : 0,' + \
+                    '"note-changes" : [' + json.dumps(note) + ']}'
+        response = self.admin_requester.put ('/api/1.0/admin/notes/', notesJson)
+        
+        # Strip the domain from the api-ref
+        noteAPIRef = json.loads(response.content)['notes'][0]['ref']['api-ref']
+        noteAPIRef = noteAPIRef.partition('/api/')[1] + noteAPIRef.partition('/api/')[2]
+        
+        response = self.admin_requester.get (noteAPIRef)
+        #print response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), singleNote)
 
     def testNoteBadMethods(self):
         # PUT/POST/DELETE are not allowed
