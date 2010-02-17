@@ -128,7 +128,7 @@ class NotesHandler(BaseHandler):
     @transaction.commit_on_success
     def update(self, request, username):
         def clean_date(date):
-            return parser.parse(date).astimezone(pytz.timezone(settings.TIME_ZONE))
+            return parser.parse(date).astimezone(pytz.utc)
 
         author = User.objects.get(username=username)
         if request.user != author:
@@ -202,8 +202,9 @@ class NoteHandler(BaseHandler):
 
 def describe_note(note):
     def local_iso(date):
-        return date.replace(tzinfo=pytz.timezone(settings.TIME_ZONE)) \
-                   .isoformat()
+        return date.replace(tzinfo=pytz.utc).isoformat()
+        #TODO: Return new format below for newer clients
+        #return date.replace(tzinfo=pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     return {
         'guid': note.guid,
