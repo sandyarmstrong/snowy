@@ -1,6 +1,8 @@
 import urllib
 import base64
 
+from dateutil import parser
+
 # Use simplejson or Python 2.6 json, prefer simplejson.
 try:
     import simplejson as json
@@ -321,22 +323,18 @@ class ApiTestCase(TestCase):
         note = {
                     "note-content": "New Note 6\\nDescribe youre note <b>here</b>.", 
                     "open-on-startup": False, 
-                    "last-metadata-change-date": "2009-04-20T02:29:23.219734-05:00", 
+                    "last-metadata-change-date": "2010-01-28T18:30:45Z",
                     "tags": [
                         "tag1", 
                         "tag2"
                         ], 
                     "title": "New Note 6", 
-                    "create-date": "2008-03-06T16:44:46.434268-05:00", 
+                    "create-date": "2009-08-28T18:30:45Z",
                     "pinned": False,
                     "last-sync-revision": 0, 
-                    "last-change-date": "2009-04-20T02:29:23.219734-05:00", 
+                    "last-change-date": "2010-01-28T18:30:45Z",
                     "guid": "002e91a2-2e34-4e2d-bf88-21def49a7705"
                 }
-
-        singleNote = {
-                         "note": [note, ] 
-                     }
 
         # Put testing data into the database
         notesJson = '{"latest-sync-revision" : 0,' + \
@@ -346,11 +344,11 @@ class ApiTestCase(TestCase):
         # Strip the domain from the api-ref
         noteAPIRef = json.loads(response.content)['notes'][0]['ref']['api-ref']
         noteAPIRef = noteAPIRef.partition('/api/')[1] + noteAPIRef.partition('/api/')[2]
-        
-        response = self.admin_requester.get (noteAPIRef)
-        #print response
+        response = self.admin_requester.get(noteAPIRef)
+        responseNote = json.loads(response.content)['note'][0]
+
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), singleNote)
+        self.assertEqual(responseNote, note)
 
     def testNoteBadMethods(self):
         # PUT/POST/DELETE are not allowed
