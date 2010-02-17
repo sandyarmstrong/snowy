@@ -75,14 +75,15 @@ class OAuthRequester:
 
         self.oa_atoken = oa_atoken
 
-    def build_request(self, abs_uri, method):
+    def build_request(self, abs_uri, method, parameters={}):
         url = 'http://' + self.SERVER_NAME + abs_uri
         oaconsumer = oauth.OAuthConsumer(self.consumer.key,
                                          self.consumer.secret)
         request = oauth.OAuthRequest.from_consumer_and_token(oaconsumer,
                                                              token=self.oa_atoken,
                                                              http_url=url,
-                                                             http_method=method)
+                                                             http_method=method,
+                                                             parameters=parameters)
         request.sign_request(self.signature_method, oaconsumer, self.oa_atoken)
         return request
 
@@ -103,7 +104,8 @@ class OAuthRequester:
                                          HTTP_AUTHORIZATION=auth)
 
     def post(self, abs_uri, json):
-        request = self.build_request(abs_uri, 'POST')
+        # Pass the json data to be appended to the http header - seems to work
+        request = self.build_request(abs_uri, 'POST', parameters={json : ''})
         auth = self.build_auth_header(request)
         return self.test_case.client.post(abs_uri, data=json,
                                           content_type='application/json',
