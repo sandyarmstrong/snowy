@@ -128,7 +128,10 @@ class NotesHandler(BaseHandler):
     @transaction.commit_on_success
     def update(self, request, username):
         def clean_date(date):
-            return parser.parse(date).astimezone(pytz.utc)
+            """Set tzinfo=None because some DB engines do not accept
+            timezone-aware dates. As long as all dates in the database
+            are UTC, this is not a problem."""
+            return parser.parse(date).astimezone(pytz.utc).replace(tzinfo=None)
 
         author = User.objects.get(username=username)
         if request.user != author:
