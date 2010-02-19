@@ -202,9 +202,7 @@ class NoteHandler(BaseHandler):
 
 def describe_note(note):
     def local_iso(date):
-        return date.replace(tzinfo=pytz.utc).isoformat()
-        #TODO: Return new format below for newer clients
-        #return date.replace(tzinfo=pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+        return date.replace(tzinfo=pytz.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     return {
         'guid': note.guid,
