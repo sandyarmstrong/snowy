@@ -1,6 +1,8 @@
 import urllib
 import base64
 
+from dateutil import parser
+
 # Use simplejson or Python 2.6 json, prefer simplejson.
 try:
     import simplejson as json
@@ -75,14 +77,15 @@ class OAuthRequester:
 
         self.oa_atoken = oa_atoken
 
-    def build_request(self, abs_uri, method):
+    def build_request(self, abs_uri, method, parameters={}):
         url = 'http://' + self.SERVER_NAME + abs_uri
         oaconsumer = oauth.OAuthConsumer(self.consumer.key,
                                          self.consumer.secret)
         request = oauth.OAuthRequest.from_consumer_and_token(oaconsumer,
                                                              token=self.oa_atoken,
                                                              http_url=url,
-                                                             http_method=method)
+                                                             http_method=method,
+                                                             parameters=parameters)
         request.sign_request(self.signature_method, oaconsumer, self.oa_atoken)
         return request
 
@@ -103,7 +106,8 @@ class OAuthRequester:
                                          HTTP_AUTHORIZATION=auth)
 
     def post(self, abs_uri, json):
-        request = self.build_request(abs_uri, 'POST')
+        # Pass the json data to be appended to the http header - seems to work
+        request = self.build_request(abs_uri, 'POST', parameters={json : ''})
         auth = self.build_auth_header(request)
         return self.test_case.client.post(abs_uri, data=json,
                                           content_type='application/json',
@@ -179,10 +183,11 @@ class ApiTestCase(TestCase):
 
     def testUserBadMethods(self):
         # PUT/POST/DELETE are not allowed
-        response = self.admin_requester.put('/api/1.0/admin/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.put('/api/1.0/admin/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-        response = self.admin_requester.post('/api/1.0/admin/', '')
+        response = self.admin_requester.post('/api/1.0/admin/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
         response = self.admin_requester.delete('/api/1.0/admin/')
@@ -236,16 +241,17 @@ class ApiTestCase(TestCase):
 
     def testRootBadMethods(self):
         # PUT/POST/DELETE are not allowed
-        response = self.admin_requester.put('/api/1.0/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.put('/api/1.0/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-        response = self.admin_requester.post('/api/1.0/', '')
+        response = self.admin_requester.post('/api/1.0/', '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
         response = self.admin_requester.delete('/api/1.0/')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-
+        
     def testNotes(self):
         noteJson = '{"guid": "002e91a2-2e34-4e2d-bf88-21def49a7705",' + \
                    '"title" :"New Note 6",' + \
@@ -305,7 +311,8 @@ class ApiTestCase(TestCase):
 
     def testNotesBadMethods(self):
         # POST/DELETE are not allowed
-        response = self.admin_requester.post('/api/1.0/admin/notes/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.post('/api/1.0/admin/notes/',  '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET, PUT')
         response = self.admin_requester.delete('/api/1.0/admin/notes/')
@@ -313,15 +320,43 @@ class ApiTestCase(TestCase):
         self.assertEqual(response['Allow'], 'GET, PUT')
 
     def testNote(self):
-        # TODO
-        pass
+        note = {
+                    "note-content": "New Note 6\\nDescribe youre note <b>here</b>.", 
+                    "open-on-startup": False, 
+                    "last-metadata-change-date": "2010-01-28T18:30:45Z",
+                    "tags": [
+                        "tag1", 
+                        "tag2"
+                        ], 
+                    "title": "New Note 6", 
+                    "create-date": "2009-08-28T18:30:45Z",
+                    "pinned": False,
+                    "last-sync-revision": 0, 
+                    "last-change-date": "2010-01-28T18:30:45Z",
+                    "guid": "002e91a2-2e34-4e2d-bf88-21def49a7705"
+                }
+
+        # Put testing data into the database
+        notesJson = '{"latest-sync-revision" : 0,' + \
+                    '"note-changes" : [' + json.dumps(note) + ']}'
+        response = self.admin_requester.put ('/api/1.0/admin/notes/', notesJson)
+        
+        # Strip the domain from the api-ref
+        noteAPIRef = json.loads(response.content)['notes'][0]['ref']['api-ref']
+        noteAPIRef = noteAPIRef.partition('/api/')[1] + noteAPIRef.partition('/api/')[2]
+        response = self.admin_requester.get(noteAPIRef)
+        responseNote = json.loads(response.content)['note'][0]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(responseNote, note)
 
     def testNoteBadMethods(self):
         # PUT/POST/DELETE are not allowed
-        response = self.admin_requester.put('/api/1.0/admin/notes/1/', '')
+        # POST and PUT need some dummy data, otherwise piston replies "Bad Request"
+        response = self.admin_requester.put('/api/1.0/admin/notes/1/',  '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
-        response = self.admin_requester.post('/api/1.0/admin/notes/1/', '')
+        response = self.admin_requester.post('/api/1.0/admin/notes/1/',  '{ "test" : "test" }')
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response['Allow'], 'GET')
         response = self.admin_requester.delete('/api/1.0/admin/notes/1/')
