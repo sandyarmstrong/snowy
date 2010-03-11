@@ -11,3 +11,5 @@ DATABASE_NAME = 'snowy.db'  # Or path to database file if using sqlite3.
 RECAPTCHA_ENABLED = False
 RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''
+
+EMAIL_PORT = 1025
