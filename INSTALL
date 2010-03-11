@@ -49,4 +49,7 @@ Running Snowy From Your Git Checkout
 
 Installing/Deploying Snowy
 --
-TODO
+For now, the WSGI deployment guide lives online at:
+http://live.gnome.org/Snowy/WSGI
+
+Other guides can be found listed at: http://live.gnome.org/Snowy
