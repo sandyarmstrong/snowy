@@ -1,5 +1,7 @@
 Running Snowy From Your Git Checkout
 --
+-1. Verify that your checkout is called "snowy" (all lower-case).
+
 0. Install python-libxslt, python-libxml2, python-pytz, and python-sqlite,
    python-dateutil, python-pkg-resources, python-uuid
    (package names somewhat different from distro to distro).
