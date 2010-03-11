@@ -26,10 +26,16 @@ Running Snowy From Your Git Checkout
 
 	NOTE: Don't name your admin user 'admin'
 
-4. Start local snowy (in your snowy git checkout):
+4. Start mail debugging server (in your snowy git checkout):
+	python manage.py debugmail
+
+	NOTE: This is only needed if Snowy needs to send mails (like in the
+	case of user registration) and you don't have an SMTP server set up.
+
+5. Start local snowy (in your snowy git checkout):
 	python manage.py runserver
 
-5. Admin your snowy:
+6. Admin your snowy:
 	http://localhost:8000/admin
 
 	- In the Sites table, make sure to set the domain and name properly, e.g.:
@@ -43,7 +49,7 @@ Running Snowy From Your Git Checkout
 		Secret: anyone
 		Status: Accepted
 
-6. Play with snowy:
+7. Play with snowy:
 	http://localhost:8000/myusername/notes (for example)
 
 
