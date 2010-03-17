@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'core',
     'api',
     'accounts',
+    'django_openid_auth',
     'notes',
 
     # System apps
@@ -143,7 +144,11 @@ ACCOUNT_ACTIVATION_DAYS = 15
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
+OPENID_CREATE_USERS = True
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/openid/login/'
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.

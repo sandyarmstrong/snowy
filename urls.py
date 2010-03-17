@@ -28,7 +28,7 @@ urlpatterns = patterns('',
 
     (r'^api/', include('snowy.api.urls')),
     (r'^accounts/', include('snowy.accounts.urls')),
-
+    (r'^openid/', include('django_openid_auth.urls')),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
 
