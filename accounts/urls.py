@@ -24,16 +24,21 @@ from django.conf.urls.defaults import *
 from registration.views import activate
 from registration.views import register
 
+import django_openid_auth.views
+
 urlpatterns = patterns('',
     url(r'^preferences/$', 'snowy.accounts.views.accounts_preferences',
         name='preferences'),
 
-    # Registration URLs
-    url(r'^activate/(?P<activation_key>\w+)/$', activate, name='registration_activate'),
-    url(r'^login/$', auth_views.login, {'template_name': 'registration/login.html'},
-        name='auth_login'),
     url(r'^logout/$', auth_views.logout, {'template_name': 'registration/logout.html'},
         name='auth_logout'),
+
+    # OpenID URLs
+    url(r'^openid/login/$', django_openid_auth.views.login_begin,
+        {'template_name': 'openid/login.html'}, name='openid_login'),
+    
+    # Registration URLs
+    url(r'^activate/(?P<activation_key>\w+)/$', activate, name='registration_activate'),
     url(r'^password/change/$', auth_views.password_change, name='auth_password_change'),
     url(r'^password/change/done/$', auth_views.password_change_done,
         name='auth_password_change_done'),
@@ -44,6 +49,8 @@ urlpatterns = patterns('',
         name='auth_password_reset_complete'),
     url(r'^password/reset/done/$', auth_views.password_reset_done,
         name='auth_password_reset_done'),
+    url(r'^register/login/$', auth_views.login, {'template_name': 'registration/login.html'},
+        name='auth_login'),
     url(r'^register/$', register, {'form_class': RegistrationFormUniqueUser},
         name='registration_register'),
     url(r'^register/complete/$', direct_to_template,

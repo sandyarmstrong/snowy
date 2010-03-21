@@ -148,7 +148,7 @@ OPENID_CREATE_USERS = True
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = '/openid/login/'
+LOGIN_URL = '/accounts/openid/login/'
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
