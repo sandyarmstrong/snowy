@@ -214,8 +214,8 @@ def describe_note(note):
         'last-change-date': local_iso(note.user_modified),
         'last-metadata-change-date': local_iso(note.modified),
         'create-date': local_iso(note.created),
-        'open-on-startup': note.open_on_startup,
-        'pinned': note.pinned,
+        'open-on-startup': note.open_on_startup == True,
+        'pinned': note.pinned == True,
         'last-sync-revision': note.last_sync_rev,
         'tags': [t.name for t in note.tags.all()],
     }
