@@ -1,29 +1,8 @@
 TODO
 ========================
 
-All non-editing tasks have been moved to the wiki:
-http://live.gnome.org/Snowy/TomboyOnlineRoadmap
+All tasks have been moved to the wiki and/or bugzilla:
 
-There is no schedule for when editing will be re-enabled in Snowy, but these are
-the relevant outstanding tasks we identified back when we were working on it.
+ * http://live.gnome.org/Snowy/TomboyOnlineRoadmap
 
- * Note Editing
-   - Renaming (incl. altering internal links)
-   - Delete note link
-   - History viewer
-   - Sharing UI
-   - New note page
-
- * Note Editor (Funcooker)
-   - Refactor to use customCommand
-   - Link editor UI
-   - Fix bugs when assigning more than one tag to something
-     (e.g.: highlight + large)
-   - Bullets, Increase/Decrease indent buttons
-   - AJAX save every 4 seconds
-   - Translate XHTML back to Tomboy XML for saving
-     + Needs to work in IE7/IE8, Opera, Safari 3/4, FF 3.0/3.5/3.6, Chrome
-
- * Notebooks
-   - List/detail pages
-   - Add notes to a notebook
+ * https://bugzilla.gnome.org/browse.cgi?product=snowy
