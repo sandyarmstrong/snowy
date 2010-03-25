@@ -1,34 +1,11 @@
 TODO
 ========================
- * General
-   - Create a NoteManager to handle permissions in one place and unit test
-   - More complicated permissions to allow for sharing
-   - Sitemap
-   - Ponies
-   - Populate Site as management function
 
- * Design
-   - Consistent design throughout site
-   - iPhone/G1 skin/theme
-   - Snowy logo
-   - Design for _list pages
+All non-editing tasks have been moved to the wiki:
+http://live.gnome.org/Snowy/TomboyOnlineRoadmap
 
- * I18N
-   - Audit translatable strings
-
- * Accounts
-   - Preferences page
-     + API access
-
- * REST API
-   - Audit data leakage
-   - Unit tests
-   - User agent type thing for clients using REST API
-   - Documentation via Piston
-
- * Note View
-   - Show which notebooks a note is part of
-   - Better page to show when current user can't view a note
+There is no schedule for when editing will be re-enabled in Snowy, but these are
+the relevant outstanding tasks we identified back when we were working on it.
 
  * Note Editing
    - Renaming (incl. altering internal links)
