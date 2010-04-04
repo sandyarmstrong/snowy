@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block sidebar %}
-<form method="GET" name="searchForm" action="{% url note_search request.user.username %}">
+<form method="GET" name="searchForm" action="{% url note_search author.username %}">
     <input type="text" id="search" class="dim" name="query" accesskey="s" value="{% trans "Search your notes" %}">
 </form>
 {% endblock %}
