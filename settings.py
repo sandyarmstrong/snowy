@@ -150,6 +150,13 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/openid/login/'
 
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
+                           'django_openid_auth.auth.OpenIDBackend',
+                           #'socialauth.auth_backends.TwitterBackend',
+                           #'socialauth.auth_backends.FacebookBackend',
+                           )
+
+
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
 try:
