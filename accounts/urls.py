@@ -36,7 +36,8 @@ urlpatterns = patterns('',
     # OpenID URLs
     url(r'^openid/login/$', django_openid_auth.views.login_begin,
         {'template_name': 'openid/login.html'}, name='openid_login'),
-    
+    url(r'^openid/complete/$', django_openid_auth.views.login_complete),
+
     # Registration URLs
     url(r'^activate/(?P<activation_key>\w+)/$', activate, name='registration_activate'),
     url(r'^password/change/$', auth_views.password_change, name='auth_password_change'),
