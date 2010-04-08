@@ -22,7 +22,7 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.conf import settings
 
-from snowy.accounts.forms import InternationalizationForm
+from snowy.accounts.forms import InternationalizationForm, EmailChangeForm
 
 @login_required
 def accounts_preferences(request, template_name='accounts/preferences.html'):
@@ -36,6 +36,14 @@ def accounts_preferences(request, template_name='accounts/preferences.html'):
     else:
         password_form = PasswordChangeForm(user)
 
+    if 'email_form' in request.POST:
+        email_form = EmailChangeForm(request.POST, instance=profile)
+        if email_form.is_valid():
+            print 'Email form is valid!'
+            email_form.save()
+    else:
+        email_form = EmailChangeForm(instance=profile)
+
     if 'i18n_form' in request.POST:
         i18n_form = InternationalizationForm(request.POST, instance=profile)
         if i18n_form.is_valid():
@@ -46,5 +54,6 @@ def accounts_preferences(request, template_name='accounts/preferences.html'):
 
     return render_to_response(template_name,
                               {'user': user, 'i18n_form': i18n_form,
-                               'password_form': password_form},
+                               'password_form': password_form,
+                               'email_form' : email_form},
                               context_instance=RequestContext(request))

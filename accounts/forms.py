@@ -74,3 +74,26 @@ class InternationalizationForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ('language',)
+
+class EmailChangeForm(forms.ModelForm):
+    """
+    This code is adapted from
+    http://stackoverflow.com/questions/1075314/allow-changing-of-user-fields-like-email-with-django-profiles
+    """
+    def __init__(self, *args, **kwargs):
+        super(EmailChangeForm, self).__init__(*args, **kwargs)
+        try:
+            self.fields['email'].initial = self.instance.user.email
+        except User.DoesNotExist:
+            pass
+
+    email = forms.EmailField(label="Email address")
+
+    def save(self, *args, **kwargs):
+        """
+        Update the email address on the user object
+        """
+        u = self.instance.user
+        u.email = self.cleaned_data['email']
+        u.save()
+        return u.email
