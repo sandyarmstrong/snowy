@@ -30,7 +30,13 @@
                 </td>
                 <td id="header-auth">
 {% if user.is_authenticated %}
-                    <h3>{{ user }}</h3>
+                    <h3>
+                      {% if user.get_profile.display_name %}
+                      {{ user.get_profile.display_name }}
+                      {% else %}
+                      {{ user }}
+                      {% endif %}
+                    </h3>
                     <p><a href="{% url preferences %}">{% trans "preferences" %}</a> / <a href="{% url django.contrib.auth.views.logout %}">{% trans "log out" %}</a></p>
 {% else %}
                     <p>{% trans "hello stranger! care to " %}<a href="{% url openid_login %}">{% trans "log in" %}</a>{% trans "?" %}</p>

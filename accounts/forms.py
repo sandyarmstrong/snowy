@@ -75,6 +75,11 @@ class InternationalizationForm(forms.ModelForm):
         model = UserProfile
         fields = ('language',)
 
+class DisplayNameChangeForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ('display_name',)
+
 class EmailChangeForm(forms.ModelForm):
     """
     This code is adapted from

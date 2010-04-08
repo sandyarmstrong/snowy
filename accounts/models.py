@@ -33,6 +33,7 @@ class UserProfile(models.Model):
     language = models.CharField(max_length=5, choices=settings.LANGUAGES,
                                 verbose_name=_(u'Application Language'),
                                 null=True, blank=True)
+    display_name = models.CharField(_('display name'), max_length=80)
 
     def __unicode__(self):
         return str(self.user)
