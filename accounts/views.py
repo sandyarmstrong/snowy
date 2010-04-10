@@ -23,7 +23,33 @@ from django.template import RequestContext
 from django.conf import settings
 
 from snowy.accounts.forms import InternationalizationForm, EmailChangeForm, \
-    DisplayNameChangeForm
+    DisplayNameChangeForm, InitialPreferencesForm
+
+@login_required
+def initial_preferences(request, template_name='accounts/initial_preferences.html'):
+    user = request.user
+    profile = user.get_profile()
+
+    if 'initial_preferences_form' in request.POST:
+        email_form = EmailChangeForm(request.POST, instance=profile)
+        if email_form.is_valid():
+            print 'Email form is valid!'
+            email_form.save()
+
+        display_name_form = DisplayNameChangeForm(request.POST, instance=profile)
+        if display_name_form.is_valid():
+            print 'Display Name form is valid!'
+            display_name_form.save()
+
+        if email_form.is_valid() and display_name_form.is_valid():
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+
+    initial_preferences_form = InitialPreferencesForm(instance=profile)
+
+    return render_to_response(template_name,
+                              {'user': user,
+                               'initial_preferences_form' : initial_preferences_form},
+                              context_instance=RequestContext(request))
 
 @login_required
 def accounts_preferences(request, template_name='accounts/preferences.html'):

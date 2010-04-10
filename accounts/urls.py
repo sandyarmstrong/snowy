@@ -30,6 +30,9 @@ urlpatterns = patterns('',
     url(r'^preferences/$', 'snowy.accounts.views.accounts_preferences',
         name='preferences'),
 
+    url(r'^initial_preferences/$', 'snowy.accounts.views.initial_preferences',
+        name='initial_preferences'),
+
     url(r'^logout/$', auth_views.logout, {'template_name': 'registration/logout.html'},
         name='auth_logout'),
 

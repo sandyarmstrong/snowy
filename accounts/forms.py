@@ -73,7 +73,7 @@ from snowy.accounts.models import UserProfile
 class InternationalizationForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ('language',)
+        fields = ('language', )
 
 class DisplayNameChangeForm(forms.ModelForm):
     class Meta:
@@ -102,3 +102,17 @@ class EmailChangeForm(forms.ModelForm):
         u.email = self.cleaned_data['email']
         u.save()
         return u.email
+
+class InitialPreferencesForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(InitialPreferencesForm, self).__init__(*args, **kwargs)
+        try:
+            self.fields['email'].initial = self.instance.user.email
+            self.fields['display_name'].initial = self.instance.display_name
+        except User.DoesNotExist:
+            pass
+
+    email = forms.EmailField(label="Email address")
+    display_name = forms.CharField(max_length=80, label="Display Name",
+                                   help_text="This name will be shown to other users when sharing notes")
