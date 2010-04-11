@@ -207,7 +207,11 @@ def login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
-                return HttpResponseRedirect(sanitise_redirect_url(redirect_to))
+                # Check if the user has filled in relevant credentials
+                if (user.get_profile().display_name and user.email):
+                    return HttpResponseRedirect(sanitise_redirect_url(redirect_to))
+                else:
+                    return HttpResponseRedirect(reverse('initial_preferences'))
             else:
                 return render_failure(request, 'Disabled account')
         else:
