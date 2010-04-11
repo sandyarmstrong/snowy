@@ -94,12 +94,17 @@ class OpenIDBackend:
 
     def create_user_from_openid(self, openid_response):
         sreg_response = sreg.SRegResponse.fromSuccessResponse(openid_response)
-        if sreg_response:
+        # Don't set username from sreg - django doesn't like some characters
+        # Related bug: https://bugs.launchpad.net/django-openid-auth/+bug/388890
+        """if sreg_response:
             nickname = sreg_response.get('nickname', 'openiduser')
             email = sreg_response.get('email', '')
         else:
             nickname = 'openiduser'
             email = ''
+            """
+        nickname = 'openiduser'
+        email = ''
 
         # Pick a username for the user based on their nickname,
         # checking for conflicts.
