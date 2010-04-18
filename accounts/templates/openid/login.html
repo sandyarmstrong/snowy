@@ -1,48 +1,68 @@
 {% extends "site_base.html" %}
 
 {% load i18n %}
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/accounts.css">
+<script type="text/javascript">
+function submit_form(name)
+{
+    document.getElementsByName(name)[0].submit();
+}
+</script>
+
+{% endblock %}
 
 {% block content %}
 
-<h3>{% trans "Log in with your OpenID" %}</h3>
+<div id="login-leftcolumn">
+    <h3>{% trans "Log in with your OpenID" %}</h3>
 
-{% if form.errors %}
-<p class="errors">{% trans "Please correct errors below:" %}<br />
-    {% if form.openid_identifier.errors %} 
-    <span class="error">{{ form.openid_identifier.errors|join:", " }}</span>
+    {% if form.errors %}
+    <p class="errors">{% trans "Please correct errors below:" %}<br />
+        {% if form.openid_identifier.errors %}
+        <span class="error">{{ form.openid_identifier.errors|join:", " }}</span>
+        {% endif %}
+        {% if form.next.errors %}
+        <span class="error">{{ form.next.errors|join:", " }}</span>
+        {% endif %}
+    </p>
     {% endif %}
-    {% if form.next.errors %} 
-    <span class="error">{{ form.next.errors|join:", " }}</span>
-    {% endif %}
-</p>
-{% endif %}
 
-<form name="fopenid" action="{{ action }}" method="post">
-    <table>
-        <tr>
-            <td style="width: 100px;"><b>{% trans "OpenID:"%}</b></td>
-            <td>{{ form.openid_identifier }}</td>
-        </tr>
-    </table>
-    <input name="bsignin" type="submit" value="{% trans "Log in with your OpenID" %}"></div>
+    <form name="fopenid" action="{{ action }}" method="post">
+        <table>
+            <tr>
+                <td style="width: 100px;"><b>{% trans "OpenID:"%}</b></td>
+                <td>{{ form.openid_identifier }}</td>
+            </tr>
+        </table>
+        <input name="bsignin" type="submit" value="{% trans "Log in with your OpenID" %}">
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+    </form>
+    <br />
+    <div>{% trans "Don't have an OpenID yet? Get one " %}<a href="http://openid.net/get-an-openid/" alt="Get an OpenID">{% trans "here!" %}</a></div>
+</div>
 
-    {% if next %}
-    <input type="hidden" name="next" value="{{ next }}" />
-    {% endif %}
-</form>	
+<div id="login-rightcolumn">
+    <h3>{% trans "...or use one of the following services:" %}</h3>
+    <br />
+    <form name="google_login_form" action="{{ action }}" method="post">
+        <input type="hidden" name="openid_identifier" value="http://www.google.com/accounts/o8/id">
+        <a href="javascript: submit_form('google_login_form')">
+            <img src="{{ MEDIA_URL }}img/accounts/google-accounts-logo.png" alt="Google Accounts Logo" class="rounded-corners-button">
+        </a>
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+    </form>
+</div>
+
+<!-- the following div makes sure the float layout works correctly -->
+<div style="clear: both;"></div>
+
 <br />
-<div>{% trans "Don't have an OpenID yet? Get one " %}<a href="http://openid.net/get-an-openid/" alt="Get an OpenID">{% trans "here!" %}</a></div>
-
-<small>{% trans "Or " %} <a href="{% url auth_login %}">{% trans "log in the old way" %}</a>{% trans "." %}</small>
+<hr>
+<div style="display: block;"><small>{% trans "...or " %} <a href="{% url auth_login %}">{% trans "log in the old way" %}</a>{% trans "." %}</small></div>
 {% endblock %}
-
-
-
-
-<!--<style type="text/css">
-input.openid {
-  background: url({% url openid-logo %}) no-repeat; 
-  background-position: 0 50%;
-  padding-left: 16px;
-}
-</style>-->

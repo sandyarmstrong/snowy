@@ -1,0 +1,21 @@
+.rounded-corners-button {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border: 1px solid #94C7B6;
+    padding: 5px;
+}
+
+#login-leftcolumn {
+    border-right: 1px solid #000;
+    width: 45%;
+    display: block;
+    float: left;
+    margin-right: 10px;
+}
+
+#login-rightcolumn {
+    width: 45%;
+    display: block;
+    float: left;
+    margin-left: 10px;
+}
