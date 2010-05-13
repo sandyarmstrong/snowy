@@ -3,9 +3,11 @@
 {% load i18n %}
 
 {% block sidebar %}
+{% if author %}
 <form method="GET" name="searchForm" action="{% url note_search author.username %}">
     <input type="text" id="search" class="dim" name="query" accesskey="s" value="{% trans "Search your notes" %}">
 </form>
+{% endif %}
 {% endblock %}
 
 {% block extra_body %}
