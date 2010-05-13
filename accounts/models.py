@@ -34,6 +34,7 @@ class UserProfile(models.Model):
                                 verbose_name=_(u'Application Language'),
                                 null=True, blank=True)
     display_name = models.CharField(_('display name'), max_length=80)
+    openid_user = models.BooleanField(verbose_name=_(u'OpenID User'),)
 
     def __unicode__(self):
         return str(self.user)
