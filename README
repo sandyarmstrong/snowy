@@ -10,13 +10,3 @@ Requirements
    - python-pytz
    - python-sqlite
 
-Under RedHat/CentOS 5.3, these packages are:
-
-   - python-lxml
-   - python-tz
-   - python-sqlite2
-   - python-dateutil
-   - python-setuptools
-   - python-uuid
-   - python-simplejson
-
