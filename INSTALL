@@ -6,11 +6,6 @@ Running Snowy From Your Git Checkout
    python-dateutil, python-pkg-resources, python-uuid
    (package names somewhat different from distro to distro).
 
-   Package names for RedHat/CentOS 5.3:
-
-   python-lxml, python-tz, python-sqlite2, python-dateutil, python-setuptools,
-   python-uuid, python-simplejson
-
 1. Install django 1.1. If your distro does not have packages for 1.1, then
    download the tarball and install it like so:
 	wget http://www.djangoproject.com/download/1.1/tarball/
