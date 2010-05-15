@@ -42,10 +42,21 @@
 <table id="content-layout" cellspacing="0" cellpadding="0">
     <tr>
         <td id="note">
+            {% comment %}
+            Django 1.1 does not support == operator, so we can't do:
+               if author == request.user
+            {% endcomment %}
+            {% if author_is_user %}
             <h1>{% trans "Notice" %}</h1>
             <div id="funcooker">
                 {% trans "You haven't synced any notes with Snowy yet." %}
             </div>
+            {% else %}
+            <h1>{% trans "Notice" %}</h1>
+            <div id="funcooker">
+                {% trans "This user is not sharing any notes with you." %}
+            </div>
+            {% endif %}
         </td>
         <td>
         </td>

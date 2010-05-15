@@ -41,7 +41,10 @@ def note_index(request, username,
     
     # TODO: Instruction page to tell user to either sync or create a new note
     return render_to_response(template_name,
-                              {'author': author},
+                              {'author': author,
+                               # Django 1.1 does not support == operator, so
+                               # we need to do the check here and pass it along
+                               'author_is_user': username==request.user.username},
                               context_instance=RequestContext(request))
 
 def note_list(request, username,
