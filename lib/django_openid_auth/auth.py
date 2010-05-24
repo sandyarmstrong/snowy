@@ -120,7 +120,10 @@ class OpenIDBackend:
             i += 1
 
         user = User.objects.create_user(username, email, password=None)
+        print user
         user.get_profile().openid_user = True
+        user.get_profile().save()
+        print str(user.get_profile().openid_user)
 
         if sreg_response:
             self.update_user_details_from_sreg(user, sreg_response)

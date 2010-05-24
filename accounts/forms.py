@@ -15,23 +15,31 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.contrib.auth.models import User
 from registration.forms import RegistrationFormUniqueEmail
 from django.utils.translation import ugettext_lazy as _
 from recaptcha_django import ReCaptchaField
 from django.conf import settings
 from django import forms
 
-class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
+def validate_username_blacklist(username):
     """
-    Subclass of ``RegistrationFormUniqueEmail`` which verifies usernames
-    against a blacklist.
+    Verifies that the username is not on the blacklist of reserved usernames
     """
-    captcha = ReCaptchaField(label=_(u'Verify words:'))
-
+    print "Validate"
     username_blacklist = ['about', 'accounts', 'admin', 'api', 'blog',
                           'contact', 'css', 'friends', 'images', 'index.html',
                           'news', 'notes', 'oauth', 'pony', 'register',
                           'registration', 'site_media', 'snowy', 'tomboy']
+    if username in username_blacklist:
+        raise forms.ValidationError(_(u'This username has been reserved.  Please choose another.'))
+
+class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
+    """
+    Subclass of ``RegistrationFormUniqueEmail`` which verifies usernames
+    against a blacklist and adds a captcha.
+    """
+    captcha = ReCaptchaField(label=_(u'Verify words:'))
 
     def __init__(self, *args, **kwargs):
         super(RegistrationFormUniqueUser, self).__init__(*args, **kwargs)
@@ -41,6 +49,8 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
         
         self.fields['username'].label = _(u'Username:')
         self.fields['username'].help_text = _(u'Maximum of 30 characters in length.')
+        self.fields['username'].validators = [validate_username_blacklist,
+                                              validate_username_available]
 
         self.fields['email'].label = _(u'Email address:')
 
@@ -50,12 +60,8 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
         self.fields['password2'].label = _(u'Re-enter password:')
 
     def clean_username(self):
-        """
-        Validate that the user doesn't exist in our blacklist.
-        """
         username = self.cleaned_data['username']
-        if username in self.username_blacklist:
-            raise forms.ValidationError(_(u'This username has been reserved.  Please choose another.'))
+        validate_username_blacklist(username)
         return username
 
     def clean_password1(self):
@@ -81,38 +87,22 @@ class DisplayNameChangeForm(forms.ModelForm):
         fields = ('display_name',)
 
 class EmailChangeForm(forms.ModelForm):
-    """
-    This code is adapted from
-    http://stackoverflow.com/questions/1075314/allow-changing-of-user-fields-like-email-with-django-profiles
-    """
+    class Meta:
+        model = User
+        fields = ('email', )
+
     def __init__(self, *args, **kwargs):
         super(EmailChangeForm, self).__init__(*args, **kwargs)
-        try:
-            self.fields['email'].initial = self.instance.user.email
-        except User.DoesNotExist:
-            pass
+        self.fields['email'].required = True
 
-    email = forms.EmailField(label="Email address")
+class UsernameChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', )
 
-    def save(self, *args, **kwargs):
-        """
-        Update the email address on the user object
-        """
-        u = self.instance.user
-        u.email = self.cleaned_data['email']
-        u.save()
-        return u.email
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        validate_username_blacklist(username)
+        return username
 
-class InitialPreferencesForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
-        super(InitialPreferencesForm, self).__init__(*args, **kwargs)
-        try:
-            self.fields['email'].initial = self.instance.user.email
-            self.fields['display_name'].initial = self.instance.display_name
-        except User.DoesNotExist:
-            pass
-
-    email = forms.EmailField(label="Email address")
-    display_name = forms.CharField(max_length=80, label="Display Name",
-                                   help_text="This name will be shown to other users when sharing notes")

@@ -208,7 +208,7 @@ def login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
             if user.is_active:
                 auth_login(request, user)
                 # Check if the user has filled in relevant credentials
-                if (user.get_profile().display_name and user.email):
+                if (user.get_profile().registration_complete()):
                     return HttpResponseRedirect(sanitise_redirect_url(redirect_to))
                 else:
                     return HttpResponseRedirect(reverse('initial_preferences'))

@@ -23,32 +23,31 @@ from django.template import RequestContext
 from django.conf import settings
 
 from snowy.accounts.forms import InternationalizationForm, EmailChangeForm, \
-    DisplayNameChangeForm, InitialPreferencesForm
+    DisplayNameChangeForm, UsernameChangeForm
 
 @login_required
 def initial_preferences(request, template_name='accounts/initial_preferences.html'):
     user = request.user
     profile = user.get_profile()
 
-    if 'initial_preferences_form' in request.POST:
-        email_form = EmailChangeForm(request.POST, instance=profile)
-        if email_form.is_valid():
-            print 'Email form is valid!'
-            email_form.save()
+    username_form = UsernameChangeForm(request.POST or None, instance=user)
+    email_form = EmailChangeForm(request.POST or None, instance=user)
+    display_name_form = DisplayNameChangeForm(request.POST or None, instance=profile)
 
-        display_name_form = DisplayNameChangeForm(request.POST, instance=profile)
-        if display_name_form.is_valid():
-            print 'Display Name form is valid!'
-            display_name_form.save()
+    forms = [username_form, email_form, display_name_form]
+    for form in forms:
+        if form.is_valid():
+            form.save()
 
-        if email_form.is_valid() and display_name_form.is_valid():
-            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
-
-    initial_preferences_form = InitialPreferencesForm(instance=profile)
+    # redirect if all forms are valid
+    if all(form.is_valid() for form in forms):
+        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
     return render_to_response(template_name,
                               {'user': user,
-                               'initial_preferences_form' : initial_preferences_form},
+                               'username_form' : username_form,
+                               'email_form' : email_form,
+                               'display_name_form' : display_name_form},
                               context_instance=RequestContext(request))
 
 @login_required

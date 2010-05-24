@@ -31,10 +31,14 @@
                 <td id="header-auth">
 {% if user.is_authenticated %}
                     <h3>
+                      {% if user.get_profile.registration_complete %}
                       {% if user.get_profile.display_name %}
                       {{ user.get_profile.display_name }}
                       {% else %}
                       {{ user }}
+                      {% endif %}
+                      {% else %}
+                      {% trans "OpenID User" %}
                       {% endif %}
                     </h3>
                     <p><a href="{% url preferences %}">{% trans "preferences" %}</a> / <a href="{% url django.contrib.auth.views.logout %}">{% trans "log out" %}</a></p>
@@ -45,7 +49,11 @@
                 </td>
                 <td id="header-avatar">
 {% if user.is_authenticated %}
+{% if user.get_profile.registration_complete %}
                     <a href="{% url notes.views.note_index user.username %}">{% gravatar_img_for_user user 64 %}</a>
+{% else %}
+                    <img src="{{MEDIA_URL}}/img/accounts/openid.png" height="64" width="64" alt="OpenID icon">
+{% endif %}
 {% endif %}
                 </td>
             </tr>
