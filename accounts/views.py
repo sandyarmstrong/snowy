@@ -30,14 +30,22 @@ from django.conf import settings
 from snowy.accounts.models import UserProfile
 from snowy.accounts.forms import InternationalizationForm, OpenIDRegistrationFormUniqueUser
 
+from django_openid_auth import auth
+
 def openid_registration(request, template_name='registration/registration_form.html'):
+    registration_form = OpenIDRegistrationFormUniqueUser(request.POST or None)
+
     try:
         openid_response = request.session['openid_response']
-        # do sreg magic here
     except KeyError:
         return HttpResponseNotAllowed(_(u'No openid_response object for this session!'))
 
-    registration_form = OpenIDRegistrationFormUniqueUser(request.POST or None)
+    try:
+        attributes = auth._extract_user_details(openid_response)
+        registration_form.fields['username'].initial = attributes['nickname']
+        registration_form.fields['email'].initial = attributes['email']
+    except KeyError:
+        pass
 
     if registration_form.is_valid():
         user = authenticate(openid_response=openid_response,
@@ -47,13 +55,13 @@ def openid_registration(request, template_name='registration/registration_form.h
         del request.session['openid_response']
 
         if user is not None:
-            email = registration_form.cleaned_data.get('email', '')
+            email = registration_form.cleaned_data.get('email')
             if email:
                 user.email = email
 
-            display_name = registration_form.cleaned_data.get('display_name', '')
-            if display_name:
-                user.get_profile().display_name = display_name
+            #display_name = registration_form.cleaned_data.get('display_name')
+            #if display_name:
+            #    user.get_profile().display_name = display_name
 
             user.save()
             user.get_profile().save()

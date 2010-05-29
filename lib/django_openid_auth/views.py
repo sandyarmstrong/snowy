@@ -44,7 +44,7 @@ from django.template.loader import render_to_string
 from openid.consumer.consumer import (
     Consumer, SUCCESS, CANCEL, FAILURE)
 from openid.consumer.discover import DiscoveryFailure
-from openid.extensions import sreg
+from openid.extensions import sreg, ax
 
 from django_openid_auth import teams
 from django_openid_auth.forms import OpenIDLoginForm
@@ -164,6 +164,19 @@ def login_begin(request, template_name='openid/login.html',
             request, "OpenID discovery error: %s" % (str(exc),), status=500)
 
     # Request some user details.
+    fetch_request = ax.FetchRequest()
+    # We mark all the attributes as required, since Google ignores
+    # optional attributes.  We request both the full name and
+    # first/last components since some providers offer one but not
+    # the other.
+    for (attr, alias) in [
+        ('http://axschema.org/contact/email', 'email'),
+        ('http://axschema.org/namePerson', 'fullname'),
+        ('http://axschema.org/namePerson/first', 'firstname'),
+        ('http://axschema.org/namePerson/last', 'lastname'),
+        ('http://axschema.org/namePerson/friendly', 'nickname')]:
+        fetch_request.add(ax.AttrInfo(attr, alias=alias, required=True))
+    openid_request.addExtension(fetch_request)
     openid_request.addExtension(
         sreg.SRegRequest(optional=['email', 'fullname', 'nickname']))
 

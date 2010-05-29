@@ -43,6 +43,7 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
         
         self.fields['username'].label = _(u'Username')
         self.fields['username'].help_text = _(u'Maximum of 30 characters in length.')
+        self.fields['username'].error_messages['invalid'] = _(u'Usernames may not contain special characters.')
 
         self.fields['email'].label = _(u'Email address')
 

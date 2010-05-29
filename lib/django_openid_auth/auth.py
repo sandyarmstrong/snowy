@@ -33,7 +33,7 @@ __metaclass__ = type
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from openid.consumer.consumer import SUCCESS
-from openid.extensions import sreg
+from openid.extensions import ax, sreg
 
 from django_openid_auth import teams
 from django_openid_auth.models import UserOpenID
@@ -71,17 +71,13 @@ class OpenIDBackend:
             user_openid = UserOpenID.objects.get(
                 claimed_id__exact=openid_response.identity_url)
         except UserOpenID.DoesNotExist:
-            if kwargs.get('create_user'):
-                if kwargs.get('username'):
-                    user = self.create_user_from_openid(openid_response,
-                                                        username=kwargs.get('username'))
-                else:
-                    return None
+            if kwargs.get('create_user') and kwargs.get('username'):
+                user = self.create_user_from_openid(openid_response,
+                                                    username=kwargs.get('username'))
+            elif getattr(settings, 'OPENID_CREATE_USERS', False):
+                user = self.create_user_from_openid(openid_response)
             else:
-                if getattr(settings, 'OPENID_CREATE_USERS', False):
-                    user = self.create_user_from_openid(openid_response)
-                else:
-                    return None
+                return None
         else:
             user = user_openid.user
 
@@ -89,10 +85,8 @@ class OpenIDBackend:
             return None
 
         if getattr(settings, 'OPENID_UPDATE_DETAILS_FROM_SREG', False):
-            sreg_response = sreg.SRegResponse.fromSuccessResponse(
-                openid_response)
-            if sreg_response:
-                self.update_user_details_from_sreg(user, sreg_response)
+            details = _extract_user_details(openid_response)
+            self.update_user_details(user, details)
 
         teams_response = teams.TeamsResponse.fromSuccessResponse(
             openid_response)
@@ -102,27 +96,29 @@ class OpenIDBackend:
         return user
 
     def create_user_from_openid(self, openid_response, username='snowyuser', email=''):
-        sreg_response = sreg.SRegResponse.fromSuccessResponse(openid_response)
+        nickname = username
+        #email = details['email'] or ''
+
         # Pick a username for the user based on their nickname,
         # checking for conflicts.
         i = 1
         while True:
-            # use the name nickname here so we don't interfere with the username argument
-            nickname = username
+            username = nickname
             if i > 1:
-                nickname += str(i)
+                username += str(i)
             try:
-                User.objects.get(username__exact=nickname)
+                User.objects.get(username__exact=username)
             except User.DoesNotExist:
                 break
             i += 1
 
-        user = User.objects.create_user(nickname, email, password=None)
+        user = User.objects.create_user(username, email, password=None)
         user.get_profile().openid_user = True
         user.get_profile().save()
 
-        if sreg_response:
-            self.update_user_details_from_sreg(user, sreg_response)
+        if getattr(settings, 'OPENID_UPDATE_DETAILS_FROM_SREG', False):
+            details = _extract_user_details(openid_response)
+            self.update_user_details(user, details)
 
         self.associate_openid(user, openid_response)
         return user
@@ -147,20 +143,20 @@ class OpenIDBackend:
 
         return user_openid
 
-    def update_user_details_from_sreg(self, user, sreg_response):
-        fullname = sreg_response.get('fullname')
-        if fullname:
-            # Do our best here ...
-            if ' ' in fullname:
-                user.first_name, user.last_name = fullname.rsplit(None, 1)
-            else:
-                user.first_name = u''
-                user.last_name = fullname
+    def update_user_details(self, user, details):
+        updated = False
+        if details['first_name']:
+            user.first_name = details['first_name']
+            updated = True
+        if details['last_name']:
+            user.last_name = details['last_name']
+            updated = True
+        if details['email']:
+            user.email = details['email']
+            updated = True
 
-        email = sreg_response.get('email')
-        if email:
-            user.email = email
-        user.save()
+        if updated:
+            user.save()
 
     def update_groups_from_teams(self, user, teams_response):
         teams_mapping_auto = getattr(settings, 'OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO', False)
@@ -186,3 +182,46 @@ class OpenIDBackend:
             user.groups.remove(group)
         for group in desired_groups - current_groups:
             user.groups.add(group)
+
+# to be used outside of the backend
+def _extract_user_details(openid_response):
+    email = fullname = first_name = last_name = nickname = None
+    sreg_response = sreg.SRegResponse.fromSuccessResponse(openid_response)
+    if sreg_response:
+        email = sreg_response.get('email')
+        fullname = sreg_response.get('fullname')
+        nickname = sreg_response.get('nickname')
+
+    # If any attributes are provided via Attribute Exchange, use
+    # them in preference.
+    fetch_response = ax.FetchResponse.fromSuccessResponse(openid_response)
+    if fetch_response:
+        email = fetch_response.getSingle(
+            'http://axschema.org/contact/email', email)
+        fullname = fetch_response.getSingle(
+            'http://axschema.org/namePerson', fullname)
+        first_name = fetch_response.getSingle(
+            'http://axschema.org/namePerson/first', first_name)
+        last_name = fetch_response.getSingle(
+            'http://axschema.org/namePerson/last', last_name)
+        nickname = fetch_response.getSingle(
+            'http://axschema.org/namePerson/friendly', nickname)
+
+    if fullname and not (first_name or last_name):
+        # Django wants to store first and last names separately,
+        # so we do our best to split the full name.
+        if ' ' in fullname:
+            first_name, last_name = fullname.rsplit(None, 1)
+        else:
+            first_name = u''
+            last_name = fullname
+
+    if (first_name and last_name) and not fullname:
+        fullname = last_name + " " + last_name
+
+    if (first_name and last_name) and not nickname:
+        nickname = (first_name + last_name).lower()
+
+    return dict(email=email, nickname=nickname,
+                first_name=first_name, last_name=last_name,
+                fullname=fullname)

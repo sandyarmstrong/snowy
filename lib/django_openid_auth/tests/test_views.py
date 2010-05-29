@@ -34,7 +34,7 @@ import unittest
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.test import TestCase
-from openid.extensions.sreg import SRegRequest, SRegResponse
+from openid.extensions import ax, sreg
 from openid.fetchers import (
     HTTPFetcher, HTTPFetchingError, HTTPResponse, setDefaultFetcher)
 from openid.oidutil import importElementTree
@@ -58,10 +58,12 @@ class StubOpenIDProvider(HTTPFetcher):
         self.endpoint_url = base_url + 'endpoint'
         self.server = Server(self.store, self.endpoint_url)
         self.last_request = None
+        self.type_uris = ['http://specs.openid.net/auth/2.0/signon']
 
     def fetch(self, url, body=None, headers=None):
         if url == self.identity_url:
-            # Serve an XRDS document directly, which is the 
+            # Serve an XRDS document directly, pointing at our endpoint.
+            type_uris = ['<Type>%s</Type>' % uri for uri in self.type_uris]
             return HTTPResponse(
                 url, 200, {'content-type': 'application/xrds+xml'}, """\
 <?xml version="1.0"?>
@@ -70,13 +72,13 @@ class StubOpenIDProvider(HTTPFetcher):
     xmlns:xrds="xri://$xrds">
   <XRD>
     <Service priority="0">
-      <Type>http://specs.openid.net/auth/2.0/signon</Type>
+      %s
       <URI>%s</URI>
       <LocalID>%s</LocalID>
     </Service>
   </XRD>
 </xrds:XRDS>
-""" % (self.endpoint_url, self.localid_url))
+""" % ('\n'.join(type_uris), self.endpoint_url, self.localid_url))
         elif url.startswith(self.endpoint_url):
             # Gather query parameters
             query = {}
@@ -260,9 +262,9 @@ class RelyingPartyTests(TestCase):
         # Complete the request, passing back some simple registration
         # data.  The user is redirected to the next URL.
         openid_request = self.provider.parseFormPost(response.content)
-        sreg_request = SRegRequest.fromOpenIDRequest(openid_request)
+        sreg_request = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         openid_response = openid_request.answer(True)
-        sreg_response = SRegResponse.extractResponse(
+        sreg_response = sreg.SRegResponse.extractResponse(
             sreg_request, {'nickname': 'someuser', 'fullname': 'Some User',
                            'email': 'foo@example.com'})
         openid_response.addExtension(sreg_response)
@@ -298,9 +300,9 @@ class RelyingPartyTests(TestCase):
         # Complete the request, passing back some simple registration
         # data.  The user is redirected to the next URL.
         openid_request = self.provider.parseFormPost(response.content)
-        sreg_request = SRegRequest.fromOpenIDRequest(openid_request)
+        sreg_request = sreg.SRegRequest.fromOpenIDRequest(openid_request)
         openid_response = openid_request.answer(True)
-        sreg_response = SRegResponse.extractResponse(
+        sreg_response = sreg.SRegResponse.extractResponse(
             sreg_request, {'nickname': 'someuser', 'fullname': 'Some User',
                            'email': 'foo@example.com'})
         openid_response.addExtension(sreg_response)
@@ -316,6 +318,68 @@ class RelyingPartyTests(TestCase):
         user = User.objects.get(username='testuser')
         self.assertEquals(user.first_name, 'Some')
         self.assertEquals(user.last_name, 'User')
+        self.assertEquals(user.email, 'foo@example.com')
+
+    def test_login_attribute_exchange(self):
+        settings.OPENID_UPDATE_DETAILS_FROM_SREG = True
+        user = User.objects.create_user('testuser', 'someone@example.com')
+        useropenid = UserOpenID(
+            user=user,
+            claimed_id='http://example.com/identity',
+            display_id='http://example.com/identity')
+        useropenid.save()
+
+        # Configure the provider to advertise attribute exchange
+        # protocol and start the authentication process:
+        self.provider.type_uris.append('http://openid.net/srv/ax/1.0')
+        response = self.client.post('/openid/login/',
+            {'openid_identifier': 'http://example.com/identity',
+             'next': '/getuser/'})
+        self.assertContains(response, 'OpenID transaction in progress')
+
+        # The resulting OpenID request uses the Attribute Exchange
+        # extension rather than the Simple Registration extension.
+        openid_request = self.provider.parseFormPost(response.content)
+        sreg_request = sreg.SRegRequest.fromOpenIDRequest(openid_request)
+        self.assertEqual(sreg_request.required, [])
+        self.assertEqual(sreg_request.optional, [])
+
+        fetch_request = ax.FetchRequest.fromOpenIDRequest(openid_request)
+        self.assertTrue(fetch_request.has_key(
+                'http://axschema.org/contact/email'))
+        self.assertTrue(fetch_request.has_key(
+                'http://axschema.org/namePerson'))
+        self.assertTrue(fetch_request.has_key(
+                'http://axschema.org/namePerson/first'))
+        self.assertTrue(fetch_request.has_key(
+                'http://axschema.org/namePerson/last'))
+        self.assertTrue(fetch_request.has_key(
+                'http://axschema.org/namePerson/friendly'))
+
+        # Build up a response including AX data.
+        openid_response = openid_request.answer(True)
+        fetch_response = ax.FetchResponse(fetch_request)
+        fetch_response.addValue(
+            'http://axschema.org/contact/email', 'foo@example.com')
+        fetch_response.addValue(
+            'http://axschema.org/namePerson/first', 'Firstname')
+        fetch_response.addValue(
+            'http://axschema.org/namePerson/last', 'Lastname')
+        fetch_response.addValue(
+            'http://axschema.org/namePerson/friendly', 'someuser')
+        openid_response.addExtension(fetch_response)
+        response = self.complete(openid_response)
+        self.assertRedirects(response, 'http://testserver/getuser/')
+
+        # And they are now logged in as testuser (the passed in
+        # nickname has not caused the username to change).
+        response = self.client.get('/getuser/')
+        self.assertEquals(response.content, 'testuser')
+
+        # The user's full name and email have been updated.
+        user = User.objects.get(username='testuser')
+        self.assertEquals(user.first_name, 'Firstname')
+        self.assertEquals(user.last_name, 'Lastname')
         self.assertEquals(user.email, 'foo@example.com')
 
     def test_login_teams(self):
