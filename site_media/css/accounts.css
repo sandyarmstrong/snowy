@@ -20,22 +20,22 @@
     margin-left: 10px;
 }
 
-.initial-preferences-label {
-    width: 10em;
+.registration-form-label {
+    width: 15em;
     font-weight: bold;
     text-align: right;
     display: inline-block;
     margin-right: 0.5em;
 }
 
-.initial-preferences-errors {
+.registration-form-errors {
     color: red;
     margin-left: 2em;
 }
 
-.initial-preferences-help-text {
+.registration-form-help-text {
     /* set the help text off from the input field above it */
     line-height: 2;
     /* make the help text align with the input field above it */
-    margin-left: 11em;
+    margin-left: 16em;
 }

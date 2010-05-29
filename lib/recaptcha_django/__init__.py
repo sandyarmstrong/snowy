@@ -11,6 +11,7 @@ from django.conf import settings
 from django.utils.translation import get_language
 from django.utils.html import conditional_escape
 from recaptcha.client import captcha
+from django.utils.safestring import mark_safe
 
 class ReCaptchaWidget(Widget):
     """
@@ -24,13 +25,13 @@ class ReCaptchaWidget(Widget):
         html = captcha.displayhtml(settings.RECAPTCHA_PUBLIC_KEY, error=error)
         options = u',\n'.join([u'%s: "%s"' % (k, conditional_escape(v)) \
                    for k, v in final_attrs.items() if k in self.options])
-        return """<script type="text/javascript">
+        return mark_safe("""<script type="text/javascript">
         var RecaptchaOptions = {
             %s
         };
         </script>
         %s
-        """ % (options, html)
+        """ % (options, html))
 
 
     def value_from_datadict(self, data, files, name):

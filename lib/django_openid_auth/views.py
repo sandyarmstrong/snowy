@@ -207,15 +207,14 @@ def login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
-                # Check if the user has filled in relevant credentials
-                if (user.get_profile().registration_complete()):
-                    return HttpResponseRedirect(sanitise_redirect_url(redirect_to))
-                else:
-                    return HttpResponseRedirect(reverse('initial_preferences'))
+                return HttpResponseRedirect(sanitise_redirect_url(redirect_to))
             else:
                 return render_failure(request, 'Disabled account')
         else:
-            return render_failure(request, 'Unknown user')
+            # save openid reponse in the session to create the user later
+            request.session['openid_response'] = openid_response
+            return HttpResponseRedirect(reverse('openid_registration'))
+            #return render_failure(request, 'Unknown user')
     elif openid_response.status == FAILURE:
         return render_failure(
             request, 'OpenID authentication failed: %s' %

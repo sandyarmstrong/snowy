@@ -22,46 +22,42 @@ from recaptcha_django import ReCaptchaField
 from django.conf import settings
 from django import forms
 
-def validate_username_blacklist(username):
+class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
     """
-    Verifies that the username is not on the blacklist of reserved usernames
+    Subclass of ``RegistrationFormUniqueEmail`` which verifies usernames
+    against a blacklist.
     """
-    print "Validate"
+    captcha = ReCaptchaField(label=_(u'Verify words'))
+
     username_blacklist = ['about', 'accounts', 'admin', 'api', 'blog',
                           'contact', 'css', 'friends', 'images', 'index.html',
                           'news', 'notes', 'oauth', 'pony', 'register',
                           'registration', 'site_media', 'snowy', 'tomboy']
-    if username in username_blacklist:
-        raise forms.ValidationError(_(u'This username has been reserved.  Please choose another.'))
-
-class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
-    """
-    Subclass of ``RegistrationFormUniqueEmail`` which verifies usernames
-    against a blacklist and adds a captcha.
-    """
-    captcha = ReCaptchaField(label=_(u'Verify words:'))
 
     def __init__(self, *args, **kwargs):
         super(RegistrationFormUniqueUser, self).__init__(*args, **kwargs)
 
+        #print self.fields['captcha'].widget.html
         if not settings.RECAPTCHA_ENABLED:
             del self.fields['captcha']
         
-        self.fields['username'].label = _(u'Username:')
+        self.fields['username'].label = _(u'Username')
         self.fields['username'].help_text = _(u'Maximum of 30 characters in length.')
-        self.fields['username'].validators = [validate_username_blacklist,
-                                              validate_username_available]
 
-        self.fields['email'].label = _(u'Email address:')
+        self.fields['email'].label = _(u'Email address')
 
-        self.fields['password1'].label = _(u'Choose a password:')
+        self.fields['password1'].label = _(u'Choose a password')
         self.fields['password1'].help_text = _(u'Minimum of 6 characters in length.')
 
-        self.fields['password2'].label = _(u'Re-enter password:')
+        self.fields['password2'].label = _(u'Re-enter password')
 
     def clean_username(self):
+        """
+        Validate that the user doesn't exist in our blacklist.
+        """
         username = self.cleaned_data['username']
-        validate_username_blacklist(username)
+        if username in self.username_blacklist:
+            raise forms.ValidationError(_(u'This username has been reserved.  Please choose another.'))
         return username
 
     def clean_password1(self):
@@ -73,6 +69,12 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
             raise forms.ValidationError(_(u'Your password must be at least 6 characters long.'))
 
         return password
+
+class OpenIDRegistrationFormUniqueUser(RegistrationFormUniqueUser):
+    def __init__(self, *args, **kwargs):
+        super(OpenIDRegistrationFormUniqueUser, self).__init__(*args, **kwargs)
+        del self.fields['password1']
+        del self.fields['password2']
 
 from snowy.accounts.models import UserProfile
 
@@ -94,15 +96,3 @@ class EmailChangeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EmailChangeForm, self).__init__(*args, **kwargs)
         self.fields['email'].required = True
-
-class UsernameChangeForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ('username', )
-
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        validate_username_blacklist(username)
-        return username
-
-

@@ -144,7 +144,8 @@ ACCOUNT_ACTIVATION_DAYS = 15
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
-OPENID_CREATE_USERS = True
+# we create users ourselves after they have given more details
+OPENID_CREATE_USERS = False
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/openid/login/'

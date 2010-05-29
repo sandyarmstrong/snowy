@@ -15,39 +15,58 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.utils.translation import ugettext_lazy as _
+
 from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.template import RequestContext
 from django.conf import settings
 
-from snowy.accounts.forms import InternationalizationForm, EmailChangeForm, \
-    DisplayNameChangeForm, UsernameChangeForm
+from snowy.accounts.models import UserProfile
+from snowy.accounts.forms import InternationalizationForm, OpenIDRegistrationFormUniqueUser
 
-@login_required
-def initial_preferences(request, template_name='accounts/initial_preferences.html'):
-    user = request.user
-    profile = user.get_profile()
+def openid_registration(request, template_name='registration/registration_form.html'):
+    try:
+        openid_response = request.session['openid_response']
+        # do sreg magic here
+    except KeyError:
+        return HttpResponseNotAllowed(_(u'No openid_response object for this session!'))
 
-    username_form = UsernameChangeForm(request.POST or None, instance=user)
-    email_form = EmailChangeForm(request.POST or None, instance=user)
-    display_name_form = DisplayNameChangeForm(request.POST or None, instance=profile)
+    registration_form = OpenIDRegistrationFormUniqueUser(request.POST or None)
 
-    forms = [username_form, email_form, display_name_form]
-    for form in forms:
-        if form.is_valid():
-            form.save()
+    if registration_form.is_valid():
+        user = authenticate(openid_response=openid_response,
+                            username=registration_form.cleaned_data.get('username', ''),
+                            create_user=True)
+        # Clear the openid_response from the session so it can't be used to create another account
+        del request.session['openid_response']
 
-    # redirect if all forms are valid
-    if all(form.is_valid() for form in forms):
-        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        if user is not None:
+            email = registration_form.cleaned_data.get('email', '')
+            if email:
+                user.email = email
+
+            display_name = registration_form.cleaned_data.get('display_name', '')
+            if display_name:
+                user.get_profile().display_name = display_name
+
+            user.save()
+            user.get_profile().save()
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+            else:
+                return HttpResponseNotAllowed(_(u'Disabled account'))
+        else:
+            return HttpResponseNotAllowed(_(u'Unknown user'))
 
     return render_to_response(template_name,
-                              {'user': user,
-                               'username_form' : username_form,
-                               'email_form' : email_form,
-                               'display_name_form' : display_name_form},
+                              {'form' : registration_form},
                               context_instance=RequestContext(request))
 
 @login_required

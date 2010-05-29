@@ -1,24 +1,61 @@
-{% extends 'site_base.html' %}
+{% extends "site_base.html" %}
 
 {% load i18n %}
 
 {% block title %}{% trans "Create an account" %} | {{ block.super }}{% endblock %}
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/accounts.css">
+{% endblock %}
 
 {% block content %}
-<h1>{% trans "Create an account" %}</h1>
-<form method='POST'>
-    <table class="input-form">
-        <tbody>
-            {{ form.as_table }}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th></th>
-                <td>
-                    <input method="submit" type="submit" value="{% trans "Create Account" %}"/>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+<h1>Tell {{ site.name }} about yourself!</h1>
+
+<form method="POST">
+    <p>
+      <label for="username" class="registration-form-label">{{ form.username.label }}:</label>
+      {{ form.username }}
+      <span class="registration-form-errors">{{ form.username.errors.0 }}</span>
+      <br /><span class="registration-form-help-text">{{ form.username.help_text }}<span>
+    </p>
+
+    <p>
+      <label for="email" class="registration-form-label">{{ form.email.label }}:</label>
+      {{ form.email }}
+      <span class="registration-form-errors">{{ form.email.errors.0 }}</span>
+      <br /><span class="registration-form-help-text">{{ form.email.help_text }}<span>
+    </p>
+
+    {% if form.password1 and form.password2 %}
+    <p>
+      <label for="password1" class="registration-form-label">{{ form.password1.label }}:</label>
+      {{ form.password1 }}
+      <span class="registration-form-errors">{{ form.password1.errors.0 }}</span>
+      <br /><span class="registration-form-help-text">{{ form.password1.help_text }}<span>
+    </p>
+    <p>
+      <label for="password2" class="registration-form-label">{{ form.password2.label }}:</label>
+      {{ form.password2 }}
+      <span class="registration-form-errors">{{ form.password2.errors.0 }}</span>
+      <br /><span class="registration-form-help-text">{{ form.password2.help_text }}<span>
+    </p>
+    {% endif %}
+
+    {% if form.display_name %}
+    <p>
+      <label for="display_name" class="registration-form-label">{{ form.display_name.label }}:</label>
+      {{ form.display_name }}
+      <span class="registration-form-errors">{{ form.display_name.errors.0 }}</span>
+      <br /><span class="registration-form-help-text">{{ form.display_name.help_text }}<span>
+    </p>
+    {% endif %}
+
+    {% if form.captcha %}
+    <p>
+      {{ form.captcha }}
+    </p>
+    {% endif %}
+
+    <input type="submit" value="{% trans "Create Account" %}"/>
 </form>
 {% endblock %}

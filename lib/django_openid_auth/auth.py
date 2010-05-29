@@ -71,8 +71,17 @@ class OpenIDBackend:
             user_openid = UserOpenID.objects.get(
                 claimed_id__exact=openid_response.identity_url)
         except UserOpenID.DoesNotExist:
-            if getattr(settings, 'OPENID_CREATE_USERS', False):
-                user = self.create_user_from_openid(openid_response)
+            if kwargs.get('create_user'):
+                if kwargs.get('username'):
+                    user = self.create_user_from_openid(openid_response,
+                                                        username=kwargs.get('username'))
+                else:
+                    return None
+            else:
+                if getattr(settings, 'OPENID_CREATE_USERS', False):
+                    user = self.create_user_from_openid(openid_response)
+                else:
+                    return None
         else:
             user = user_openid.user
 
@@ -92,38 +101,25 @@ class OpenIDBackend:
 
         return user
 
-    def create_user_from_openid(self, openid_response):
+    def create_user_from_openid(self, openid_response, username='snowyuser', email=''):
         sreg_response = sreg.SRegResponse.fromSuccessResponse(openid_response)
-        # Don't set username from sreg - django doesn't like some characters
-        # Related bug: https://bugs.launchpad.net/django-openid-auth/+bug/388890
-        """if sreg_response:
-            nickname = sreg_response.get('nickname', 'openiduser')
-            email = sreg_response.get('email', '')
-        else:
-            nickname = 'openiduser'
-            email = ''
-            """
-        nickname = 'openiduser'
-        email = ''
-
         # Pick a username for the user based on their nickname,
         # checking for conflicts.
         i = 1
         while True:
-            username = nickname
+            # use the name nickname here so we don't interfere with the username argument
+            nickname = username
             if i > 1:
-                username += str(i)
+                nickname += str(i)
             try:
-                User.objects.get(username__exact=username)
+                User.objects.get(username__exact=nickname)
             except User.DoesNotExist:
                 break
             i += 1
 
-        user = User.objects.create_user(username, email, password=None)
-        print user
+        user = User.objects.create_user(nickname, email, password=None)
         user.get_profile().openid_user = True
         user.get_profile().save()
-        print str(user.get_profile().openid_user)
 
         if sreg_response:
             self.update_user_details_from_sreg(user, sreg_response)

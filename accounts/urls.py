@@ -24,14 +24,13 @@ from django.conf.urls.defaults import *
 from registration.views import activate
 from registration.views import register
 
+from snowy.accounts.views import openid_registration
+
 import django_openid_auth.views
 
 urlpatterns = patterns('',
     url(r'^preferences/$', 'snowy.accounts.views.accounts_preferences',
         name='preferences'),
-
-    url(r'^initial_preferences/$', 'snowy.accounts.views.initial_preferences',
-        name='initial_preferences'),
 
     url(r'^logout/$', auth_views.logout, {'template_name': 'registration/logout.html'},
         name='auth_logout'),
@@ -40,6 +39,8 @@ urlpatterns = patterns('',
     url(r'^openid/login/$', django_openid_auth.views.login_begin,
         {'template_name': 'openid/login.html'}, name='openid_login'),
     url(r'^openid/complete/$', django_openid_auth.views.login_complete),
+    url(r'^openid/registration/$', openid_registration,
+        name='openid_registration'),
 
     # Registration URLs
     url(r'^activate/(?P<activation_key>\w+)/$', activate, name='registration_activate'),
