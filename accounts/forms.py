@@ -58,6 +58,14 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
         username = self.cleaned_data['username']
         if username in self.username_blacklist:
             raise forms.ValidationError(_(u'This username has been reserved.  Please choose another.'))
+
+        try:
+            user = User.objects.get(username=username)
+            if user:
+                raise forms.ValidationError(_(u'This username has already been taken. Please choose another.'))
+        except User.DoesNotExist:
+            pass
+
         return username
 
     def clean_password1(self):
