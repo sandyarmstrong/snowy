@@ -33,9 +33,6 @@ class UserProfile(models.Model):
     language = models.CharField(max_length=5, choices=settings.LANGUAGES,
                                 verbose_name=_(u'Application Language'),
                                 null=True, blank=True)
-    display_name = models.CharField(_('display name'), max_length=80,
-                                    blank=True,
-                                    help_text=_(u'Optional. Will be displayed to other users when sharing notes.'))
     openid_user = models.BooleanField(verbose_name=_(u'OpenID User'),)
 
     def __unicode__(self):

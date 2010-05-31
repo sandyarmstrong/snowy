@@ -92,16 +92,8 @@ class InternationalizationForm(forms.ModelForm):
         model = UserProfile
         fields = ('language', )
 
-class DisplayNameChangeForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ('display_name',)
-
 class EmailChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('email', )
 
-    def __init__(self, *args, **kwargs):
-        super(EmailChangeForm, self).__init__(*args, **kwargs)
-        self.fields['email'].required = True

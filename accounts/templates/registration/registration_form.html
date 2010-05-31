@@ -41,15 +41,6 @@
     </p>
     {% endif %}
 
-    {% if form.display_name %}
-    <p>
-      <label for="display_name" class="registration-form-label">{{ form.display_name.label }}:</label>
-      {{ form.display_name }}
-      <span class="registration-form-errors">{{ form.display_name.errors.0 }}</span>
-      <br /><span class="registration-form-help-text">{{ form.display_name.help_text }}<span>
-    </p>
-    {% endif %}
-
     {% if form.captcha %}
     <p>
       {{ form.captcha }}

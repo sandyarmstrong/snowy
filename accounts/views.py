@@ -28,7 +28,7 @@ from django.template import RequestContext
 from django.conf import settings
 
 from snowy.accounts.models import UserProfile
-from snowy.accounts.forms import InternationalizationForm, OpenIDRegistrationFormUniqueUser
+from snowy.accounts.forms import InternationalizationForm, OpenIDRegistrationFormUniqueUser, EmailChangeForm
 
 from django_openid_auth import auth
 
@@ -59,10 +59,6 @@ def openid_registration(request, template_name='registration/registration_form.h
             if email:
                 user.email = email
 
-            #display_name = registration_form.cleaned_data.get('display_name')
-            #if display_name:
-            #    user.get_profile().display_name = display_name
-
             user.save()
             user.get_profile().save()
             if user.is_active:
@@ -90,26 +86,15 @@ def accounts_preferences(request, template_name='accounts/preferences.html'):
         password_form = PasswordChangeForm(user)
 
     if 'email_form' in request.POST:
-        email_form = EmailChangeForm(request.POST, instance=profile)
+        email_form = EmailChangeForm(request.POST, instance=user)
         if email_form.is_valid():
-            print 'Email form is valid!'
             email_form.save()
     else:
-        email_form = EmailChangeForm(instance=profile)
-
-    if 'display_name_form' in request.POST:
-        display_name_form = DisplayNameChangeForm(request.POST, instance=profile)
-        if display_name_form.is_valid():
-            print 'Display Name form is valid!'
-            display_name_form.save()
-    else:
-        display_name_form = DisplayNameChangeForm(instance=profile)
-
+        email_form = EmailChangeForm(instance=user)
 
     if 'i18n_form' in request.POST:
         i18n_form = InternationalizationForm(request.POST, instance=profile)
         if i18n_form.is_valid():
-            print 'Internationalization form is valid!'
             i18n_form.save()
     else:
         i18n_form = InternationalizationForm(instance=profile)
@@ -117,6 +102,5 @@ def accounts_preferences(request, template_name='accounts/preferences.html'):
     return render_to_response(template_name,
                               {'user': user, 'i18n_form': i18n_form,
                                'password_form': password_form,
-                               'email_form' : email_form,
-                               'display_name_form' : display_name_form},
+                               'email_form' : email_form},
                               context_instance=RequestContext(request))
