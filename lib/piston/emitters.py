@@ -31,6 +31,7 @@ from django.http import HttpResponse
 from django.core import serializers
 
 from utils import HttpStatusCode, Mimer
+from validate_jsonp import is_valid_jsonp_callback_value
 
 try:
     import cStringIO as StringIO
@@ -52,8 +53,15 @@ class Emitter(object):
     conveniently returns a serialized `dict`. This is
     usually the only method you want to use in your
     emitter. See below for examples.
+
+    `RESERVED_FIELDS` was introduced when better resource
+    method detection came, and we accidentially caught these
+    as the methods on the handler. Issue58 says that's no good.
     """
     EMITTERS = { }
+    RESERVED_FIELDS = set([ 'read', 'update', 'create', 
+                            'delete', 'model', 'anonymous',
+                            'allowed_methods', 'fields', 'exclude' ])
 
     def __init__(self, payload, typemapper, handler, fields=(), anonymous=True):
         self.typemapper = typemapper
@@ -65,17 +73,18 @@ class Emitter(object):
         if isinstance(self.data, Exception):
             raise
     
-    def method_fields(self, data, fields):
-        if not data:
+    def method_fields(self, handler, fields):
+        if not handler:
             return { }
 
-        has = dir(data)
         ret = dict()
             
-        for field in fields:
-            if field in has and callable(field):
-                ret[field] = getattr(data, field)
-        
+        for field in fields - Emitter.RESERVED_FIELDS:
+            t = getattr(handler, str(field), None)
+
+            if t and callable(t):
+                ret[field] = t
+
         return ret
     
     def construct(self):
@@ -111,6 +120,8 @@ class Emitter(object):
                 f = thing.__emittable__
                 if inspect.ismethod(f) and len(inspect.getargspec(f)[0]) == 1:
                     ret = _any(f())
+            elif repr(thing).startswith("<django.db.models.fields.related.RelatedManager"):
+                ret = _any(thing.all())
             else:
                 ret = smart_unicode(thing, strings_only=True)
 
@@ -176,7 +187,7 @@ class Emitter(object):
                     get_fields = set(fields)
 
                 met_fields = self.method_fields(handler, get_fields)
-                
+                           
                 for f in data._meta.local_fields:
                     if f.serialize and not any([ p in met_fields for p in [ f.attname, f.name ]]):
                         if not f.rel:
@@ -370,11 +381,11 @@ class JSONEmitter(Emitter):
     JSON emitter, understands timestamps.
     """
     def render(self, request):
-        cb = request.GET.get('callback')
+        cb = request.GET.get('callback', None)
         seria = simplejson.dumps(self.construct(), cls=DateTimeAwareJSONEncoder, ensure_ascii=False, indent=4)
 
         # Callback
-        if cb:
+        if cb and is_valid_jsonp_callback_value(cb):
             return '%s(%s)' % (cb, seria)
 
         return seria
@@ -392,7 +403,7 @@ class YAMLEmitter(Emitter):
 
 if yaml:  # Only register yaml if it was import successfully.
     Emitter.register('yaml', YAMLEmitter, 'application/x-yaml; charset=utf-8')
-    Mimer.register(yaml.load, ('application/x-yaml',))
+    Mimer.register(lambda s: dict(yaml.load(s)), ('application/x-yaml',))
 
 class PickleEmitter(Emitter):
     """
@@ -402,7 +413,17 @@ class PickleEmitter(Emitter):
         return pickle.dumps(self.construct())
         
 Emitter.register('pickle', PickleEmitter, 'application/python-pickle')
-Mimer.register(pickle.loads, ('application/python-pickle',))
+
+"""
+WARNING: Accepting arbitrary pickled data is a huge security concern.
+The unpickler has been disabled by default now, and if you want to use
+it, please be aware of what implications it will have.
+
+Read more: http://nadiana.com/python-pickle-insecure
+
+Uncomment the line below to enable it. You're doing so at your own risk.
+"""
+# Mimer.register(pickle.loads, ('application/python-pickle',))
 
 class DjangoEmitter(Emitter):
     """

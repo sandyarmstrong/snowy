@@ -60,7 +60,7 @@ class HttpBasicAuthentication(object):
         
         request.user = self.auth_func(username=username, password=password) \
             or AnonymousUser()
-        
+                
         return not request.user in (False, None, AnonymousUser())
         
     def challenge(self):
@@ -68,6 +68,20 @@ class HttpBasicAuthentication(object):
         resp['WWW-Authenticate'] = 'Basic realm="%s"' % self.realm
         resp.status_code = 401
         return resp
+
+    def __repr__(self):
+        return u'<HTTPBasic: realm=%s>' % self.realm
+
+class HttpBasicSimple(HttpBasicAuthentication):
+    def __init__(self, realm, username, password):
+        self.user = User.objects.get(username=username)
+        self.password = password
+
+        super(HttpBasicSimple, self).__init__(auth_func=self.hash, realm=realm)
+    
+    def hash(self, username, password):
+        if username == self.user.username and password == self.password:
+            return self.user
 
 def load_data_store():
     '''Load data store for OAuth Consumers, Tokens, Nonces and Resources
@@ -97,9 +111,19 @@ def initialize_server_request(request):
     """
     Shortcut for initialization.
     """
+    if request.method == "POST": #and \
+#       request.META['CONTENT_TYPE'] == "application/x-www-form-urlencoded":
+        params = dict(request.REQUEST.items())
+    else:
+        params = { }
+
+    # Seems that we want to put HTTP_AUTHORIZATION into 'Authorization'
+    # for oauth.py to understand. Lovely.
+    request.META['Authorization'] = request.META.get('HTTP_AUTHORIZATION', '')
+
     oauth_request = oauth.OAuthRequest.from_request(
         request.method, request.build_absolute_uri(), 
-        headers=request.META, parameters=dict(request.REQUEST.items()),
+        headers=request.META, parameters=params,
         query_string=request.environ.get('QUERY_STRING', ''))
         
     if oauth_request:
@@ -143,8 +167,8 @@ def oauth_request_token(request):
 def oauth_auth_view(request, token, callback, params):
     form = forms.OAuthAuthenticationForm(initial={
         'oauth_token': token.key,
-        'oauth_callback': callback,
-        })
+        'oauth_callback': token.get_callback_url() or callback,
+      })
 
     return render_to_response('piston/authorize_token.html',
             { 'form': form }, RequestContext(request))
@@ -165,7 +189,7 @@ def oauth_user_auth(request):
         callback = oauth_server.get_callback(oauth_request)
     except:
         callback = None
-        
+    
     if request.method == "GET":
         params = oauth_request.get_normalized_parameters()
 
@@ -182,6 +206,7 @@ def oauth_user_auth(request):
                 args = '?'+token.to_string(only_key=True)
             else:
                 args = '?error=%s' % 'Access not granted by user.'
+                print "FORM ERROR", form.errors
             
             if not callback:
                 callback = getattr(settings, 'OAUTH_CALLBACK_VIEW')
@@ -235,6 +260,7 @@ class OAuthAuthentication(object):
 
             if consumer and token:
                 request.user = token.user
+                request.consumer = consumer
                 request.throttle_extra = token.consumer.id
                 return True
             

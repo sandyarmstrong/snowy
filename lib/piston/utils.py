@@ -1,12 +1,18 @@
+import time
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden, HttpResponse, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django import get_version as django_version
+from django.core.mail import send_mail, mail_admins
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.template import loader, TemplateDoesNotExist
+from django.contrib.sites.models import Site
 from decorator import decorator
 
 from datetime import datetime, timedelta
 
-__version__ = '0.2.2'
+__version__ = '0.2.3rc1'
 
 def get_version():
     return __version__
@@ -27,6 +33,7 @@ class rc_factory(object):
                  NOT_FOUND = ('Not Found', 404),
                  DUPLICATE_ENTRY = ('Conflict/Duplicate', 409),
                  NOT_HERE = ('Gone', 410),
+                 INTERNAL_ERROR = ('Internal Error', 500),
                  NOT_IMPLEMENTED = ('Not Implemented', 501),
                  THROTTLED = ('Throttled', 503))
 
@@ -41,7 +48,30 @@ class rc_factory(object):
         except TypeError:
             raise AttributeError(attr)
 
-        return HttpResponse(r, content_type='text/plain', status=c)
+        class HttpResponseWrapper(HttpResponse):
+            """
+            Wrap HttpResponse and make sure that the internal _is_string 
+            flag is updated when the _set_content method (via the content 
+            property) is called
+            """
+            def _set_content(self, content):
+                """
+                Set the _container and _is_string properties based on the 
+                type of the value parameter. This logic is in the construtor
+                for HttpResponse, but doesn't get repeated when setting 
+                HttpResponse.content although this bug report (feature request)
+                suggests that it should: http://code.djangoproject.com/ticket/9403 
+                """
+                if not isinstance(content, basestring) and hasattr(content, '__iter__'):
+                    self._container = content
+                    self._is_string = False
+                else:
+                    self._container = [content]
+                    self._is_string = True
+
+            content = property(HttpResponse._get_content, _set_content)            
+
+        return HttpResponseWrapper(r, content_type='text/plain', status=c)
     
 rc = rc_factory()
     
@@ -59,6 +89,7 @@ def validate(v_form, operation='POST'):
         form = v_form(getattr(request, operation))
     
         if form.is_valid():
+            setattr(request, 'form', form)
             return f(self, request, *a, **kwa)
         else:
             raise FormValidationError(form)
@@ -102,24 +133,20 @@ def throttle(max_requests, timeout=60*60, extra=''):
             """
             ident += ':%s' % extra
     
-            now = datetime.now()
-            ts_key = 'throttle:ts:%s' % ident
-            timestamp = cache.get(ts_key)
-            offset = now + timedelta(seconds=timeout)
-    
-            if timestamp and timestamp < offset:
+            now = time.time()
+            count, expiration = cache.get(ident, (1, None))
+
+            if expiration is None:
+                expiration = now + timeout
+
+            if count >= max_requests and expiration > now:
                 t = rc.THROTTLED
-                wait = timeout - (offset-timestamp).seconds
+                wait = int(expiration - now)
                 t.content = 'Throttled, wait %d seconds.' % wait
-                
+                t['Retry-After'] = wait
                 return t
-                
-            count = cache.get(ident, 1)
-            cache.set(ident, count+1)
-            
-            if count >= max_requests:
-                cache.set(ts_key, offset, timeout)
-                cache.set(ident, 1)
+
+            cache.set(ident, (count+1, expiration), (expiration - now))
     
         return f(self, request, *args, **kwargs)
     return wrap
@@ -135,6 +162,20 @@ def coerce_put_post(request):
     in mod_python. This should fix it.
     """
     if request.method == "PUT":
+        # Bug fix: if _load_post_and_files has already been called, for
+        # example by middleware accessing request.POST, the below code to
+        # pretend the request is a POST instead of a PUT will be too late
+        # to make a difference. Also calling _load_post_and_files will result 
+        # in the following exception:
+        #   AttributeError: You cannot set the upload handlers after the upload has been processed.
+        # The fix is to check for the presence of the _post field which is set 
+        # the first time _load_post_and_files is called (both by wsgi.py and 
+        # modpython.py). If it's set, the request has to be 'reset' to redo
+        # the query value parsing in POST mode.
+        if hasattr(request, '_post'):
+            del request._post
+            del request._files
+        
         try:
             request.method = "POST"
             request._load_post_and_files()
@@ -176,7 +217,7 @@ class Mimer(object):
             for mime in mimes:
                 if ctype.startswith(mime):
                     return loadee
-
+                    
     def content_type(self):
         """
         Returns the content type of the request in all cases where it is
@@ -186,11 +227,10 @@ class Mimer(object):
 
         ctype = self.request.META.get('CONTENT_TYPE', type_formencoded)
         
-        if ctype.startswith(type_formencoded):
+        if type_formencoded in ctype:
             return None
         
         return ctype
-        
 
     def translate(self):
         """
@@ -211,14 +251,18 @@ class Mimer(object):
         if not self.is_multipart() and ctype:
             loadee = self.loader_for_type(ctype)
             
-            try:
-                self.request.data = loadee(self.request.raw_post_data)
-                
-                # Reset both POST and PUT from request, as its
-                # misleading having their presence around.
-                self.request.POST = self.request.PUT = dict()
-            except (TypeError, ValueError):
-                raise MimerDataException
+            if loadee:
+                try:
+                    self.request.data = loadee(self.request.raw_post_data)
+                        
+                    # Reset both POST and PUT from request, as its
+                    # misleading having their presence around.
+                    self.request.POST = self.request.PUT = dict()
+                except (TypeError, ValueError):
+                    # This also catches if loadee is None.
+                    raise MimerDataException
+            else:
+                self.request.data = None
 
         return self.request
                 
@@ -260,3 +304,48 @@ def require_mime(*mimes):
 
 require_extended = require_mime('json', 'yaml', 'xml', 'pickle')
     
+def send_consumer_mail(consumer):
+    """
+    Send a consumer an email depending on what their status is.
+    """
+    try:
+        subject = settings.PISTON_OAUTH_EMAIL_SUBJECTS[consumer.status]
+    except AttributeError:
+        subject = "Your API Consumer for %s " % Site.objects.get_current().name
+        if consumer.status == "accepted":
+            subject += "was accepted!"
+        elif consumer.status == "canceled":
+            subject += "has been canceled."
+        elif consumer.status == "rejected":
+            subject += "has been rejected."
+        else: 
+            subject += "is awaiting approval."
+
+    template = "piston/mails/consumer_%s.txt" % consumer.status    
+    
+    try:
+        body = loader.render_to_string(template, 
+            { 'consumer' : consumer, 'user' : consumer.user })
+    except TemplateDoesNotExist:
+        """ 
+        They haven't set up the templates, which means they might not want
+        these emails sent.
+        """
+        return 
+
+    try:
+        sender = settings.PISTON_FROM_EMAIL
+    except AttributeError:
+        sender = settings.DEFAULT_FROM_EMAIL
+
+    if consumer.user:
+        send_mail(_(subject), body, sender, [consumer.user.email], fail_silently=True)
+
+    if consumer.status == 'pending' and len(settings.ADMINS):
+        mail_admins(_(subject), body, fail_silently=True)
+
+    if settings.DEBUG and consumer.user:
+        print "Mail being sent, to=%s" % consumer.user.email
+        print "Subject: %s" % _(subject)
+        print body
+
