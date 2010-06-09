@@ -4,8 +4,12 @@
 
 {% block sidebar %}
 {% if author %}
-<form method="GET" name="searchForm" action="{% url note_search author.username %}">
+<form method="GET" name="searchForm" action="">
+    {% if request.GET.query %}
+    <input type="text" id="search" name="query" accesskey="s" value="{{request.GET.query}}">
+    {% else %}
     <input type="text" id="search" class="dim" name="query" accesskey="s" value="{% trans "Search your notes" %}">
+    {% endif %}
 </form>
 {% endif %}
 {% endblock %}
@@ -18,7 +22,10 @@ $(document).ready(function() {
                     .val("")
                     .unbind("focus", undim);
     }
-    $("#search").bind("focus", undim);
+
+    if($("#search").attr('class') == "dim") {
+        $("#search").bind("focus", undim);
+    }
 
     $('#search').keyup(function(e) {
         // enter key

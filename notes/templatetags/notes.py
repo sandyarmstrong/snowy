@@ -20,12 +20,14 @@ from django import template
 from snowy import settings
 from snowy.notes.models import Note, NoteTag
 
+from django.db.models import Q
+
 register = template.Library()
 
 @register.tag
 def user_notes_list(parser, tokens):
     """ Usage:
-        {% user_notes_list request author as all_notes %}
+        {% user_notes_list request author as list_notes %}
     """
     try:
         tag_name, request, author, _as, dest = tokens.split_contents()
@@ -46,16 +48,21 @@ class UserNotesListNode(template.Node):
     def render(self, context):
         request = self.request.resolve(context)
         author = self.author.resolve(context)
+        search_query = request.GET.get('query', None)
 
-        # XXX: Replace this with a NotesManager
-        all_notes = Note.objects.filter(author=author) \
+        list_notes = Note.objects.user_viewable(request.user, author) \
                                 .order_by('-pinned', '-user_modified')
-        if request.user != author:
-            all_notes = all_notes.filter(permissions=1)
         
-        context[self.dest] = all_notes[:settings.SNOWY_LIST_MAX_NOTES]
-        return ''
+        if search_query:
+            list_notes = list_notes.filter(Q(title__icontains=search_query) |
+                                           Q(content__icontains=search_query))
 
+        if not search_query:
+            # do not limit the amount of search results returned
+            list_notes = list_notes[:settings.SNOWY_LIST_MAX_NOTES]
+
+        context[self.dest] = list_notes
+        return ''
 
 @register.tag
 def user_notebook_list(parser, tokens):

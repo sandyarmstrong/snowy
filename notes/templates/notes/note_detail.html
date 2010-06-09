@@ -16,13 +16,19 @@
 
 {% block sidebar %}
 {{ block.super }}
-{% user_notes_list request author as all_notes %}
+{% user_notes_list request author as list_notes %}
 <div id="sidebar-note-list">
     <ul>
-{% for n in all_notes %}
-        <li class="note-item{% if n.pinned %} pinned{% endif %}{% ifequal n note %} selected{% endifequal %}"><a href="{{ n.get_absolute_url }}">{{ n.title|safe }}</a></li>
-{% endfor %}
+        {% for n in list_notes %}
+        <li class="note-item{% if n.pinned %} pinned{% endif %}{% ifequal n note %} selected{% endifequal %}"><a href="{{ n.get_absolute_url }}{% if request.GET.query %}?query={{request.GET.query}}{% endif %}">{{ n.title|safe }}</a></li>
+        {% endfor %}
+        {% if request.GET.query %}
+        <div style="text-align: center; margin: 3px;">
+            <a href="."><input type="button" value="{% trans "Clear Search" %}" style="width:90%;"></a>
+        </div>
+        {% else %}
         <li class="more-item"><a href="{% url note_list author.username %}">{% trans "More Notes..." %}</a></li>
+        {% endif %}
     </ul>
     <hr />
     <ul>

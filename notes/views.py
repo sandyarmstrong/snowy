@@ -55,24 +55,6 @@ def note_list(request, username,
                               {'notes': notes},
                               context_instance=RequestContext(request))
 
-def note_search(request, username,
-                template_name='notes/note_search.html'):
-    author = get_object_or_404(User, username=username)
-    notes = []
-    if request.method == 'GET':
-        form = SearchForm(request.GET)
-        if form.is_valid():
-            query = request.GET['query']
-            notes = Note.objects.user_viewable(request.user, author) \
-                                .filter(Q(title__icontains=query) \
-                                        | Q(content__icontains=query))
-    else:
-        form = SearchForm()
-
-    return render_to_response(template_name,
-                              {'notes': notes, 'form': form},
-                              context_instance=RequestContext(request))
-
 def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
     def clean_content(xml, author):
