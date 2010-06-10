@@ -25,7 +25,6 @@ from django.template import RequestContext
 from django.db.models import Q
 
 from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
-from snowy.notes.forms import SearchForm
 from snowy.notes.models import *
 from snowy import settings
 
