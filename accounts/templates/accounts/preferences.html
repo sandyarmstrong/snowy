@@ -20,6 +20,22 @@
     <input type="hidden" name="password_form" value="1" />
 </form>
 
+<h3>{% trans "Change your Email address" %}</h3>
+<form method="POST">
+    <table class="input-form">
+    {{ email_form.as_table }}
+        <tfoot>
+            <tr>
+                <th></th>
+                <td>
+                    <input type="submit" value="{% trans "Save" %}"/>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <input type="hidden" name="email_form" value="1" />
+</form>
+
 <h3>{% trans "Internationalization" %}</h3>
 <form method="POST">
     <table class="input-form">

@@ -1,0 +1,41 @@
+.rounded-corners-button {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border: 1px solid #94C7B6;
+    padding: 5px;
+}
+
+#login-leftcolumn {
+    border-right: 1px solid #000;
+    width: 45%;
+    display: block;
+    float: left;
+    margin-right: 10px;
+}
+
+#login-rightcolumn {
+    width: 45%;
+    display: block;
+    float: left;
+    margin-left: 10px;
+}
+
+.registration-form-label {
+    width: 15em;
+    font-weight: bold;
+    text-align: right;
+    display: inline-block;
+    margin-right: 0.5em;
+}
+
+.registration-form-errors {
+    color: red;
+    margin-left: 2em;
+}
+
+.registration-form-help-text {
+    /* set the help text off from the input field above it */
+    line-height: 2;
+    /* make the help text align with the input field above it */
+    margin-left: 16em;
+}

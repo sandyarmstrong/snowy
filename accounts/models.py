@@ -33,9 +33,19 @@ class UserProfile(models.Model):
     language = models.CharField(max_length=5, choices=settings.LANGUAGES,
                                 verbose_name=_(u'Application Language'),
                                 null=True, blank=True)
+    openid_user = models.BooleanField(verbose_name=_(u'OpenID User'),)
 
     def __unicode__(self):
         return str(self.user)
+
+    def registration_complete(self):
+        """
+        Checks whether an OpenID user has given all of his user details
+        """
+        if self.openid_user:
+            if self.user.username[:10] == "openiduser" or self.user.email == "":
+                return False
+        return True
 
 def _create_profile(sender, instance, created, **kwargs):
     """

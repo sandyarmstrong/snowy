@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.contrib.auth.models import User
 from registration.forms import RegistrationFormUniqueEmail
 from django.utils.translation import ugettext_lazy as _
 from recaptcha_django import ReCaptchaField
@@ -26,7 +27,7 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
     Subclass of ``RegistrationFormUniqueEmail`` which verifies usernames
     against a blacklist.
     """
-    captcha = ReCaptchaField(label=_(u'Verify words:'))
+    captcha = ReCaptchaField(label=_(u'Verify words'))
 
     username_blacklist = ['about', 'accounts', 'admin', 'api', 'blog',
                           'contact', 'css', 'friends', 'images', 'index.html',
@@ -36,18 +37,20 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
     def __init__(self, *args, **kwargs):
         super(RegistrationFormUniqueUser, self).__init__(*args, **kwargs)
 
+        #print self.fields['captcha'].widget.html
         if not settings.RECAPTCHA_ENABLED:
             del self.fields['captcha']
         
-        self.fields['username'].label = _(u'Username:')
+        self.fields['username'].label = _(u'Username')
         self.fields['username'].help_text = _(u'Maximum of 30 characters in length.')
+        self.fields['username'].error_messages['invalid'] = _(u'Usernames may not contain special characters.')
 
-        self.fields['email'].label = _(u'Email address:')
+        self.fields['email'].label = _(u'Email address')
 
-        self.fields['password1'].label = _(u'Choose a password:')
+        self.fields['password1'].label = _(u'Choose a password')
         self.fields['password1'].help_text = _(u'Minimum of 6 characters in length.')
 
-        self.fields['password2'].label = _(u'Re-enter password:')
+        self.fields['password2'].label = _(u'Re-enter password')
 
     def clean_username(self):
         """
@@ -56,6 +59,14 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
         username = self.cleaned_data['username']
         if username in self.username_blacklist:
             raise forms.ValidationError(_(u'This username has been reserved.  Please choose another.'))
+
+        try:
+            user = User.objects.get(username=username)
+            if user:
+                raise forms.ValidationError(_(u'This username has already been taken. Please choose another.'))
+        except User.DoesNotExist:
+            pass
+
         return username
 
     def clean_password1(self):
@@ -68,9 +79,21 @@ class RegistrationFormUniqueUser(RegistrationFormUniqueEmail):
 
         return password
 
+class OpenIDRegistrationFormUniqueUser(RegistrationFormUniqueUser):
+    def __init__(self, *args, **kwargs):
+        super(OpenIDRegistrationFormUniqueUser, self).__init__(*args, **kwargs)
+        del self.fields['password1']
+        del self.fields['password2']
+
 from snowy.accounts.models import UserProfile
 
 class InternationalizationForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ('language',)
+        fields = ('language', )
+
+class EmailChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('email', )
+

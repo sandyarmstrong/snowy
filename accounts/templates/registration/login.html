@@ -25,5 +25,7 @@
 <input type="hidden" name="next" value="{{ next }}" />
 {% endif %}
 </form>
+
+<p><small>{% trans "not a member yet?" %} <a href="{% url registration.views.register %}">{% trans "Sign up." %}</a></small></p>
 {% endblock %}
 
