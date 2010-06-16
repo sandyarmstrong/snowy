@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.utils.functional import curry
 
 from piston import oauth
-from piston.models import Consumer, Token
+from piston.models import Consumer, Token, generate_random, VERIFIER_SIZE
 from piston.forms import OAuthAuthenticationForm
 
 from snowy import settings
@@ -34,10 +34,14 @@ class OAuthRequester:
         oaconsumer = oauth.OAuthConsumer(self.consumer.key,
                                          self.consumer.secret)
 
+        # Callback URL
+        c_url = 'http://printer.example.com/request_token_ready'
+
         # Get a request key...
         url = 'http://' + self.SERVER_NAME + '/oauth/request_token/'
         request = oauth.OAuthRequest.from_consumer_and_token(oaconsumer,
-                                                             http_url=url)
+                                                             http_url=url,
+                                                             parameters={"oauth_callback" : c_url})
         request.sign_request(self.signature_method, oaconsumer, None)
 
         response = test_case.client.get('/oauth/request_token/',
@@ -51,21 +55,27 @@ class OAuthRequester:
         test_case.failUnless(test_case.client.login(username=username,
                                                     password=password))
         url = 'http://' + self.SERVER_NAME + '/oauth/authenticate/'
-        c_url = 'http://printer.example.com/request_token_ready'
         request = oauth.OAuthRequest.from_token_and_callback(token=oatoken,
-                                                             callback=c_url,
                                                              http_url=url)
         request.sign_request(self.signature_method, oaconsumer, oatoken)
         
         # Faking form submission seems to not work, so approve token manually
+        # This normally happens in piston.store.authorize_request_token
         token.is_approved = True
+        token.verifier = generate_random(VERIFIER_SIZE)
         token.user = User.objects.get(username=username)
         token.save()
+
+        # Normally the oauth_verifier is transmitted with the callback to the
+        # consumer, which does not happen here. Get the verifier directly from
+        # the database instead.
+        oaverifier = token.verifier
 
         # Obtain access token...
         url = 'http://' + self.SERVER_NAME + '/oauth/access_token/'
         request = oauth.OAuthRequest.from_consumer_and_token(oaconsumer,
                                                              token=oatoken,
+                                                             verifier=oaverifier,
                                                              http_url=url)
         request.sign_request(self.signature_method, oaconsumer, oatoken)
         response = test_case.client.get('/oauth/access_token/',
