@@ -1,0 +1,17 @@
+
+Snowy NEWS
+
+Please send questions and suggestions to
+http://mail.gnome.org/mailman/listinfo/snowy-list.
+
+Please report bugs using https://bugzilla.gnome.org/
+(https://bugzilla.gnome.org/enter_bug.cgi?product=snowy).
+
+Version 0.1 "Chihuahua"
+* Initial release features:
+  + Implementation of Tomboy Web Sync API
+    http://live.gnome.org/Tomboy/Synchronization/REST
+  + OpenID support
+  + Read-only online note access
+  + Inital unit tests
+* Not yet recommended for public servers or important note data
