@@ -2,11 +2,4 @@ Snowy is Tomboy's best friend online.
 
 Snowy is a web-based viewer for your Tomboy notes written in Django.
 
-Requirements
-=================
- * Python >= 2.5
-   - python-libxslt
-   - python-libxml2
-   - python-pytz
-   - python-sqlite
-
+See INSTALL for dependencies and other requirements.
