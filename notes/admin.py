@@ -22,7 +22,7 @@ from django.contrib import admin
 
 class NoteAdmin(VersionAdmin):
     list_display = ('created', 'author', 'title')
-    search_fields = ['body', 'title']
+    search_fields = ['content', 'title']
     prepopulated_fields = {'slug': ('title',)}
 
 admin.site.register(Note, NoteAdmin)
