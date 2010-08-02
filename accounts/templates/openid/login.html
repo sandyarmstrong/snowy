@@ -4,11 +4,14 @@
 {% block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/accounts.css">
+<link rel="stylesheet" href="{{ MEDIA_URL }}css/openid.css" />
+<script type="text/javascript" src="{{ MEDIA_URL }}js/config.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/openid-jquery.js"></script>
 <script type="text/javascript">
-function submit_form(name)
-{
-    document.getElementsByName(name)[0].submit();
-}
+    $(document).ready(function() {
+        openid.img_path = '{{ MEDIA_URL }}img/accounts/openid/';
+        openid.init('openid_identifier');
+    });
 </script>
 
 {% endblock %}
@@ -48,15 +51,29 @@ function submit_form(name)
 <div id="login-rightcolumn">
     <h3>{% trans "...or use one of the following services:" %}</h3>
     <br />
-    <form name="google_login_form" action="{{ action }}" method="post">
-        <input type="hidden" name="openid_identifier" value="http://www.google.com/accounts/o8/id">
-        <a href="javascript: submit_form('google_login_form')">
-            <img src="{{ MEDIA_URL }}img/accounts/google-accounts-logo.png" alt="Google Accounts Logo" class="rounded-corners-button">
-        </a>
-        {% if next %}
-        <input type="hidden" name="next" value="{{ next }}" />
-        {% endif %}
-    </form>
+<!-- Simple OpenID Selector -->
+<form action="{{ action }}" method="post" id="openid_form">
+    <!--<input type="hidden" name="action" value="verify" />-->
+
+    <fieldset>
+            <legend>Sign-in or Create New Account</legend>
+            <div id="openid_choice">
+                <p>Please click your account provider:</p>
+                <div id="openid_btns"></div>
+            </div>
+            <div id="openid_input_area">
+                <input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
+                <input id="openid_submit" type="submit" value="Sign-In"/>
+            </div>
+            <noscript>
+            <p>OpenID is service that allows you to log-on to many different websites using a single indentity.
+            Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
+            </noscript>
+            {% if next %}
+            <input type="hidden" name="next" value="{{ next }}" />
+            {% endif %}
+    </fieldset>
+</form>
 </div>
 
 <!-- the following div makes sure the float layout works correctly -->
