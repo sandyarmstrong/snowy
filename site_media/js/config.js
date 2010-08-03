@@ -8,7 +8,7 @@ var providers_large = {
     },
     launchpad: {
         name: 'Launchpad',
-        label: 'Your Launchpad.net username',
+        label: 'Your Launchpad.net username.',
         url: 'https://launchpad.net/~{username}'
     },
     yahoo: {
@@ -19,6 +19,11 @@ var providers_large = {
         name: 'AOL',
         label: 'Enter your AOL screenname.',
         url: 'http://openid.aol.com/{username}'
+    },
+    myspace: {
+        name: 'MySpace',
+        label: 'Enter your MySpace username or email address.',
+        url: 'http://{username}.myspace.com'
     },
     /*
     verisign: {
