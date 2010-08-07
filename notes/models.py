@@ -26,7 +26,7 @@ from snowy.notes.managers import NoteManager
 
 class Note(models.Model):
     NOTE_PERMISSIONS = (
-        (0, _(u'Private')), (1, _(u'Public')), 
+        (0, _(u'Private')), (1, _(u'Public')),
     )
 
     guid = models.CharField(max_length=36)
@@ -49,7 +49,7 @@ class Note(models.Model):
 
     open_on_startup = models.BooleanField(default=False)
     pinned = models.BooleanField(default=False)
-    
+
     last_sync_rev = models.IntegerField(default=-1)
 
     objects = NoteManager()
@@ -87,10 +87,20 @@ class NoteTag(models.Model):
     def __unicode__(self):
         return self.name
 
+    def _note_is_public(self):
+        # This will need to be expanded once a more
+        # fine-grained permissions system is in place.
+        if self.note_set.filter(permissions__gt=0).count():
+            return True
+        else:
+            return False
+
     def get_name_for_display(self):
         if self.is_notebook:
             return self.name.split(':', 2)[-1]
         return self.name
+
+    is_public = property(_note_is_public)
 
 def _update_is_notebook(sender, instance, **kwargs):
     """

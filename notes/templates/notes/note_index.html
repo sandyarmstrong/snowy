@@ -28,14 +28,9 @@
 </div>
 <div id="sidebar-notebook-list">
     <h3>{% trans "Notebooks" %}</h3>
-    <ul> 
+    <ul>
 {% user_notebook_list request author as all_notebooks %}
-{% for n in all_notebooks %}
-        <li class="notebook-item"><a href="#">{{ n.get_name_for_display }}</a></li>
-{% endfor %}
-        <li class="more-item"><a href="#">{% trans "More Notebooks..." %}</a></li>
-    </ul>
-</div>
+{% include "notes/notebook_list_snippet.html" %}
 {% endblock %}
 
 {% block content %}
