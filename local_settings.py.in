@@ -13,3 +13,6 @@ RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''
 
 EMAIL_PORT = 1025
+
+# Uncomment for limited user access
+#MODERATE_NEW_USERS = True

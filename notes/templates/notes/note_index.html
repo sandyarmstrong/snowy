@@ -12,6 +12,7 @@
 {{ block.super }}
 {% user_notes_list request author as all_notes %}
 <div id="sidebar-note-list">
+    {% if enabled %}
     <ul>
 {% for n in all_notes %}
         <li class="note-item{% if n.pinned %} pinned{% endif %}"><a href="{{ n.get_absolute_url }}">{{ n.title|safe }}</a></li>
@@ -25,15 +26,19 @@
         <li id="new-note"><a href="#">New Note...</a></li>
 {% endcomment %}
     </ul>
+    {% endif %}
 </div>
 <div id="sidebar-notebook-list">
+{% if enabled %}
     <h3>{% trans "Notebooks" %}</h3>
     <ul>
 {% user_notebook_list request author as all_notebooks %}
 {% include "notes/notebook_list_snippet.html" %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
+{% if enabled %}
 <table id="content-layout" cellspacing="0" cellpadding="0">
     <tr>
         <td id="note">
@@ -57,4 +62,8 @@
         </td>
     </br>
 </table>
+{% else %}
+<h1>Notice</h1>
+{{ author }}'s account is currently disabled.
+{% endif %}
 {% endblock %}

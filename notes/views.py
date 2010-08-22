@@ -31,16 +31,18 @@ from snowy import settings
 def note_index(request, username,
                template_name='notes/note_index.html'):
     author = get_object_or_404(User, username=username)
+    enabled = author.is_active
 
     # TODO: retrieve the last open note from the user
     last_modified = Note.objects.user_viewable(request.user, author) \
                                 .order_by('-user_modified')
     if last_modified.count() > 0:
         return HttpResponseRedirect(last_modified[0].get_absolute_url())
-    
+
     # TODO: Instruction page to tell user to either sync or create a new note
     return render_to_response(template_name,
                               {'author': author,
+                               'enabled': enabled,
                                # Django 1.1 does not support == operator, so
                                # we need to do the check here and pass it along
                                'author_is_user': username==request.user.username},
