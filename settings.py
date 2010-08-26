@@ -90,7 +90,7 @@ MIDDLEWARE_CLASSES = (
     'snowy.accounts.middleware.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
-    'reversion.middleware.RevisionMiddleware',
+    #'reversion.middleware.RevisionMiddleware',
     'recaptcha_django.middleware.ReCaptchaMiddleware',
     'pagination.middleware.PaginationMiddleware',
 )
@@ -130,7 +130,7 @@ INSTALLED_APPS = (
     # External apps
     'registration',
     'south',
-    'reversion',
+    #'reversion',
     'gravatar',
     'autoslug',
     'piston',
