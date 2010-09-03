@@ -4,6 +4,7 @@
 
 {% block content %}
 <h1>{% trans "Preferences" %}</h1>
+{% if user.has_usable_password %}
 <h3>{% trans "Change your password" %}</h3>
 <form method="POST">
     <table class="input-form">
@@ -19,6 +20,7 @@
     </table>
     <input type="hidden" name="password_form" value="1" />
 </form>
+{% endif %}
 
 <h3>{% trans "Change your Email address" %}</h3>
 <form method="POST">
