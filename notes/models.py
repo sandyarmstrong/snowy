@@ -78,7 +78,7 @@ class Note(models.Model):
 
 class NoteTag(models.Model):
     author = models.ForeignKey(User)
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=255)
     is_notebook = models.BooleanField(default=False)
 
     class Meta:
