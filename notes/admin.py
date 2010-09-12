@@ -17,10 +17,11 @@
 
 from snowy.accounts.models import UserProfile
 from snowy.notes.models import Note, NoteTag
-from reversion.admin import VersionAdmin
+#from reversion.admin import VersionAdmin
 from django.contrib import admin
 
-class NoteAdmin(VersionAdmin):
+#class NoteAdmin(VersionAdmin):
+class NoteAdmin(admin.ModelAdmin):
     list_display = ('created', 'author', 'title')
     search_fields = ['content', 'title']
     prepopulated_fields = {'slug': ('title',)}
