@@ -26,18 +26,10 @@ auth = HttpBasicAuthentication(realm='Snowy')
 authoauth = OAuthAuthentication(realm='Snowy')
 ad = {'authentication': authoauth}
 
-""" piston resources are marked csrf_exempt to ensure the the django
-CsrfMiddleware doesn't interfere with POST requests
-http://bitbucket.org/jespern/django-piston/issue/82/post-requests-fail-when-using-django-trunk """
-
 root_handler = Resource(handler=RootHandler, **ad)
-root_handler.csrf_exempt = getattr(root_handler.handler, 'csrf_exempt', True)
 user_handler = Resource(UserHandler)
-user_handler.csrf_exempt = getattr(user_handler.handler, 'csrf_exempt', True)
 notes_handler = Resource(handler=NotesHandler, **ad)
-notes_handler.csrf_exempt = getattr(notes_handler.handler, 'csrf_exempt', True)
 note_handler = Resource(handler=NoteHandler, **ad)
-note_handler.csrf_exempt = getattr(note_handler.handler, 'csrf_exempt', True)
 
 urlpatterns = patterns('',
     # 1.0 API methods
