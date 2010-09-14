@@ -11,7 +11,7 @@ Version 0.2 "Papillon"
 * Better mysql (and especially innodb) support (#624934, etc)
 * Support for more OpenID providers
 * Optional new user account moderation
-* Do not show other users non-public notebook names ($614814)
+* Do not show other users non-public notebook names (#614814)
 * Redirect from /username to /username/notes (#614815)
 * Remove all usage of django-reversion for now
 * Fix searching for notes in django admin UI
