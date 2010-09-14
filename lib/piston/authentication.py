@@ -12,6 +12,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
+#TODO: Update to proper 1.2 imports (once we drop 1.1 support)
+from django.contrib.csrf.middleware import csrf_exempt
+
 from piston import forms
 
 class NoAuthentication(object):
@@ -150,6 +153,7 @@ def send_oauth_error(err=None):
 
     return response
 
+@csrf_exempt
 def oauth_request_token(request):
     oauth_server, oauth_request = initialize_server_request(request)
     
@@ -221,6 +225,7 @@ def oauth_user_auth(request):
             
     return response
 
+@csrf_exempt
 def oauth_access_token(request):
     oauth_server, oauth_request = initialize_server_request(request)
     
