@@ -91,11 +91,13 @@ def note_detail(request, username, note_id, slug='',
     # break this out into a function
     import libxslt
     import libxml2
-    
+    import os.path
+
     style, doc, result = None, None, None
  
     try:
-        styledoc = libxml2.parseFile('data/note2xhtml.xsl')
+        styledoc = libxml2.parseFile(os.path.join(settings.PROJECT_ROOT,
+                                                  'data/note2xhtml.xsl'))
         style = libxslt.parseStylesheetDoc(styledoc)
     
         template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
