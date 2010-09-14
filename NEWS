@@ -7,6 +7,17 @@ http://mail.gnome.org/mailman/listinfo/snowy-list.
 Please report bugs using https://bugzilla.gnome.org/
 (https://bugzilla.gnome.org/enter_bug.cgi?product=snowy).
 
+Version 0.2 "Papillon"
+* Better mysql (and especially innodb) support (#624934, etc)
+* Support for more OpenID providers
+* Optional new user account moderation
+* Do not show other users non-public notebook names ($614814)
+* Redirect from /username to /username/notes (#614815)
+* Remove all usage of django-reversion for now
+* Fix searching for notes in django admin UI
+* Possibly the first release of the Tomboy Online alpha
+  (unless we find some last-minute bugs)
+
 Version 0.1 "Chihuahua"
 * Initial release features:
   + Implementation of Tomboy Web Sync API
