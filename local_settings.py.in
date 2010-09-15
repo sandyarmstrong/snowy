@@ -16,3 +16,6 @@ EMAIL_PORT = 1025
 
 # Uncomment for limited user access
 #MODERATE_NEW_USERS = True
+
+# Uncomment for HTTPS
+#URI_SCHEME = 'https'
