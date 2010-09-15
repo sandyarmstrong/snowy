@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>Slick Notes</title>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <script type="text/javascript">
+
+        var NoteSync = {
+            get_titles: function() {
+                $.getJSON('{{ root_uri }}', null, function(root) {
+                    $.getJSON(root['user-ref']['api-ref'], null, function(user) {
+                        $("#status").html("Notes belonging to " + user['user-name']);
+                        $.getJSON(user['notes-ref']['api-ref'], {include_notes:true}, function(notes) {
+                            for(var i=0; i < notes.notes.length; i++) {
+                                var note = notes.notes[i];
+                                $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
+                            }
+                        });
+                    });
+                });
+            },
+        }
+
+        NoteSync.get_titles();
+        </script>
+    </head>
+
+    <body>
+
+        <p id="status">Nothing yet</p>
+
+        <ul id="note-title-list" />
+
+    </body>
+</html>
