@@ -7,8 +7,8 @@ Running Snowy From Your Git Checkout
    (or on Python 2.6 possibly python-json), python-openid >= 2.2.4
    (package names somewhat different from distro to distro).
 
-1. Install django 1.1. If your distro does not have packages for 1.1, then
-   download the tarball and install it like so:
+1. Install django 1.1 or 1.2. If your distro does not have packages for 1.1/1.2,
+   then download the tarball and install it like so:
 	wget http://www.djangoproject.com/download/1.1/tarball/
 	tar zxvf Django-1.1.tar.gz
 	cd Django-1.1
