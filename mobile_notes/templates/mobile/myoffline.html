@@ -4,7 +4,7 @@
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
         <script type="text/javascript">
 
-        var NoteSync = {
+        var TomboyWeb = {
             root_uri: '{{ root_uri }}',
 
             get_updates_since: function(version, noteJsonCallback) {
@@ -63,7 +63,7 @@
         var lastSyncRev = localStorage.getItem('latest-sync-revision');
         if (lastSyncRev == null)
             lastSyncRev = -1;
-        NoteSync.get_updates_since(lastSyncRev, function(notes) {
+        TomboyWeb.get_updates_since(lastSyncRev, function(notes) {
             for(var i=0; i < notes.notes.length; i++) {
                 var note = notes.notes[i];
                 // NOTE: Tricky ON CONFLICT REPLACE option makes this INSERT
