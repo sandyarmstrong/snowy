@@ -5,22 +5,88 @@
         <script type="text/javascript">
 
         var NoteSync = {
-            get_titles: function() {
-                $.getJSON('{{ root_uri }}', null, function(root) {
+            root_uri: '{{ root_uri }}',
+
+            get_updates_since: function(version, noteJsonCallback) {
+                $.getJSON(this.root_uri, null, function(root) {
                     $.getJSON(root['user-ref']['api-ref'], null, function(user) {
-                        $("#status").html("Notes belonging to " + user['user-name']);
-                        $.getJSON(user['notes-ref']['api-ref'], {include_notes:true}, function(notes) {
-                            for(var i=0; i < notes.notes.length; i++) {
-                                var note = notes.notes[i];
-                                $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
-                            }
+                        //$("#status").html("Notes belonging to " + user['user-name']);
+                        $.getJSON(user['notes-ref']['api-ref'], {include_notes:true, since:version}, function(notes) {
+                            noteJsonCallback(notes);
                         });
                     });
                 });
             },
         }
 
-        NoteSync.get_titles();
+        var OfflineNotesDatabase = {
+            db: null,
+
+            init_db: function() {
+                // TODO: Error-checking, encapuslation, etc
+                this.db = openDatabase('Notes', 0.1, 'Tomboy Online Notes', 5*1024*1024)
+                this.db.transaction(function(tx) {
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ' +
+                                  'notes(guid TEXT PRIMARY KEY ON CONFLICT REPLACE, title TEXT, content TEXT)',
+                                  []);
+                });
+            },
+
+            insert_note: function(guid, title, content) {
+                this.db.transaction(function(tx) {
+                    tx.executeSql('INSERT INTO notes(guid, title, content) VALUES (?,?,?)',
+                                  [guid, title, content]);
+                });
+            },
+
+            select_notes: function(selectedRowCallback) {
+                var that = this;
+                var selection_processor = function(tx, rs) {
+                    for(var i=0; i < rs.rows.length; i++) {
+                        var note = rs.rows.item(i);
+                        selectedRowCallback(note);
+                    }
+                };
+                this.db.transaction(function(tx) {
+                    tx.executeSql("SELECT * FROM notes", [],
+                                  selection_processor,
+                                  that.on_error);
+                });
+            },
+
+            on_error: function(tx, e) {
+                alert("There has been a db error: " + e.message);
+            },
+        }
+
+        OfflineNotesDatabase.init_db();
+        var lastSyncRev = localStorage.getItem('latest-sync-revision');
+        if (lastSyncRev == null)
+            lastSyncRev = -1;
+        NoteSync.get_updates_since(lastSyncRev, function(notes) {
+            for(var i=0; i < notes.notes.length; i++) {
+                var note = notes.notes[i];
+                // NOTE: Tricky ON CONFLICT REPLACE option makes this INSERT
+                //       magically turn into a DELETE+INSERT if the row already
+                //       exists.
+                // TODO: This is probably wasteful since we should most likely
+                //       prefer optimizing the UPDATE case over the new INSERT
+                //       case.
+                OfflineNotesDatabase.insert_note(note.guid, note.title, note['note-content']);
+            }
+            // TODO: Error-handling whenever using localStorage
+            localStorage.setItem('latest-sync-revision', notes['latest-sync-revision']);
+        });
+
+        // TODO: Above method calls are async, so this may not return the
+        //       desired data when called sequentially like this. Dumping into
+        //       above call at end of loop doesn't necessarily fix because DB
+        //       calls are also async (right?).  Need to figure out cleanest
+        //       solution.  Setting a timer at end of above call might be
+        //       easiest?
+        OfflineNotesDatabase.select_notes(function(note) {
+            $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
+        });
         </script>
     </head>
 
