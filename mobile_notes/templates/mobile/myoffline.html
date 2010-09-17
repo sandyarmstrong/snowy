@@ -109,57 +109,66 @@
             },
         };
 
-        OfflineNotesDatabase.init_db();
-        var lastSyncRev = localStorage.getItem('latest-sync-revision');
-        if (lastSyncRev == null)
-            lastSyncRev = -1;
-
-        TomboyWeb.get_updates_since(lastSyncRev, function(notes) {
-            for(var i=0; i < notes.notes.length; i++) {
-                var note = notes.notes[i];
-                // NOTE: Tricky ON CONFLICT REPLACE option makes this INSERT
-                //       magically turn into a DELETE+INSERT if the row already
-                //       exists.
-                // TODO: This is probably wasteful since we should most likely
-                //       prefer optimizing the UPDATE case over the new INSERT
-                //       case.
-                OfflineNotesDatabase.insert_note(note.guid, note.title, note['note-content']);
-            }
-            // TODO: Error-handling whenever using localStorage
-            localStorage.setItem('latest-sync-revision', notes['latest-sync-revision']);
-        });
-
-        // Look for note that have been deleted on the server
-        TomboyWeb.get_note_list(function(noteInfo) {
-            var allNoteGuids = [];
-            for(var i=0; i < noteInfo.notes.length; i++) {
-                allNoteGuids.push(noteInfo.notes[i].guid);
-            }
-            OfflineNotesDatabase.select_note_guids(function(noteInfo) {
-                var guid = noteInfo.guid;
-                if (allNoteGuids.indexOf(guid) == -1) {
-                    OfflineNotesDatabase.deleteAtGuid(guid);
-                    // TODO: Do this onSuccess?
-                    $('#note-title-list > li#' + guid).remove()
-                }
-            });
-        });
-
-        // TODO: Above method calls are async, so this may not return the
-        //       desired data when called sequentially like this. Dumping into
-        //       above call at end of loop doesn't necessarily fix because DB
-        //       calls are also async (right?).  Need to figure out cleanest
-        //       solution.  Setting a timer at end of above call might be
-        //       easiest?
-        OfflineNotesDatabase.select_notes(function(note) {
-            $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
-        });
-
         $(function() {
+            // Set up controls
             $('#wipe')[0].addEventListener('click', function(event) {
                 OfflineNotesDatabase.wipe_db();
                 localStorage.setItem('latest-sync-revision', -1);
                 $('#note-title-list > li').remove();
+            });
+            $('#beginSync')[0].addEventListener('click', function(event) {
+                // TODO: Obviously this whole function should be refactored into
+                //       one or two calls to a NoteSync object
+                OfflineNotesDatabase.check_db();
+                var lastSyncRev = localStorage.getItem('latest-sync-revision');
+                if (lastSyncRev == null)
+                    lastSyncRev = -1;
+
+                TomboyWeb.get_updates_since(lastSyncRev, function(notes) {
+                    var insertCallbackMaker = function(note) {
+                        return function() {
+                            // TODO: This is a dupe of below!
+                            $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
+                        };
+                    };
+                    for(var i=0; i < notes.notes.length; i++) {
+                        var note = notes.notes[i];
+                        // NOTE: Tricky ON CONFLICT REPLACE option makes this INSERT
+                        //       magically turn into a DELETE+INSERT if the row already
+                        //       exists.
+                        // TODO: This is probably wasteful since we should most likely
+                        //       prefer optimizing the UPDATE case over the new INSERT
+                        //       case.
+                        OfflineNotesDatabase.insert_note(note.guid, note.title, note['note-content'],
+                                                         insertCallbackMaker(note));
+                    }
+                    // TODO: Error-handling whenever using localStorage (applies elsewhere)
+                    localStorage.setItem('latest-sync-revision', notes['latest-sync-revision']);
+                    $('#status').html('Processed ' + notes.notes.length + ' note updates, not including deletions');
+                });
+
+                // Look for note that have been deleted on the server
+                TomboyWeb.get_note_list(function(noteInfo) {
+                    var allNoteGuids = [];
+                    for(var i=0; i < noteInfo.notes.length; i++) {
+                        allNoteGuids.push(noteInfo.notes[i].guid);
+                    }
+                    OfflineNotesDatabase.select_note_guids(function(noteInfo) {
+                        var guid = noteInfo.guid;
+                        if (allNoteGuids.indexOf(guid) == -1) {
+                            OfflineNotesDatabase.deleteAtGuid(guid, function(tx,rs) {
+                                $('#note-title-list > li#' + guid).remove();
+                            });
+                        }
+                    });
+                });
+            });
+
+            OfflineNotesDatabase.init_db();
+
+            // Show cached notes
+            OfflineNotesDatabase.select_notes(function(note) {
+                $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
             });
         });
         </script>
@@ -168,6 +177,9 @@
     <body>
 
         <p id="status">Nothing yet</p>
+
+        <p>Looking for something?  Why don't you
+        <a href="#" id="beginSync">initiate a sync</a>?</p>
 
         <p>Feeling uncomfortable? Why don't you go ahead and
         <a href="#" id="wipe">clear all offline storage</a>?</p>
