@@ -75,6 +75,27 @@
                 });
             },
 
+            select_note_guids: function(selectedRowCallback) {
+                var that = this;
+                var selection_processor = function(tx, rs) {
+                    for(var i=0; i < rs.rows.length; i++) {
+                        var note = rs.rows.item(i);
+                        selectedRowCallback(note);
+                    }
+                };
+                this.db.transaction(function(tx) {
+                    tx.executeSql("SELECT guid FROM notes", [],
+                                  selection_processor,
+                                  that.on_error);
+                });
+            },
+
+            deleteAtGuid: function(guid) {
+                this.db.transaction(function(tx) {
+                    tx.executeSql("DELETE FROM notes WHERE guid=" + guid);
+                });
+            },
+
             on_error: function(tx, e) {
                 alert("There has been a db error: " + e.message);
             },
@@ -84,7 +105,7 @@
         var lastSyncRev = localStorage.getItem('latest-sync-revision');
         if (lastSyncRev == null)
             lastSyncRev = -1;
-        // TODO: This doesn't handle deleted notes *at all*
+
         TomboyWeb.get_updates_since(lastSyncRev, function(notes) {
             for(var i=0; i < notes.notes.length; i++) {
                 var note = notes.notes[i];
@@ -98,6 +119,22 @@
             }
             // TODO: Error-handling whenever using localStorage
             localStorage.setItem('latest-sync-revision', notes['latest-sync-revision']);
+        });
+
+        // Look for note that have been deleted on the server
+        TomboyWeb.get_note_list(function(noteInfo) {
+            var allNoteGuids = [];
+            for(var i=0; i < noteInfo.notes.length; i++) {
+                allNoteGuids.push(noteInfo.notes[i].guid);
+            }
+            OfflineNotesDatabase.select_note_guids(function(noteInfo) {
+                var guid = noteInfo.guid;
+                if (allNoteGuids.indexOf(guid) == -1) {
+                    OfflineNotesDatabase.deleteAtGuid(guid);
+                    // TODO: Do this onSuccess?
+                    $('#note-title-list > li#' + guid).remove()
+                }
+            });
         });
 
         // TODO: Above method calls are async, so this may not return the
