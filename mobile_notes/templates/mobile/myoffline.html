@@ -96,9 +96,11 @@
                 this._select_from_notes("guid", null, selectedRowCallback);
             },
 
-            deleteAtGuid: function(guid) {
+            deleteAtGuid: function(guid, onSuccess) {
                 this.db.transaction(function(tx) {
-                    tx.executeSql("DELETE FROM notes WHERE guid=" + guid);
+                    tx.executeSql("DELETE FROM notes WHERE guid=?", [guid],
+                                  onSuccess,
+                                  OfflineNotesDatabase.on_error);
                 });
             },
 
