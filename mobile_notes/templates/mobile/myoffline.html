@@ -6,18 +6,33 @@
 
         var TomboyWeb = {
             root_uri: '{{ root_uri }}',
+            notes_uri: null,
 
-            get_updates_since: function(version, noteJsonCallback) {
-                $.getJSON(this.root_uri, null, function(root) {
-                    $.getJSON(root['user-ref']['api-ref'], null, function(user) {
-                        //$("#status").html("Notes belonging to " + user['user-name']);
-                        $.getJSON(user['notes-ref']['api-ref'], {include_notes:true, since:version}, function(notes) {
-                            noteJsonCallback(notes);
+            _get_notes: function(params, callback) {
+                if(this.notes_uri == null) {
+                    var that = this;
+                    $.getJSON(this.root_uri, null, function(root) {
+                        $.getJSON(root['user-ref']['api-ref'], null, function(user) {
+                            that.notes_uri = user['notes-ref']['api-ref'];
+                            that._get_notes(params, callback);
                         });
                     });
-                });
+                } else {
+                    // TODO: On certain errors, set notes_uri to null and
+                    //       start from scratch
+                    $.getJSON(this.notes_uri, params, callback);
+                }
             },
-        }
+
+            get_updates_since: function(version, noteJsonCallback) {
+                this._get_notes({include_notes:true, since:version},
+                                noteJsonCallback);
+            },
+
+            get_note_list: function(minimalNoteJsonCallback) {
+                this._get_notes(null, minimalNoteJsonCallback);
+            }
+        };
 
         var OfflineNotesDatabase = {
             db: null,
