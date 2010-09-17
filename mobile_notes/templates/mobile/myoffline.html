@@ -74,7 +74,6 @@
                 if(where) {
                     sql += " WHERE " + where;
                 }
-                var that = this;
                 var selection_processor = function(tx, rs) {
                     for(var i=0; i < rs.rows.length; i++) {
                         var note = rs.rows.item(i);
@@ -85,7 +84,7 @@
                     tx.executeSql(sql,
                                   [],
                                   selection_processor,
-                                  that.on_error);
+                                  OfflineNotesDatabase.on_error);
                 });
             },
 
