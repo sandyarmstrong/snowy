@@ -59,10 +59,13 @@
                 });
             },
 
-            insert_note: function(guid, title, content) {
+            insert_note: function(guid, title, content, insertedRowCallback) {
+                // TODO: Should we handle case where there is no desired callback?
                 this.db.transaction(function(tx) {
                     tx.executeSql('INSERT INTO notes(guid, title, content) VALUES (?,?,?)',
-                                  [guid, title, content]);
+                                  [guid, title, content],
+                                  insertedRowCallback,
+                                  OfflineNotesDatabase.on_error);
                 });
             },
 
