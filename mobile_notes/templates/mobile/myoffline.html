@@ -78,7 +78,7 @@
             on_error: function(tx, e) {
                 alert("There has been a db error: " + e.message);
             },
-        }
+        };
 
         OfflineNotesDatabase.init_db();
         var lastSyncRev = localStorage.getItem('latest-sync-revision');
