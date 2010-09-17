@@ -60,7 +60,11 @@
                 });
             },
 
-            select_notes: function(selectedRowCallback) {
+            _select_from_notes: function(params, where, selectedRowCallback) {
+                var sql = "SELECT " + params + " FROM notes";
+                if(where) {
+                    sql += " WHERE " + where;
+                }
                 var that = this;
                 var selection_processor = function(tx, rs) {
                     for(var i=0; i < rs.rows.length; i++) {
@@ -69,25 +73,19 @@
                     }
                 };
                 this.db.transaction(function(tx) {
-                    tx.executeSql("SELECT * FROM notes", [],
+                    tx.executeSql(sql,
+                                  [],
                                   selection_processor,
                                   that.on_error);
                 });
             },
 
+            select_notes: function(selectedRowCallback) {
+                this._select_from_notes("*", null, selectedRowCallback);
+            },
+
             select_note_guids: function(selectedRowCallback) {
-                var that = this;
-                var selection_processor = function(tx, rs) {
-                    for(var i=0; i < rs.rows.length; i++) {
-                        var note = rs.rows.item(i);
-                        selectedRowCallback(note);
-                    }
-                };
-                this.db.transaction(function(tx) {
-                    tx.executeSql("SELECT guid FROM notes", [],
-                                  selection_processor,
-                                  that.on_error);
-                });
+                this._select_from_notes("guid", null, selectedRowCallback);
             },
 
             deleteAtGuid: function(guid) {
