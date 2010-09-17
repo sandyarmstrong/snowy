@@ -84,6 +84,7 @@
         var lastSyncRev = localStorage.getItem('latest-sync-revision');
         if (lastSyncRev == null)
             lastSyncRev = -1;
+        // TODO: This doesn't handle deleted notes *at all*
         TomboyWeb.get_updates_since(lastSyncRev, function(notes) {
             for(var i=0; i < notes.notes.length; i++) {
                 var note = notes.notes[i];
