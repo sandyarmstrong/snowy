@@ -32,6 +32,12 @@
                 });
             },
 
+            wipe_db: function() {
+                this.db.transaction(function(tx) {
+                    tx.executeSql('DROP TABLE notes');
+                });
+            },
+
             insert_note: function(guid, title, content) {
                 this.db.transaction(function(tx) {
                     tx.executeSql('INSERT INTO notes(guid, title, content) VALUES (?,?,?)',
@@ -87,12 +93,23 @@
         OfflineNotesDatabase.select_notes(function(note) {
             $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
         });
+
+        $(function() {
+            $('#wipe')[0].addEventListener('click', function(event) {
+                OfflineNotesDatabase.wipe_db();
+                localStorage.setItem('latest-sync-revision', -1);
+                $('#note-title-list > li').remove();
+            });
+        });
         </script>
     </head>
 
     <body>
 
         <p id="status">Nothing yet</p>
+
+        <p>Feeling uncomfortable? Why don't you go ahead and
+        <a href="#" id="wipe">clear all offline storage</a>?</p>
 
         <ul id="note-title-list" />
 
