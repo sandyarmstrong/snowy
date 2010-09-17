@@ -24,7 +24,7 @@
 
             init_db: function() {
                 // TODO: Error-checking, encapuslation, etc
-                this.db = openDatabase('Notes', 0.1, 'Tomboy Online Notes', 5*1024*1024)
+                this.db = openDatabase('Notes', 0.1, 'Tomboy Online Notes', 5*1024*1024);
                 this.db.transaction(function(tx) {
                     tx.executeSql('CREATE TABLE IF NOT EXISTS ' +
                                   'notes(guid TEXT PRIMARY KEY ON CONFLICT REPLACE, title TEXT, content TEXT)',
