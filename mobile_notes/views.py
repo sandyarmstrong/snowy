@@ -15,13 +15,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from django.http import HttpResponseRedirect
+
 from django.shortcuts import render_to_response
 
 from django.template import RequestContext
 
 from snowy.core.urlresolvers import reverse_full
 
+def mobile_note_index_redirect(request):
+    return HttpResponseRedirect(reverse_full('mobile_note_index'))
+
 def mobile_note_index(request):
-    return render_to_response('mobile/myoffline.html',
-                              {'root_uri': reverse_full('api_root'),},
+    return render_to_response('mobile/index.html',
+                              {'root_uri': reverse_full('api_root'),
+                               'jquery_uri': 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',},
+                              context_instance=RequestContext(request))
+
+def cache_manifest(request):
+    return render_to_response('mobile/cache.manifest',
+                              {'root_uri': reverse_full('api_root'),
+                               'jquery_uri': 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js',},
+                              mimetype='text/cache-manifest',
                               context_instance=RequestContext(request))
