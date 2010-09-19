@@ -127,8 +127,10 @@
                 TomboyWeb.get_updates_since(lastSyncRev, function(notes) {
                     var insertCallbackMaker = function(note) {
                         return function() {
-                            // TODO: This is a dupe of below!
-                            $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
+                            // TODO: Ugh, this is gross. Calling this method
+                            //       with both JSON objects and db row objects
+                            note.content = note['note-content'];
+                            add_note_list_item(note);
                         };
                     };
                     for(var i=0; i < notes.notes.length; i++) {
@@ -164,12 +166,27 @@
                 });
             });
 
+            // TODO: Refactor, move somewhere reasonable
+            function add_note_list_item(note) {
+                $('<li id="' + note.guid + '"><a href="#' + note.guid + '">' + note.title + '</a></li>').appendTo('#note-title-list');
+                $('li#' + note.guid).bind('click', note, function(event) {
+                    var note = event.data;
+                    $('.note-content').remove();
+                    if(note.guid != currentlyOpenGuid) {
+                        $('<div class="note-content">' + escape(note.content) + '</div>').appendTo('li#' + note.guid);
+                        currentlyOpenGuid = note.guid;
+                    } else {
+                        currentlyOpenGuid = null;
+                    }
+                });
+            }
+
             OfflineNotesDatabase.init_db();
 
+            var currentlyOpenGuid = null;
+
             // Show cached notes
-            OfflineNotesDatabase.select_notes(function(note) {
-                $('<li id="' + note.guid + '">' + note.title + '</li>').appendTo('#note-title-list');
-            });
+            OfflineNotesDatabase.select_notes(add_note_list_item);
         });
         </script>
     </head>
