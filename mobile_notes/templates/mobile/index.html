@@ -111,12 +111,12 @@
 
         $(function() {
             // Set up controls
-            $('#wipe')[0].addEventListener('click', function(event) {
+            $('#wipe').bind('click', function(event) {
                 OfflineNotesDatabase.wipe_db();
                 localStorage.setItem('latest-sync-revision', -1);
                 $('#note-title-list > li').remove();
             });
-            $('#beginSync')[0].addEventListener('click', function(event) {
+            $('#beginSync').bind('click', function(event) {
                 // TODO: Obviously this whole function should be refactored into
                 //       one or two calls to a NoteSync object
                 OfflineNotesDatabase.check_db();
