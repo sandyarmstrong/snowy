@@ -58,62 +58,47 @@ def note_list(request, username,
 
 def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
-    def clean_content(xml, author):
-        """
-        Adds an id attribute to <link:internal> tags so that URLs can be
-        constructed by the XSLT.
-        """
-        from xml.dom import minidom
-        doc = minidom.parseString(xml)
-
-        for link in doc.getElementsByTagName('link:internal'):
-            if len(link.childNodes) < 1: continue
-
-            title = link.childNodes[0].nodeValue
-            try:
-                note = Note.objects.get(author=author, title=title)
-            except ObjectDoesNotExist:
-                continue
-
-            link.setAttribute("id", str(note.pk))
-        
-        return doc.toxml()
-
     author = get_object_or_404(User, username=username)
     note = get_object_or_404(Note, pk=note_id, author=author)
 
     if request.user != author and note.permissions == 0:
         return HttpResponseForbidden()
-        
+
     if note.slug != slug:
         return HttpResponseRedirect(note.get_absolute_url())
-    
+
     # break this out into a function
-    import libxslt
-    import libxml2
+    from lxml import etree
     import os.path
 
-    style, doc, result = None, None, None
- 
-    try:
-        styledoc = libxml2.parseFile(os.path.join(settings.PROJECT_ROOT,
-                                                  'data/note2xhtml.xsl'))
-        style = libxslt.parseStylesheetDoc(styledoc)
-    
-        template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
-        complete_xml = template.replace('%%%CONTENT%%%', note.content.encode('UTF-8'))
-        doc = libxml2.parseDoc(clean_content(complete_xml, author).encode('UTF-8'))
+    # Extension function for XSL. Called twice per link,
+    # so we keep a little cache to save on lookups
+    link_cache = {}
+    def get_url_for_title(dummy, link_text):
+        if link_text in link_cache:
+            return link_cache[link_text]
+        try:
+            note = Note.objects.get(author=author, title=link_text)
+            note_url = note.get_absolute_url()
+            link_cache[link_text] = note_url
+            return note_url
+        except ObjectDoesNotExist:
+            return None
 
-        result = style.applyStylesheet(doc,
-            {'base-user-url': "'%s'" % reverse('note_index', kwargs={'username': author.username})}
-        )
+    ns = etree.FunctionNamespace("http://tomboy-online.org/stuff")
+    ns.prefix = "tomboyonline"
+    ns['get_url_for_title'] = get_url_for_title
 
-        # libxml2 doesn't munge encodings, so forcibly decode from UTF-8
-        body = unicode(style.saveResultToString(result), 'UTF-8')
-    finally:
-        if style != None: style.freeStylesheet()
-        if doc != None: doc.freeDoc()
-        if result != None: result.freeDoc()
+    style = etree.parse(os.path.join(settings.PROJECT_ROOT,
+                                     'data/note2xhtml.xsl'))
+    transform = etree.XSLT(style)
+
+    template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
+    complete_xml = template.replace('%%%CONTENT%%%', note.content)
+    doc = etree.fromstring(complete_xml)
+
+    result = transform(doc)
+    body = str(result)
 
     return render_to_response(template_name,
                               {'title': note.title,

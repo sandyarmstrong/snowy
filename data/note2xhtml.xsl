@@ -3,6 +3,7 @@
 		xmlns:tomboy="http://beatniksoftware.com/tomboy"
 		xmlns:size="http://beatniksoftware.com/tomboy/size"
 		xmlns:link="http://beatniksoftware.com/tomboy/link"
+		xmlns:tomboyonline="http://tomboy-online.org/stuff"
                 version='1.0'>
 
 <xsl:output method="html" indent="no" />
@@ -85,8 +86,8 @@
 
 <xsl:template match="link:internal">
 	<xsl:choose>
-		<xsl:when test="@id">
-			<a href="{$base-user-url}{@id}" class="link-internal">
+		<xsl:when test="tomboyonline:get_url_for_title(string(.))">
+			<a href="{tomboyonline:get_url_for_title(string(.))}" class="link-internal">
 				<xsl:value-of select="node()"/>
 			</a>
 		</xsl:when>
