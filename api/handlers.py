@@ -165,7 +165,7 @@ class NotesHandler(BaseHandler):
             if c.has_key('last-metadata-change-date'):
                 note.modified = clean_date(c['last-metadata-change-date'])
             else:
-                note.modified = datetime.now()
+                note.modified = datetime.utcnow()
             if c.has_key('create-date'): note.created = clean_date(c['create-date'])
             if c.has_key('open-on-startup'): note.open_on_startup = (c['open-on-startup'] == True)
             if c.has_key('pinned'): note.pinned = (c['pinned'] == True)
@@ -183,7 +183,7 @@ class NotesHandler(BaseHandler):
         if len(changes) > 0:
             profile.latest_sync_rev = new_sync_rev
             profile.save()
-        
+
         return {
             'latest-sync-revision': profile.latest_sync_rev,
             'notes': [simple_describe_note(n) for n in Note.objects.filter(author=author)]
