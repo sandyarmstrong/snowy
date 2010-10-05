@@ -58,7 +58,7 @@ def openid_registration(request, template_name='registration/registration_form.h
             email = registration_form.cleaned_data.get('email')
             if email:
                 user.email = email
-            if settings.MODERATE_NEW_USERS:
+            if getattr(settings, 'MODERATE_NEW_USERS', False):
                 user.is_active = False
 
             user.save()
@@ -67,7 +67,7 @@ def openid_registration(request, template_name='registration/registration_form.h
                 login(request, user)
                 return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
             else:
-                if not settings.MODERATE_NEW_USERS:
+                if not getattr(settings, 'MODERATE_NEW_USERS', False):
                     return HttpResponseNotAllowed(_(u'Disabled account'))
                 else:
                     return render_to_response("registration/moderated.html", {'user': user,},
