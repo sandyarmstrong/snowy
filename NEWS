@@ -7,6 +7,10 @@ http://mail.gnome.org/mailman/listinfo/snowy-list.
 Please report bugs using https://bugzilla.gnome.org/
 (https://bugzilla.gnome.org/enter_bug.cgi?product=snowy).
 
+Version 0.5 "Cavalier King Charles Spaniel"
+* Don't crash if MODERATE_NEW_USERS not set
+* Enforce storage of UTC dates in database
+
 Version 0.4 "King Charles Spaniel"
 * Port note XML -> HTML transform code from libxml2 to lxml (#631189)
 
