@@ -1,6 +1,6 @@
 # django-openid-auth -  OpenID integration for django.contrib.auth
 #
-# Copyright (C) 2008-2009 Canonical Ltd.
+# Copyright (C) 2008-2010 Canonical Ltd.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -183,7 +183,7 @@ class OpenIDBackend:
         for group in desired_groups - current_groups:
             user.groups.add(group)
 
-# to be used outside of the backend
+# kept outside of the class to make function usable outside of the backend
 def _extract_user_details(openid_response):
     email = fullname = first_name = last_name = nickname = None
     sreg_response = sreg.SRegResponse.fromSuccessResponse(openid_response)
@@ -196,6 +196,17 @@ def _extract_user_details(openid_response):
     # them in preference.
     fetch_response = ax.FetchResponse.fromSuccessResponse(openid_response)
     if fetch_response:
+        # The myOpenID provider advertises AX support, but uses
+        # attribute names from an obsolete draft of the
+        # specification.  We check for them first so the common
+        # names take precedence.
+        email = fetch_response.getSingle(
+            'http://schema.openid.net/contact/email', email)
+        fullname = fetch_response.getSingle(
+            'http://schema.openid.net/namePerson', fullname)
+        nickname = fetch_response.getSingle(
+            'http://schema.openid.net/namePerson/friendly', nickname)
+
         email = fetch_response.getSingle(
             'http://axschema.org/contact/email', email)
         fullname = fetch_response.getSingle(

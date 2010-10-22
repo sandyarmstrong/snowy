@@ -1,6 +1,6 @@
 # Launchpad OpenID Teams Extension support for python-openid
 #
-# Copyright (C) 2008-2009 Canonical Ltd.
+# Copyright (C) 2008-2010 Canonical Ltd.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions

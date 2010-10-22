@@ -1,7 +1,7 @@
 # django-openid-auth -  OpenID integration for django.contrib.auth
 #
 # Copyright (C) 2007 Simon Willison
-# Copyright (C) 2008-2009 Canonical Ltd.
+# Copyright (C) 2008-2010 Canonical Ltd.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions

@@ -1,7 +1,7 @@
 # django-openid-auth -  OpenID integration for django.contrib.auth
 #
 # Copyright (C) 2007 Simon Willison
-# Copyright (C) 2008-2009 Canonical Ltd.
+# Copyright (C) 2008-2010 Canonical Ltd.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -40,6 +40,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
 
 from openid.consumer.consumer import (
     Consumer, SUCCESS, CANCEL, FAILURE)
@@ -111,10 +112,11 @@ def render_openid_request(request, openid_request, return_to, trust_root=None):
         return HttpResponse(form_html, content_type='text/html;charset=UTF-8')
 
 
-def render_failure(request, message, status=403):
+def default_render_failure(request, message, status=403,
+                           template_name='openid/failure.html'):
     """Render an error page to the user."""
     data = render_to_string(
-        'openid/failure.html', dict(message=message),
+        template_name, dict(message=message),
         context_instance=RequestContext(request))
     return HttpResponse(data, status=status)
 
@@ -132,6 +134,9 @@ def parse_openid_response(request):
 
 
 def login_begin(request, template_name='openid/login.html',
+                login_complete_view='openid-complete',
+                form_class=OpenIDLoginForm,
+                render_failure=default_render_failure,
                 redirect_field_name=REDIRECT_FIELD_NAME):
     """Begin an OpenID login request, possibly asking for an identity URL."""
     redirect_to = request.REQUEST.get(redirect_field_name, '')
@@ -142,11 +147,11 @@ def login_begin(request, template_name='openid/login.html',
 
     if openid_url is None:
         if request.POST:
-            login_form = OpenIDLoginForm(data=request.POST)
+            login_form = form_class(data=request.POST)
             if login_form.is_valid():
                 openid_url = login_form.cleaned_data['openid_identifier']
         else:
-            login_form = OpenIDLoginForm()
+            login_form = form_class()
 
         # Invalid or no form data:
         if openid_url is None:
@@ -163,22 +168,31 @@ def login_begin(request, template_name='openid/login.html',
         return render_failure(
             request, "OpenID discovery error: %s" % (str(exc),), status=500)
 
-    # Request some user details.
-    fetch_request = ax.FetchRequest()
-    # We mark all the attributes as required, since Google ignores
-    # optional attributes.  We request both the full name and
-    # first/last components since some providers offer one but not
-    # the other.
-    for (attr, alias) in [
-        ('http://axschema.org/contact/email', 'email'),
-        ('http://axschema.org/namePerson', 'fullname'),
-        ('http://axschema.org/namePerson/first', 'firstname'),
-        ('http://axschema.org/namePerson/last', 'lastname'),
-        ('http://axschema.org/namePerson/friendly', 'nickname')]:
-        fetch_request.add(ax.AttrInfo(attr, alias=alias, required=True))
-    openid_request.addExtension(fetch_request)
-    openid_request.addExtension(
-        sreg.SRegRequest(optional=['email', 'fullname', 'nickname']))
+    # Request some user details.  If the provider advertises support
+    # for attribute exchange, use that.
+    if openid_request.endpoint.supportsType(ax.AXMessage.ns_uri):
+        fetch_request = ax.FetchRequest()
+        # We mark all the attributes as required, since Google ignores
+        # optional attributes.  We request both the full name and
+        # first/last components since some providers offer one but not
+        # the other.
+        for (attr, alias) in [
+            ('http://axschema.org/contact/email', 'email'),
+            ('http://axschema.org/namePerson', 'fullname'),
+            ('http://axschema.org/namePerson/first', 'firstname'),
+            ('http://axschema.org/namePerson/last', 'lastname'),
+            ('http://axschema.org/namePerson/friendly', 'nickname'),
+            # The myOpenID provider advertises AX support, but uses
+            # attribute names from an obsolete draft of the
+            # specification.  We request them for compatibility.
+            ('http://schema.openid.net/contact/email', 'old_email'),
+            ('http://schema.openid.net/namePerson', 'old_fullname'),
+            ('http://schema.openid.net/namePerson/friendly', 'old_nickname')]:
+            fetch_request.add(ax.AttrInfo(attr, alias=alias, required=True))
+        openid_request.addExtension(fetch_request)
+    else:
+        openid_request.addExtension(
+            sreg.SRegRequest(optional=['email', 'fullname', 'nickname']))
 
     # Request team info
     teams_mapping_auto = getattr(settings, 'OPENID_LAUNCHPAD_TEAMS_MAPPING_AUTO', False)
@@ -196,7 +210,7 @@ def login_begin(request, template_name='openid/login.html',
 
     # Construct the request completion URL, including the page we
     # should redirect to.
-    return_to = request.build_absolute_uri(reverse(login_complete))
+    return_to = request.build_absolute_uri(reverse(login_complete_view))
     if redirect_to:
         if '?' in return_to:
             return_to += '&'
@@ -207,7 +221,9 @@ def login_begin(request, template_name='openid/login.html',
     return render_openid_request(request, openid_request, return_to)
 
 
-def login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME):
+@csrf_exempt
+def login_complete(request, redirect_field_name=REDIRECT_FIELD_NAME,
+                   render_failure=default_render_failure):
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
     openid_response = parse_openid_response(request)

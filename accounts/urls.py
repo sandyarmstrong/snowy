@@ -36,9 +36,11 @@ urlpatterns = patterns('',
         name='auth_logout'),
 
     # OpenID URLs
+    # names must not be altered because django_openid_auth has to reverse them
     url(r'^openid/login/$', django_openid_auth.views.login_begin,
-        {'template_name': 'openid/login.html'}, name='openid_login'),
-    url(r'^openid/complete/$', django_openid_auth.views.login_complete),
+        {'template_name': 'openid/login.html'}, name='openid-login'),
+    url(r'^openid/complete/$', django_openid_auth.views.login_complete,
+        name='openid-complete'),
     url(r'^openid/registration/$', openid_registration,
         name='openid_registration'),
 
