@@ -81,7 +81,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'snowy.core.context_processors.current_site',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.csrf.middleware.CsrfViewMiddleware',
     'django.contrib.csrf.middleware.CsrfResponseMiddleware',
@@ -93,16 +93,16 @@ MIDDLEWARE_CLASSES = (
     #'reversion.middleware.RevisionMiddleware',
     'recaptcha_django.middleware.ReCaptchaMiddleware',
     'pagination.middleware.PaginationMiddleware',
-)
+]
 
 ROOT_URLCONF = 'snowy.urls'
 
-TEMPLATE_DIRS = (
+TEMPLATE_DIRS = [
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_ROOT, "templates"),
-)
+]
 
 # Add the lib/ directory to the path for external apps
 EXTERNAL_APPS_PATH = os.path.join(PROJECT_ROOT, "lib")
@@ -110,7 +110,7 @@ EXTERNAL_APPS_PATH = os.path.join(PROJECT_ROOT, "lib")
 import sys
 sys.path.append(EXTERNAL_APPS_PATH)
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     # Local apps
     'core',
     'api',
@@ -135,7 +135,7 @@ INSTALLED_APPS = (
     'autoslug',
     'piston',
     'pagination',
-)
+]
 
 # Maximum number of notes to show on the notes_detail list.
 SNOWY_LIST_MAX_NOTES = 18
