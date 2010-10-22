@@ -17,16 +17,14 @@
 
 from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.shortcuts import render_to_response, get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.db.models import Q
 
-from snowy.notes.templates import CONTENT_TEMPLATES, DEFAULT_CONTENT_TEMPLATE
+from snowy.notes.utils  import note_to_html
 from snowy.notes.models import *
-from snowy import settings
 
 def note_index(request, username,
                template_name='notes/note_index.html'):
@@ -67,38 +65,7 @@ def note_detail(request, username, note_id, slug='',
     if note.slug != slug:
         return HttpResponseRedirect(note.get_absolute_url())
 
-    # break this out into a function
-    from lxml import etree
-    import os.path
-
-    # Extension function for XSL. Called twice per link,
-    # so we keep a little cache to save on lookups
-    link_cache = {}
-    def get_url_for_title(dummy, link_text):
-        if link_text in link_cache:
-            return link_cache[link_text]
-        try:
-            note = Note.objects.get(author=author, title=link_text)
-            note_url = note.get_absolute_url()
-            link_cache[link_text] = note_url
-            return note_url
-        except ObjectDoesNotExist:
-            return None
-
-    ns = etree.FunctionNamespace("http://tomboy-online.org/stuff")
-    ns.prefix = "tomboyonline"
-    ns['get_url_for_title'] = get_url_for_title
-
-    style = etree.parse(os.path.join(settings.PROJECT_ROOT,
-                                     'data/note2xhtml.xsl'))
-    transform = etree.XSLT(style)
-
-    template = CONTENT_TEMPLATES.get(note.content_version, DEFAULT_CONTENT_TEMPLATE)
-    complete_xml = template.replace('%%%CONTENT%%%', note.content)
-    doc = etree.fromstring(complete_xml)
-
-    result = transform(doc)
-    body = str(result)
+    body = note_to_html(note, author)
 
     return render_to_response(template_name,
                               {'title': note.title,
