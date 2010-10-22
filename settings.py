@@ -1,4 +1,10 @@
-# Django settings for snowy project.
+# STOP STOP STOP STOP STOP STOP STOP STOP
+# Every time you edit settings.py directly, $DEITY kills a kitten.
+#
+# Please, think of the kittens.
+#
+# Seriously now, edit local_settings.py for any site specific settings.
+# STOP STOP STOP STOP STOP STOP STOP STOP
 
 import os.path
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
