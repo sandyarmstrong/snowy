@@ -18,19 +18,15 @@
 
 {% block content %}
 
+{% if messages %}
+{% for message in messages %}
+<div{% if message.tags %} class="{{ message.tags }} center"{% endif %} style="color: red;">{{ message }}</div>
+<br />
+{% endfor %}
+{% endif %}
+
 <div id="login-leftcolumn">
     <h3>{% trans "Log in with your OpenID" %}</h3>
-
-    {% if form.errors %}
-    <p class="errors">{% trans "Please correct errors below:" %}<br />
-        {% if form.openid_identifier.errors %}
-        <span class="error">{{ form.openid_identifier.errors|join:", " }}</span>
-        {% endif %}
-        {% if form.next.errors %}
-        <span class="error">{{ form.next.errors|join:", " }}</span>
-        {% endif %}
-    </p>
-    {% endif %}
 
     <form name="fopenid" action="{{ action }}" method="post">
         <table>

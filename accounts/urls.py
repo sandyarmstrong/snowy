@@ -24,8 +24,7 @@ from django.conf.urls.defaults import *
 from registration.views import activate
 from registration.views import register
 
-from snowy.accounts.views import openid_registration
-
+import snowy.accounts.views
 import django_openid_auth.views
 
 urlpatterns = patterns('',
@@ -37,11 +36,11 @@ urlpatterns = patterns('',
 
     # OpenID URLs
     # names must not be altered because django_openid_auth has to reverse them
-    url(r'^openid/login/$', django_openid_auth.views.login_begin,
+    url(r'^openid/login/$', snowy.accounts.views.openid_begin,
         {'template_name': 'openid/login.html'}, name='openid-login'),
-    url(r'^openid/complete/$', django_openid_auth.views.login_complete,
+    url(r'^openid/complete/$', snowy.accounts.views.openid_complete,
         name='openid-complete'),
-    url(r'^openid/registration/$', openid_registration,
+    url(r'^openid/registration/$', snowy.accounts.views.openid_registration,
         name='openid_registration'),
 
     # Registration URLs

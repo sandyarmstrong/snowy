@@ -21,6 +21,8 @@ from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
@@ -31,6 +33,7 @@ from snowy.accounts.models import UserProfile
 from snowy.accounts.forms import InternationalizationForm, OpenIDRegistrationFormUniqueUser, EmailChangeForm
 
 from django_openid_auth import auth
+import django_openid_auth.views
 
 def openid_registration(request, template_name='registration/registration_form.html'):
     registration_form = OpenIDRegistrationFormUniqueUser(request.POST or None)
@@ -78,6 +81,30 @@ def openid_registration(request, template_name='registration/registration_form.h
     return render_to_response(template_name,
                               {'form' : registration_form},
                               context_instance=RequestContext(request))
+
+def openid_begin(request, **kwargs):
+    """A wrapper view around the login_begin view in
+    django_openid_auth that features a nicer error display"""
+    return django_openid_auth.views.login_begin(request, render_failure=render_openid_failure,
+                                                   **kwargs)
+
+def openid_complete(request, **kwargs):
+    """A wrapper view around the login_complete view in
+    django_openid_auth that features a nicer error page"""
+    return django_openid_auth.views.login_complete(request, render_failure=render_openid_failure,
+                                                   **kwargs)
+
+def render_openid_failure(request, message, status=403, **kwargs):
+    """A wrapper view around the login page to display an error message above
+    the login form"""
+    # the most common error is a mistyped URL - make the error message less cryptic for this case
+    # TODO: Put this "error message correction" in a better place - maybe django_openid_auth
+    error_message = unicode(message)
+    if error_message.find("OpenID discovery error: Error fetching XRDS document:") > -1:
+        error_message = unicode(_("OpenID endpoint not found. Please check your OpenID."))
+
+    messages.add_message(request, messages.ERROR, _("Error logging in: ") + error_message)
+    return HttpResponseRedirect(reverse('openid-login'))
 
 @login_required
 def accounts_preferences(request, template_name='accounts/preferences.html'):
