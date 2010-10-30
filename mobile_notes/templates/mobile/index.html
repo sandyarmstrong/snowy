@@ -1,7 +1,10 @@
+<!DOCTYPE html>
 <html manifest="cache.manifest">
     <head>
         <title>Slick Notes</title>
-        <script type="text/javascript" src="{{ jquery_uri }}"></script>
+        <link rel="stylesheet" href="{{ jquery_mobile_css_uri }}" />
+        <script src="{{ jquery_uri }}"></script>
+        <script src="{{ jquery_mobile_js_uri }}"></script>
         <script type="text/javascript">
 
         var TomboyWeb = {
@@ -146,7 +149,7 @@
                     }
                     // TODO: Error-handling whenever using localStorage (applies elsewhere)
                     localStorage.setItem('latest-sync-revision', notes['latest-sync-revision']);
-                    $('#status').html('Processed ' + notes.notes.length + ' note updates, not including deletions');
+                    //$('#status').html('Processed ' + notes.notes.length + ' note updates, not including deletions');
                 });
 
                 // Look for note that have been deleted on the server
@@ -168,22 +171,24 @@
 
             // TODO: Refactor, move somewhere reasonable
             function add_note_list_item(note) {
-                $('<li id="' + note.guid + '"><a href="#' + note.guid + '">' + note.title + '</a></li>').appendTo('#note-title-list');
-                $('li#' + note.guid).bind('click', note, function(event) {
+                $('<li id="' + note.guid + '"><a href="#' + note.guid + '-page">' + note.title + '</a></li>').appendTo('#note-title-list');
+                $('li#' + note.guid).bind('mouseenter', note, function(event) {
+                    $('.note-content-page').remove();
                     var note = event.data;
-                    $('.note-content').remove();
-                    if(note.guid != currentlyOpenGuid) {
-                        $('<div class="note-content">' + escape(note.content) + '</div>').appendTo('li#' + note.guid);
-                        currentlyOpenGuid = note.guid;
-                    } else {
-                        currentlyOpenGuid = null;
-                    }
+                    $('<div data-role="page" class="note-content-page" id="' + note.guid + '-page">' +
+                      '<div data-role="header"><h1>' + note.title + '</h1></div>' +
+                      '<div data-role="content"><p>' + escape(note.content) + '</p></div>')
+                      .page()
+                      .insertAfter('#note-list-page');
                 });
+                //$('li#' + note.guid).bind('mouseleave', note, function(event) {
+                //    var note = event.data;
+                //    $('div#' + note.guid + '-page').remove();
+                //});
+                $("#note-title-list").listview('refresh');
             }
 
             OfflineNotesDatabase.init_db();
-
-            var currentlyOpenGuid = null;
 
             // Show cached notes
             OfflineNotesDatabase.select_notes(add_note_list_item);
@@ -193,15 +198,21 @@
 
     <body>
 
-        <p id="status">Nothing yet</p>
+        <div data-role="page" id="main-page">
+            <div data-role="header"><h1>Slick Notes</h1></div>
+            <div data-role="content">
+                <a href="#" id="beginSync" data-role="button">Sync Notes</a>
+                <a href="#" id="wipe" data-role="button">Clear Offline Storage</a>
+                <a href="#note-list-page" data-role="button">View Notes List</a>
+            </div>
+        </div>
 
-        <p>Looking for something?  Why don't you
-        <a href="#" id="beginSync">initiate a sync</a>?</p>
-
-        <p>Feeling uncomfortable? Why don't you go ahead and
-        <a href="#" id="wipe">clear all offline storage</a>?</p>
-
-        <ul id="note-title-list" />
+        <div data-role="page" id="note-list-page">
+            <div data-role="header"><h1>Slick Notes</h1></div>
+            <div data-role="content">
+                <ul id="note-title-list" data-role="listview" />
+            </div>
+        </div>
 
     </body>
 </html>

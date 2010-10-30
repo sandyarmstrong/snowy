@@ -2,6 +2,9 @@ CACHE MANIFEST
 # Revision: 0.1
 index.html
 {{ jquery_uri }}
+{{ jquery_mobile_js_uri }}
+{{ jquery_mobile_css_uri }}
+http://192.168.1.106:8000/site_media/css/images/icons-18-white.png
 
 NETWORK:
 {{ root_uri }}
