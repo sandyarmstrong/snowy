@@ -22,6 +22,8 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
 
+handler500 = 'snowy.views.server_error'
+
 urlpatterns = patterns('',
     url(r'^$', direct_to_template, {'template': 'index.html'},
         name='snowy_index'),
