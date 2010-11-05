@@ -5,13 +5,14 @@ Running Snowy From Your Git Checkout
 0. Install python-lxml, python-pytz, and python-sqlite,
    python-dateutil, python-pkg-resources, python-uuid, python-simplejson
    (or on Python 2.6 possibly python-json), python-openid >= 2.2.4
-   (package names somewhat different from distro to distro).
+   (package names somewhat different from distro to distro. you may have luck
+    finding more specific info at http://live.gnome.org/Snowy/Install ).
 
-1. Install django 1.1 or 1.2. If your distro does not have packages for 1.1/1.2,
+1. Install django 1.2. If your distro does not have packages for 1.2,
    then download the tarball and install it like so:
-	wget http://www.djangoproject.com/download/1.1/tarball/
-	tar zxvf Django-1.1.tar.gz
-	cd Django-1.1
+	wget http://www.djangoproject.com/download/1.2/tarball/
+	tar zxvf Django-1.2.tar.gz
+	cd Django-1.2
 	sudo python setup.py install
 
 2. Set up your local settings file (in your snowy git checkout):
@@ -54,4 +55,4 @@ Installing/Deploying Snowy
 For now, the WSGI deployment guide lives online at:
 http://live.gnome.org/Snowy/WSGI
 
-Other guides can be found listed at: http://live.gnome.org/Snowy
+Other guides can be found listed at: http://live.gnome.org/Snowy/Install
