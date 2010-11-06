@@ -83,7 +83,7 @@
 		<xsl:value-of select="node()"/>
 	</span>
 </xsl:template>
-
+<!--
 <xsl:template match="link:internal">
 	<xsl:choose>
 		<xsl:when test="tomboyonline:get_url_for_title(string(.))">
@@ -98,7 +98,7 @@
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
-
+-->
 <xsl:template match="link:url">
 	<a href="{node()}" class="link-url"><xsl:value-of select="node()"/></a>
 </xsl:template>
