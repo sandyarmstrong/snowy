@@ -17,7 +17,7 @@
 	<xsl:apply-templates select="tomboy:note-content"/>
 </xsl:template>
 
-<xsl:template match="text()">
+<!--<xsl:template match="text()">
    <xsl:call-template name="softbreak"/>
 </xsl:template>
 
@@ -36,7 +36,7 @@
 			<xsl:value-of select="$text"/>
 		</xsl:otherwise>
 	</xsl:choose>
-</xsl:template>
+</xsl:template>-->
 
 <xsl:template match="tomboy:note-content">
 	<div>
