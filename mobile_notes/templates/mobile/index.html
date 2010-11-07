@@ -181,7 +181,7 @@
                     var parser2 = new DOMParser();
                     var xsltProcessor=new XSLTProcessor();
                     var req = new XMLHttpRequest();
-                    req.open("GET", "{{ note_xml_to_html_xsl_uri}}", false);
+                    req.open("GET", "{{ note_xml_to_html_xsl_uri }}", false);
                     req.send(null);
                     var xsldoc = req.responseXML;
                     xsltProcessor.importStylesheet(xsldoc);
