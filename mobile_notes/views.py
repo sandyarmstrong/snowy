@@ -34,6 +34,7 @@ def mobile_note_index(request):
                                'jquery_uri': 'http://code.jquery.com/jquery-1.4.3.min.js',
                                'jquery_mobile_js_uri': MEDIA_URL + 'js/jquery.mobile-1.0a2pre.js',
                                'jquery_mobile_css_uri': MEDIA_URL  + 'css/jquery.mobile-1.0a2pre.css',
+                              },
                               context_instance=RequestContext(request))
 
 def cache_manifest(request):
@@ -42,5 +43,6 @@ def cache_manifest(request):
                                'jquery_uri': 'http://code.jquery.com/jquery-1.4.3.min.js',
                                'jquery_mobile_js_uri': MEDIA_URL + 'js/jquery.mobile-1.0a2pre.js',
                                'jquery_mobile_css_uri': MEDIA_URL  + 'css/jquery.mobile-1.0a2pre.css',
+                              },
                               mimetype='text/cache-manifest',
                               context_instance=RequestContext(request))
