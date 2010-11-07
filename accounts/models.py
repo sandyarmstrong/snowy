@@ -21,15 +21,12 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
 
-import uuid
+from snowy.core.utils import create_uuid
 
 class UserProfile(models.Model):
-    def _create_uuid():
-        return str(uuid.uuid4())
-
     user = models.ForeignKey(User, unique=True)
     latest_sync_rev = models.IntegerField(default=-1)
-    current_sync_uuid = models.CharField(max_length=36, default=_create_uuid)
+    current_sync_uuid = models.CharField(max_length=36, default=create_uuid)
     language = models.CharField(max_length=5, choices=settings.LANGUAGES,
                                 verbose_name=_(u'Application Language'),
                                 null=True, blank=True)
