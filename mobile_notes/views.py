@@ -28,13 +28,18 @@ from settings import MEDIA_URL
 def mobile_note_index_redirect(request):
     return HttpResponseRedirect(reverse_full('mobile_note_index'))
 
+def mobile_note_js(request):
+    return render_to_response('mobile/slicknotes.js',
+                              {'root_uri': reverse_full('api_root'),
+                               'note_xml_to_html_xsl_uri': MEDIA_URL + 'xsl/note2xhtml.xsl',
+                               },
+                              context_instance=RequestContext(request))
+
 def mobile_note_index(request):
     return render_to_response('mobile/index.html',
-                              {'root_uri': reverse_full('api_root'),
-                               'jquery_uri': 'http://code.jquery.com/jquery-1.4.3.min.js',
+                              {'jquery_uri': 'http://code.jquery.com/jquery-1.4.3.min.js',
                                'jquery_mobile_js_uri': MEDIA_URL + 'js/jquery.mobile-1.0a2pre.js',
                                'jquery_mobile_css_uri': MEDIA_URL  + 'css/jquery.mobile-1.0a2pre.css',
-                               'note_xml_to_html_xsl_uri': MEDIA_URL + 'xsl/note2xhtml.xsl',
                               },
                               context_instance=RequestContext(request))
 

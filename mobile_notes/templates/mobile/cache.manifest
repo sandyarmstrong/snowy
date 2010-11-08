@@ -1,6 +1,7 @@
 CACHE MANIFEST
 # Revision: 0.1
 index.html
+slicknotes.js
 {{ jquery_uri }}
 {{ jquery_mobile_js_uri }}
 {{ jquery_mobile_css_uri }}

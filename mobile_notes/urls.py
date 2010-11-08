@@ -21,4 +21,5 @@ urlpatterns = patterns('',
     url(r'^$', 'snowy.mobile_notes.views.mobile_note_index_redirect'),
     url(r'index.html$', 'snowy.mobile_notes.views.mobile_note_index', name='mobile_note_index'),
     url(r'cache.manifest$', 'snowy.mobile_notes.views.cache_manifest', name='cache_manifest'),
+    url(r'slicknotes.js$', 'snowy.mobile_notes.views.mobile_note_js', name='mobile_note_js'), # TODO: Static instead?
 )
