@@ -35,7 +35,8 @@ Running Snowy From Your Git Checkout
 6. Admin your snowy:
 	http://localhost:8000/admin
 
-	- In the Sites table, make sure to set the domain and name properly, e.g.:
+	- In the Sites table, make sure to edit the existing example.com and
+	set the domain and name properly, e.g.:
 
 		Domain name:  localhost:8000
 		Display name: Snowy
