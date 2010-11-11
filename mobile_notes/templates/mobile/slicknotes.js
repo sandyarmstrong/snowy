@@ -54,17 +54,27 @@ var OfflineNotesDatabase = {
         });
     },
 
-    insert_note: function(guid, title, content, insertedRowCallback) {
-        // TODO: Should we handle case where there is no desired callback?
+    transaction: function(callback) {
         this.db.transaction(function(tx) {
+            callback(tx);
+        });
+    },
+
+    insert_note: function(guid, title, content, insertedRowCallback, currentTx) {
+        // TODO: Should we handle case where there is no desired callback?
+        var f = function(tx) {
             tx.executeSql('INSERT INTO notes(guid, title, content) VALUES (?,?,?)',
                           [guid, title, content],
                           insertedRowCallback,
                           OfflineNotesDatabase.on_error);
-        });
+        };
+        if(currentTx)
+            f(currentTx);
+        else
+            this.db.transaction(f);
     },
 
-    _select_from_notes: function(params, where, selectedRowCallback) {
+    _select_from_notes: function(params, where, selectedRowCallback, currentTx) {
         var sql = "SELECT " + params + " FROM notes";
         if(where) {
             sql += " WHERE " + where;
@@ -75,28 +85,36 @@ var OfflineNotesDatabase = {
                 selectedRowCallback(note);
             }
         };
-        this.db.readTransaction(function(tx) {
+        var f = function(tx) {
             tx.executeSql(sql,
                           [],
                           selection_processor,
                           OfflineNotesDatabase.on_error);
-        });
+        };
+        if(currentTx)
+            f(currentTx);
+        else
+            this.db.transaction(f);
     },
 
-    select_notes: function(selectedRowCallback) {
-        this._select_from_notes("*", null, selectedRowCallback);
+    select_notes: function(selectedRowCallback, currentTx) {
+        this._select_from_notes("*", null, selectedRowCallback, currentTx);
     },
 
-    select_note_guids: function(selectedRowCallback) {
-        this._select_from_notes("guid", null, selectedRowCallback);
+    select_note_guids: function(selectedRowCallback, currentTx) {
+        this._select_from_notes("guid", null, selectedRowCallback, currentTx);
     },
 
-    deleteAtGuid: function(guid, onSuccess) {
-        this.db.transaction(function(tx) {
+    deleteAtGuid: function(guid, onSuccess, currentTx) {
+        var f = function(tx) {
             tx.executeSql("DELETE FROM notes WHERE guid=?", [guid],
                           onSuccess,
                           OfflineNotesDatabase.on_error);
-        });
+        };
+        if(currentTx)
+            f(currentTx);
+        else
+            this.db.transaction(f);
     },
 
     on_error: function(tx, e) {
