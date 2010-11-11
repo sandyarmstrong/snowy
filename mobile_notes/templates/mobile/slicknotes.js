@@ -259,7 +259,7 @@ $(function() {
             .append(html);
 
             // Inject markdown editor into note editing page
-            $('div#' + editPageId + ' p')  // TODO: Fix this selector, figure out why real one didn't work
+            $('div#' + editPageId + ' [data-role="content"] p')
             .append("<textarea>test</textarea>");
             $('div#' + editPageId + ' textarea') // TODO: Why is this the only way I can set up the textarea?
             .text(note.content);
