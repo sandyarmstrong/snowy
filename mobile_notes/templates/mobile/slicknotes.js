@@ -26,6 +26,21 @@ var TomboyWeb = {
 
     get_note_list: function(minimalNoteJsonCallback) {
         this._get_notes(null, minimalNoteJsonCallback);
+    },
+
+    upload_notes: function(notes, successCallback, errorCallback) {
+        if(this.notes_uri != null) {
+            $.ajax({
+                type: "PUT",
+                url: notes_uri,
+                data: JSON.stringify(notes),
+                contentType: "application/json",
+                dataType: "json",
+                error: errorCallback,//function(XMLHttpRequest, textStatus, errorThrown){},
+                success: successCallback
+            })
+        }
+        // TODO: Else
     }
 };
 
