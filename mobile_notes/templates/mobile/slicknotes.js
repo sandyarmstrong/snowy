@@ -222,6 +222,15 @@ $(function() {
         NoteSynchronizer.sync(add_note_list_item, remove_note_by_guid);
     });
 
+    // Prepare for note conversion (TODO: Do this work elsewhere?)
+    // (based on MDC example, could be cleaner)
+    var parser2 = new DOMParser();
+    var xsltProcessor=new XSLTProcessor();
+    var xslReq = new XMLHttpRequest();
+    xslReq.open("GET", "{{ note_xml_to_html_xsl_uri }}", false);
+    xslReq.send(null);
+    xsltProcessor.importStylesheet(xslReq.responseXML);
+
     // TODO: Refactor, move somewhere reasonable
     function add_note_list_item(note) {
         $('<li id="' + note.guid + '"><a href="#' + note.guid + '-page">' + note.title + '</a></li>').appendTo('#note-title-list');
@@ -232,13 +241,6 @@ $(function() {
 
             // Convert content XML to HTML
             // (based on MDC example, could be cleaner)
-            var parser2 = new DOMParser();
-            var xsltProcessor=new XSLTProcessor();
-            var req = new XMLHttpRequest();
-            req.open("GET", "{{ note_xml_to_html_xsl_uri }}", false);
-            req.send(null);
-            var xsldoc = req.responseXML;
-            xsltProcessor.importStylesheet(xsldoc);
             var dom = parser2.parseFromString('<note-content version="0.1" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">' + note.content + '</note-content>',
                                               'text/xml');
             var html = xsltProcessor.transformToFragment(dom, document);
