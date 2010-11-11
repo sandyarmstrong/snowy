@@ -122,6 +122,81 @@ var OfflineNotesDatabase = {
     }
 };
 
+var NoteSynchronizer = {
+    sync: function(noteAddedCallback) {
+        OfflineNotesDatabase.check_db(noteAddedCallback);
+        var lastSyncRev = localStorage.getItem('latest-sync-revision');
+        if (lastSyncRev == null)
+            lastSyncRev = -1;
+
+        // Get note updates since last sync
+        TomboyWeb.get_updates_since(lastSyncRev, function(noteUpdates) {
+            // Get full note list to check for deleted notes
+            TomboyWeb.get_note_list(function(noteList) {
+                // Record latest sync rev on server
+                var latestServerRev = noteUpdates['latest-sync-revision'];
+
+                OfflineNotesDatabase.transaction(function(syncTx) {
+                    // Check for new notes (new guid) with local title conflicts, handle
+                    // TODO
+
+                    // Process new notes and note updates, handle conflicts
+
+                    // Check for notes deleted on server
+
+                    // Build content for PUT for any local modificatons:
+                    //      * All new and modified notes
+                    //      * All deleted notes
+                    //      * Set expected new sync rev to latest server sync rev + 1
+
+                    // Set local sync rev to new latest server sync rev
+
+
+                    var insertCallbackMaker = function(note) {
+                        return function() {
+                            // TODO: Ugh, this is gross. Calling this method
+                            //       with both JSON objects and db row objects
+                            note.content = note['note-content'];
+                            noteAddedCallback(note);
+                        };
+                    };
+                    for(var i=0; i < noteUpdates.notes.length; i++) {
+                        var note = noteUpdates.notes[i];
+                        // NOTE: Tricky ON CONFLICT REPLACE option makes this INSERT
+                        //       magically turn into a DELETE+INSERT if the row already
+                        //       exists.
+                        // TODO: This is probably wasteful since we should most likely
+                        //       prefer optimizing the UPDATE case over the new INSERT
+                        //       case.
+                        OfflineNotesDatabase.insert_note(note.guid, note.title, note['note-content'],
+                                                         insertCallbackMaker(note), syncTx);
+                    }
+
+                    // Look for notes that have been deleted on the server
+                    var allNoteGuids = [];
+                    for(var i=0; i < noteList.notes.length; i++) {
+                        allNoteGuids.push(noteList.notes[i].guid);
+                    }
+                    OfflineNotesDatabase.select_note_guids(function(noteInfo) {
+                        var guid = noteInfo.guid;
+                        if (allNoteGuids.indexOf(guid) == -1) {
+                            OfflineNotesDatabase.deleteAtGuid(guid, function(tx,rs) {
+                                // TODO: Remove this from NoteSynchronizer, should be passed in or something
+                                $('#note-title-list > li#' + guid).remove();
+                            }, syncTx);
+                        }
+                    }, syncTx);
+
+                    // TODO: Error-handling whenever using localStorage (applies elsewhere)
+                    localStorage.setItem('latest-sync-revision',
+                                         noteUpdates['latest-sync-revision']);
+                });
+
+            });
+        });
+    }
+};
+
 $(function() {
     // Set up controls
     $('#wipe').bind('click', function(event) {
@@ -130,53 +205,7 @@ $(function() {
         $('#note-title-list > li').remove();
     });
     $('#beginSync').bind('click', function(event) {
-        // TODO: Obviously this whole function should be refactored into
-        //       one or two calls to a NoteSync object
-        OfflineNotesDatabase.check_db();
-        var lastSyncRev = localStorage.getItem('latest-sync-revision');
-        if (lastSyncRev == null)
-            lastSyncRev = -1;
-
-        TomboyWeb.get_updates_since(lastSyncRev, function(notes) {
-            var insertCallbackMaker = function(note) {
-                return function() {
-                    // TODO: Ugh, this is gross. Calling this method
-                    //       with both JSON objects and db row objects
-                    note.content = note['note-content'];
-                    add_note_list_item(note);
-                };
-            };
-            for(var i=0; i < notes.notes.length; i++) {
-                var note = notes.notes[i];
-                // NOTE: Tricky ON CONFLICT REPLACE option makes this INSERT
-                //       magically turn into a DELETE+INSERT if the row already
-                //       exists.
-                // TODO: This is probably wasteful since we should most likely
-                //       prefer optimizing the UPDATE case over the new INSERT
-                //       case.
-                OfflineNotesDatabase.insert_note(note.guid, note.title, note['note-content'],
-                                                 insertCallbackMaker(note));
-            }
-            // TODO: Error-handling whenever using localStorage (applies elsewhere)
-            localStorage.setItem('latest-sync-revision', notes['latest-sync-revision']);
-            //$('#status').html('Processed ' + notes.notes.length + ' note updates, not including deletions');
-        });
-
-        // Look for note that have been deleted on the server
-        TomboyWeb.get_note_list(function(noteInfo) {
-            var allNoteGuids = [];
-            for(var i=0; i < noteInfo.notes.length; i++) {
-                allNoteGuids.push(noteInfo.notes[i].guid);
-            }
-            OfflineNotesDatabase.select_note_guids(function(noteInfo) {
-                var guid = noteInfo.guid;
-                if (allNoteGuids.indexOf(guid) == -1) {
-                    OfflineNotesDatabase.deleteAtGuid(guid, function(tx,rs) {
-                        $('#note-title-list > li#' + guid).remove();
-                    });
-                }
-            });
-        });
+        NoteSynchronizer.sync(add_note_list_item);
     });
 
     // TODO: Refactor, move somewhere reasonable
