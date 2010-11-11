@@ -123,7 +123,7 @@ var OfflineNotesDatabase = {
 };
 
 var NoteSynchronizer = {
-    sync: function(noteAddedCallback) {
+    sync: function(noteAddedCallback, noteGuidRemovedCallback) {
         OfflineNotesDatabase.check_db(noteAddedCallback);
         var lastSyncRev = localStorage.getItem('latest-sync-revision');
         if (lastSyncRev == null)
@@ -181,8 +181,7 @@ var NoteSynchronizer = {
                         var guid = noteInfo.guid;
                         if (allNoteGuids.indexOf(guid) == -1) {
                             OfflineNotesDatabase.deleteAtGuid(guid, function(tx,rs) {
-                                // TODO: Remove this from NoteSynchronizer, should be passed in or something
-                                $('#note-title-list > li#' + guid).remove();
+                                noteGuidRemovedCallback(guid);
                             }, syncTx);
                         }
                     }, syncTx);
@@ -205,7 +204,7 @@ $(function() {
         $('#note-title-list > li').remove();
     });
     $('#beginSync').bind('click', function(event) {
-        NoteSynchronizer.sync(add_note_list_item);
+        NoteSynchronizer.sync(add_note_list_item, remove_note_by_guid);
     });
 
     // TODO: Refactor, move somewhere reasonable
@@ -270,6 +269,10 @@ $(function() {
         //    $('div#' + note.guid + '-page').remove();
         //});
         $("#note-title-list").listview('refresh');
+    }
+
+    function remove_note_by_guid(guid) {
+        $('#note-title-list > li#' + guid).remove();
     }
 
     OfflineNotesDatabase.init_db();
