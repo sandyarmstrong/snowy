@@ -33,7 +33,8 @@ def mobile_note_js(request):
                               {'root_uri': reverse_full('api_root'),
                                'note_xml_to_html_xsl_uri': MEDIA_URL + 'xsl/note2xhtml.xsl',
                                },
-                              context_instance=RequestContext(request))
+                              context_instance=RequestContext(request),
+                              mimetype="application/javascript")
 
 def mobile_note_index(request):
     return render_to_response('mobile/index.html',
