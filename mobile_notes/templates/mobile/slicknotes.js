@@ -75,18 +75,21 @@ var OfflineNotesDatabase = {
         });
     },
 
+    _transact: function(callback, currentTx) {
+        if(currentTx)
+            callback(currentTx);
+        else
+            this.db.transaction(callback);
+    },
+
     insert_note: function(guid, title, content, insertedRowCallback, currentTx) {
         // TODO: Should we handle case where there is no desired callback?
-        var f = function(tx) {
+        this._transact(function(tx) {
             tx.executeSql('INSERT INTO notes(guid, title, content) VALUES (?,?,?)',
                           [guid, title, content],
                           insertedRowCallback,
                           OfflineNotesDatabase.on_error);
-        };
-        if(currentTx)
-            f(currentTx);
-        else
-            this.db.transaction(f);
+        }, currentTx);
     },
 
     _select_from_notes: function(params, where, selectedRowCallback, currentTx) {
@@ -100,16 +103,12 @@ var OfflineNotesDatabase = {
                 selectedRowCallback(note);
             }
         };
-        var f = function(tx) {
+        this._transact(function(tx) {
             tx.executeSql(sql,
                           [],
                           selection_processor,
                           OfflineNotesDatabase.on_error);
-        };
-        if(currentTx)
-            f(currentTx);
-        else
-            this.db.transaction(f);
+        }, currentTx);
     },
 
     select_notes: function(selectedRowCallback, currentTx) {
@@ -121,15 +120,11 @@ var OfflineNotesDatabase = {
     },
 
     deleteAtGuid: function(guid, onSuccess, currentTx) {
-        var f = function(tx) {
+        this._transact(function(tx) {
             tx.executeSql("DELETE FROM notes WHERE guid=?", [guid],
                           onSuccess,
                           OfflineNotesDatabase.on_error);
-        };
-        if(currentTx)
-            f(currentTx);
-        else
-            this.db.transaction(f);
+        }, currentTx);
     },
 
     on_error: function(tx, e) {
