@@ -92,6 +92,17 @@ var OfflineNotesDatabase = {
         }, currentTx);
     },
 
+    update_note: function(note, updatedRowCallback, currentTx) {
+        // TODO: What if there is no note?
+        // TODO: Allow updating only specific fields?
+        this._transact(function(tx) {
+            tx.executeSql('UPDATE notes SET title=?, content=? WHERE guid=?',
+                          [note.title, note.content, note.guid],
+                          updatedRowCallback,
+                          OfflineNotesDatabase.on_error);
+        }, currentTx);
+    },
+
     _select_from_notes: function(params, where, selectedRowCallback, currentTx) {
         var sql = "SELECT " + params + " FROM notes";
         if(where) {
@@ -281,6 +292,31 @@ $(function() {
             .append("<textarea>test</textarea>");
             $('div#' + editPageId + ' textarea') // TODO: Why is this the only way I can set up the textarea?
             .text(note.content);
+
+            $('div#' + editPageId + ' .save-edit').bind('tap', note, function(event) {
+                var note = event.data;
+                var editPageId = note.guid + '-edit-page';
+
+                // NOTE: This note obj won't let us set content property,
+                //       so we copy to a new obj and use that.
+                // TODO: A proper model-based approach would be much cleaner here
+                var note2 = {guid: note.guid, title: note.title};
+                // TODO: Figure out why $ gets messed up here, file bug upstream
+                note2.content = jQuery('div#' + editPageId + ' textarea').val();
+
+                var updateCallback = function(note) {
+                    return function() {
+                        var html = convert_note_to_html_fragment(note);
+                        // TODO: Can surely make this one call instead
+                        $('div#' + pageId + ' [data-role="content"] p')
+                        .html('');
+                        $('div#' + pageId + ' [data-role="content"] p')
+                        .append(html);
+                        $.mobile.changePage('#' + note.guid + '-page');
+                    };
+                };
+                OfflineNotesDatabase.update_note(note2, updateCallback(note2));
+            });
         });
         //$('li#' + note.guid).bind('mouseleave', note, function(event) {
         //    var note = event.data;
