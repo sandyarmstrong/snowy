@@ -226,6 +226,15 @@ $(function() {
     xslReq.send(null);
     xsltProcessor.importStylesheet(xslReq.responseXML);
 
+    // TODO: Import CSS too!
+    function convert_note_to_html_fragment(note) {
+            // Convert content XML to HTML
+            // (based on MDC example, could be cleaner)
+            var dom = parser2.parseFromString('<note-content version="0.1" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">' + note.content + '</note-content>',
+                                              'text/xml');
+            return xsltProcessor.transformToFragment(dom, document);
+    }
+
     // TODO: Refactor, move somewhere reasonable
     function add_note_list_item(note) {
         $('<li id="' + note.guid + '"><a href="#' + note.guid + '-page">' + note.title + '</a></li>').appendTo('#note-title-list');
@@ -234,11 +243,7 @@ $(function() {
             $('.note-content-edit-page').remove();
             var note = event.data;
 
-            // Convert content XML to HTML
-            // (based on MDC example, could be cleaner)
-            var dom = parser2.parseFromString('<note-content version="0.1" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">' + note.content + '</note-content>',
-                                              'text/xml');
-            var html = xsltProcessor.transformToFragment(dom, document);
+            var html = convert_note_to_html_fragment(note);
 
             var pageId = note.guid + '-page';
             var editPageId = note.guid + '-edit-page';
