@@ -251,6 +251,7 @@ $(function() {
             // Set up note viewing page
             $('<div data-role="page" class="note-content-page" id="' + pageId + '">' +
               '<div data-role="header">' +
+                    '<a href="#note-list-page" data-icon="arrow-l">Back to note list</a>' +
                     '<h1>' + note.title + '</h1>' +
                     '<a href="#' + editPageId + '" data-icon="gear" id="edit-note">Edit</a>' +
               '</div>' +
