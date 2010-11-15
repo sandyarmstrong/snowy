@@ -95,6 +95,7 @@ var OfflineNotesDatabase = {
     update_note: function(note, updatedRowCallback, currentTx) {
         // TODO: What if there is no note?
         // TODO: Allow updating only specific fields?
+        // TODO: Update mod time, indicate need for sync
         this._transact(function(tx) {
             tx.executeSql('UPDATE notes SET title=?, content=? WHERE guid=?',
                           [note.title, note.content, note.guid],
@@ -186,6 +187,7 @@ var NoteSynchronizer = {
                         return function() {
                             // TODO: Ugh, this is gross. Calling this method
                             //       with both JSON objects and db row objects
+                            //       (again, need for Note model clear...)
                             note.content = note['note-content'];
                             noteAddedCallback(note);
                         };
@@ -237,7 +239,9 @@ $(function() {
         NoteSynchronizer.sync(add_note_list_item, remove_note_by_guid);
     });
 
-    // Prepare for note conversion (TODO: Do this work elsewhere?)
+
+    // Prepare for note conversion
+    // TODO: Do this on-demand when showing first note
     // (based on MDC example, could be cleaner)
     var parser2 = new DOMParser();
     var xsltProcessor=new XSLTProcessor();
@@ -247,6 +251,8 @@ $(function() {
     xsltProcessor.importStylesheet(xslReq.responseXML);
 
     // TODO: Import CSS too!
+    // TODO: Update XSL to handle line breaks properly
+    // TODO: Support note links
     function convert_note_to_html_fragment(note) {
             // Convert content XML to HTML
             // (based on MDC example, could be cleaner)
@@ -257,7 +263,8 @@ $(function() {
 
     // TODO: Refactor, move somewhere reasonable
     function add_note_list_item(note) {
-        $('<li id="' + note.guid + '"><a href="#' + note.guid + '-page">' + note.title + '</a></li>').appendTo('#note-title-list');
+        $('<li id="' + note.guid + '"><a href="#' + note.guid + '-page">' + note.title + '</a></li>')
+        .appendTo('#note-title-list');
         $('li#' + note.guid).bind('mouseenter', note, function(event) {
             $('.note-content-page').remove();
             $('.note-content-edit-page').remove();
@@ -287,7 +294,7 @@ $(function() {
                     '<h1>' + note.title + '</h1>' +
                     '<a href="#" data-icon="check" class="save-edit">Save</a>' +
               '</div>' +
-              '<div data-role="content"><p/></div>' +
+              '<div data-role="content"><p></p></div>' +
               '</div>')
               .page()
               .insertAfter('#' + pageId);
