@@ -97,6 +97,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.locale.LocaleMiddleware',
     'snowy.accounts.middleware.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'snowy.accounts.middleware.LoginRedirectMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     #'reversion.middleware.RevisionMiddleware',
     'recaptcha_django.middleware.ReCaptchaMiddleware',

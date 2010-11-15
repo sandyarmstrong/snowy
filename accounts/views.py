@@ -19,10 +19,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
@@ -85,6 +86,10 @@ def openid_registration(request, template_name='registration/registration_form.h
 def openid_begin(request, **kwargs):
     """A wrapper view around the login_begin view in
     django_openid_auth that features a nicer error display"""
+    redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+    if redirect_to != '':
+        request.session['login_complete_redirect'] = redirect_to
+
     return django_openid_auth.views.login_begin(request, render_failure=render_openid_failure,
                                                    **kwargs)
 

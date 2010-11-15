@@ -17,6 +17,9 @@
 
 from django.middleware.common import CommonMiddleware
 from django.utils import translation
+from django.http import HttpResponseRedirect
+
+from django.conf import settings
 
 class LocaleMiddleware:
     def process_view(self, request, view_func, view_args, view_kwargs):
@@ -25,3 +28,13 @@ class LocaleMiddleware:
             if profile.language:
                 translation.activate(profile.language)
         return None
+
+class LoginRedirectMiddleware:
+    def process_request(self, request):
+        if request.path == settings.LOGIN_REDIRECT_URL and \
+        request.session.get('login_complete_redirect', None) and \
+        request.user.is_authenticated():
+            redirect_to = request.session['login_complete_redirect']
+            # do not redirect the next time the user visits LOGIN_REDIRECT_URL
+            request.session['login_complete_redirect'] = None
+            return HttpResponseRedirect(redirect_to)
