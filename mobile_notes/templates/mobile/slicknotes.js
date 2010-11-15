@@ -354,6 +354,12 @@ $(function() {
         NoteSynchronizer.sync(add_note_list_item, remove_note_by_guid);
     });
 
+    // TODO: This is over-simplistic. Need to deal with things like sync, notes
+    //       being added/removed, etc.  Currently, once hidden, no way to get
+    //       load button back.  Also, select_notes should work in date order,
+    //       maybe support prioritizing pinned notes, etc.  Modified notes
+    //       should move around in the list.  Current method of tracking offset
+    //       is insufficient.
     $('#load-more-notes').bind('click', function(event) {
         var current_length = $('#note-title-list li').length;
         OfflineNotesDatabase.select_notes(add_note_list_item, limit=current_length+",10");
