@@ -348,5 +348,18 @@ $(function() {
     OfflineNotesDatabase.init_db();
 
     // Show cached notes
-    OfflineNotesDatabase.select_notes(add_note_list_item);
+    // NOTE: Only fetching a few notes at a time. On a fast laptop with desktop
+    //       Chromium, found that 593 notes took ~4 seconds to load.
+    OfflineNotesDatabase.select_notes(add_note_list_item, limit="0,10");
+
+    $('#load-more-notes').bind('click', function(event) {
+        var current_length = $('#note-title-list li').length;
+        OfflineNotesDatabase.select_notes(add_note_list_item, limit=current_length+",10");
+        OfflineNotesDatabase.count(function(count) {
+            var current_length = $('#note-title-list li').length;
+            if(current_length >= count) {
+                $('#load-more-notes').hide();
+            }
+        });
+    });
 });

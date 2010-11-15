@@ -22,7 +22,15 @@
         <div data-role="page" id="note-list-page">
             <div data-role="header"><h1>Tomboy Offline</h1></div>
             <div data-role="content">
-                <ul id="note-title-list" data-role="listview" />
+                <!-- data-inset used to make 'load' button format correctly
+                     Should remove if button (and any other inline widgets)
+                     are no longer needed (like if we auto-load when scroll
+                     hits bottom of list) -->
+                <!-- Using separate </ul> closing tag because self-closing <ul>
+                     led to formatting bug where jquery-mobile tried to put
+                     'load' button inside note list -->
+                <ul id="note-title-list" data-role="listview" data-inset="true"></ul>
+                <a href="#" id="load-more-notes" data-role="button">Load More Notes...</a>
             </div>
         </div>
 
