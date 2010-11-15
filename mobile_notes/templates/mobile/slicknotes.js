@@ -103,10 +103,13 @@ var OfflineNotesDatabase = {
         }, currentTx);
     },
 
-    _select_from_notes: function(params, where, selectedRowCallback, currentTx) {
+    _select_from_notes: function(params, limit, where, selectedRowCallback, currentTx) {
         var sql = "SELECT " + params + " FROM notes";
         if(where) {
             sql += " WHERE " + where;
+        }
+        if(limit) {
+            sql += " LIMIT " + limit;
         }
         var selection_processor = function(tx, rs) {
             for(var i=0; i < rs.rows.length; i++) {
@@ -122,12 +125,12 @@ var OfflineNotesDatabase = {
         }, currentTx);
     },
 
-    select_notes: function(selectedRowCallback, currentTx) {
-        this._select_from_notes("*", null, selectedRowCallback, currentTx);
+    select_notes: function(selectedRowCallback, limit, currentTx) {
+        this._select_from_notes("*", limit, null, selectedRowCallback, currentTx);
     },
 
     select_note_guids: function(selectedRowCallback, currentTx) {
-        this._select_from_notes("guid", null, selectedRowCallback, currentTx);
+        this._select_from_notes("guid", null, null, selectedRowCallback, currentTx);
     },
 
     deleteAtGuid: function(guid, onSuccess, currentTx) {
@@ -135,6 +138,12 @@ var OfflineNotesDatabase = {
             tx.executeSql("DELETE FROM notes WHERE guid=?", [guid],
                           onSuccess,
                           OfflineNotesDatabase.on_error);
+        }, currentTx);
+    },
+
+    count: function(countCallback, currentTx) {
+        this._select_from_notes("COUNT(*)", null, null, function(result) {
+            countCallback(result["COUNT(*)"]);
         }, currentTx);
     },
 
