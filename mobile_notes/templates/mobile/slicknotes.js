@@ -229,15 +229,7 @@ var NoteSynchronizer = {
 };
 
 $(function() {
-    // Set up controls
-    $('#wipe').bind('click', function(event) {
-        OfflineNotesDatabase.wipe_db();
-        localStorage.setItem('latest-sync-revision', -1);
-        $('#note-title-list > li').remove();
-    });
-    $('#beginSync').bind('click', function(event) {
-        NoteSynchronizer.sync(add_note_list_item, remove_note_by_guid);
-    });
+    OfflineNotesDatabase.init_db();
 
 
     // Prepare for note conversion
@@ -345,12 +337,22 @@ $(function() {
         $('#note-title-list > li#' + guid).remove();
     }
 
-    OfflineNotesDatabase.init_db();
-
     // Show cached notes
     // NOTE: Only fetching a few notes at a time. On a fast laptop with desktop
     //       Chromium, found that 593 notes took ~4 seconds to load.
     OfflineNotesDatabase.select_notes(add_note_list_item, limit="0,10");
+
+
+    // Set up controls
+    $('#wipe').bind('click', function(event) {
+        OfflineNotesDatabase.wipe_db();
+        localStorage.setItem('latest-sync-revision', -1);
+        $('#note-title-list > li').remove();
+    });
+
+    $('#beginSync').bind('click', function(event) {
+        NoteSynchronizer.sync(add_note_list_item, remove_note_by_guid);
+    });
 
     $('#load-more-notes').bind('click', function(event) {
         var current_length = $('#note-title-list li').length;
