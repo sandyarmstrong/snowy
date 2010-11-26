@@ -52,7 +52,8 @@ def note_list(request, username,
     author = get_object_or_404(User, username=username)
     notes = Note.objects.user_viewable(request.user, author)
     return render_to_response(template_name,
-                              {'notes': notes},
+                              {'notes': notes,
+                               'author': author},
                               context_instance=RequestContext(request))
 
 def note_detail(request, username, note_id, slug='',

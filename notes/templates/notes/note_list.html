@@ -1,10 +1,9 @@
-{% extends 'notes/base.html' %}
+{% extends 'notes/note_detail.html' %}
 
 {% load i18n %}
 
 {% block title %}{% trans "All Notes" %} | {{ block.super }}{% endblock %}
 
-{% block content-container %}
-<h1>{% trans "All Notes" %}</h1>
+{% block content %}
 {% include "notes/note_list_snippet.html" %}
 {% endblock %}

@@ -11,7 +11,7 @@
     <tbody>
 {% autopaginate notes %}
 {% for note in notes %}
-        <tr class="{% cycle 'row-odd' 'row-even' %}">
+        <tr class="note-list-row">
 {% if note.pinned %}
             <td class="icon"><img src="{{ MEDIA_URL }}img/pin-down_16.png" width="16" height="16" alt="Pinned"/></td>
 {% else %}

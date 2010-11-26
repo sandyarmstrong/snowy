@@ -1,0 +1,87 @@
+#content-container {
+    border-radius: 5px;
+    border: 1px solid black;
+    /* In case the content does not fill up the container just blend in */
+    vertical-align: top;
+    background-color: #ffffff;
+}
+
+#content {
+    vertical-align: top;
+    font-family: Candara, Verdana, Tahmoa, Arial, sans-serif;
+    height: inherit;
+    padding: 12px 12px 12px 24px;
+}
+
+#content h1 {
+    margin: 0.2em 0 0.5em 0;
+}
+
+#note-header {
+    position: relative;
+    top: 0px;
+    /* border-bottom is a visual divider between the header/toolbar and the content */
+    border-bottom: 1px solid black;
+    padding: 8px 12px 8px 24px;
+    /* Set border-radius-top to something crazy, else the div somehow overlaps with the rounded corners
+     * in the parent conainer and it looks weird - webkit bug?
+     */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    /* Yellow-to-white gradient in the toolbar */
+    background: -webkit-gradient(linear, left top, left bottom, from(#f5e599), to(#ffffff));
+    background: -moz-linear-gradient(top,  #f5e599, #ffffff);
+}
+.header-button {
+    padding: 0.6em 1.5em 0.6em 1.5em;
+}
+
+#content-layout td {
+    padding: 8px;
+    vertical-align: top;
+}
+
+table#content-layout {
+    width: 100%;
+}
+
+/* Note-specific styles */
+
+.note-datetime {
+    color: #666666;
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+.note-highlight {
+    background-color: yellow;
+}
+
+.note-monospace {
+    font-family: Consolas, monospace;
+}
+
+.note-size-small {
+    font-size: 0.8em;
+}
+
+.note-size-large {
+    font-size: 1.5em;
+}
+
+.note-size-huge {
+    font-size: 2.0em;
+}
+
+a.link-internal {
+    color: #204A87;
+}
+
+a.link-broken {
+    color: #555753;
+}
+
+a.link-url {
+    color: #3465A4;
+}
+

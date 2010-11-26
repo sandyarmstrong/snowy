@@ -1,0 +1,121 @@
+#sidebar {
+    margin: 20px 0 20px 0;
+    padding-bottom: 20px;
+
+    background-color: #ffffff;
+    border: 1px solid black;
+    border-right: none;
+    font-family: Trebuchet MS, Calibri, Verdana, Arial, sans-serif;
+    font-size: 1.05em;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+/* For section headers in the sidebar */
+#sidebar h3 {
+    font-family: Verdana, Candara, Tahoma, Arial, sans-serif;
+    margin: 0.3em 14px;
+    font-size: 1.0em;
+    color: #578186;
+    padding-top: 7px;
+    text-transform: uppercase;
+}
+#sidebar h3 a {
+    /* do not underline links */
+    text-decoration: none;
+}
+
+/* Search field */
+#sidebar input#search {
+    width: 250px;
+    margin: 10px;
+    margin-bottom: 5px;
+    /*padding: 3px 3px 3px 30px;*/
+    padding: 3px 3px 3px 3px;
+    
+    border: 1px solid #bababa;
+    border-radius: 5px; 
+    /* TODO convert the search bar image to fit in with the white layout */
+    /* background: url('/site_media/img/search.png') center left no-repeat; */
+}
+
+#sidebar input#search.dim {
+    color: #aba49e;
+    font-style: italic;
+}
+
+#sidebar hr {
+    height: 1px;
+    margin: 0.6em 0;
+    background-color: #aba49e;
+    border: 0;
+}
+
+/* List elements */
+#sidebar ul {
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar li {
+    padding: 0.5em 0 0.25em 25px;
+    list-style-position: inside;
+}
+
+#sidebar li a {
+    position: relative;
+    top: -0.2em;
+
+    color: black;
+    text-decoration: none;
+}
+
+#sidebar-note-list, #sidebar-notebook-list {
+    margin: 3px 0 0 0;
+}
+
+.note-item {
+    list-style-image: url('/site_media/img/note_16.png'); 
+    padding-right: 12px;
+}
+
+.note-pinned {
+    list-style-image: url('/site_media/img/pin-down_16.png'); 
+}
+
+.note-selected {
+    background-color: #d6e1c7;
+    color: #545247;
+}
+
+.note-selected::before {
+    content: ' ';
+    float: right;
+    display: block;
+    background-color: #edece6;
+    /* The fancy selected arrow pointing into the editable area is no longer needed */
+    /*margin-top: -7.5px;
+    margin-right: -23.5px;
+    border-top: 15.5px solid transparent;
+    border-right: 0 solid transparent;
+    border-bottom: 15.5px solid transparent;
+    border-left: 12px solid #d6e1c7;*/
+}
+
+.note-selected a {
+    color: #000000;
+}
+
+#new-note {
+    list-style-image: url('/site_media/img/note-new_16.png'); 
+}
+
+#sidebar-notebook-list {
+    margin: 0;
+    color: #ffffff;
+}
+
+#sidebar-notebook-list .notebook-item {
+    list-style-image: url('/site_media/img/notebook_16.png'); 
+}
+
