@@ -26,7 +26,13 @@
 {% endif %}
 
 <div id="login-leftcolumn">
-    <h3>{% trans "Log in with your OpenID" %}</h3>
+    <h3>
+        {% if user.is_authenticated %}
+            {% trans "Add a New OpenID Identity to Your Account" %}
+        {% else %}
+            {% trans "Log in with your OpenID" %}
+        {% endif %}
+    </h3>
 
     <form name="fopenid" action="{{ action }}" method="post">
         <table>
