@@ -16,6 +16,7 @@
 #
 
 from django.contrib.auth.models import User
+from django.forms import ModelChoiceField
 from registration.forms import RegistrationFormUniqueEmail
 from django.utils.translation import ugettext_lazy as _
 from recaptcha_django import ReCaptchaField
@@ -97,3 +98,14 @@ class EmailChangeForm(forms.ModelForm):
         model = User
         fields = ('email', )
 
+class UserOpenIDChoiceField(ModelChoiceField):
+    """Custom ModelChoiceField to display UserOpenIDs by UserOpenID.display_id"""
+    def label_from_instance(self, obj):
+        return obj.display_id
+
+class RemoveUserOpenIDForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        open_ids = kwargs.pop('open_ids')
+        super(RemoveUserOpenIDForm, self).__init__(*args, **kwargs)
+
+        self.fields['openid'] = UserOpenIDChoiceField(open_ids, required=True, label=_('Delete OpenID account'))

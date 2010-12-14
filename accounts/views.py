@@ -17,6 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
+from django.contrib.auth import get_backends
 from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
@@ -31,9 +32,11 @@ from django.template import RequestContext
 from django.conf import settings
 
 from snowy.accounts.models import UserProfile
-from snowy.accounts.forms import InternationalizationForm, OpenIDRegistrationFormUniqueUser, EmailChangeForm
+from snowy.accounts.forms import InternationalizationForm, OpenIDRegistrationFormUniqueUser, EmailChangeForm, RemoveUserOpenIDForm
 
 from django_openid_auth import auth
+from django_openid_auth.auth import OpenIDBackend
+from django_openid_auth.models import UserOpenID
 import django_openid_auth.views
 
 def openid_registration(request, template_name='registration/registration_form.html'):
@@ -43,6 +46,17 @@ def openid_registration(request, template_name='registration/registration_form.h
         openid_response = request.session['openid_response']
     except KeyError:
         return HttpResponseNotAllowed(_(u'No openid_response object for this session!'))
+
+    # If the user is already logged on, then link this new UserOpenID to their User
+    if request.user.is_authenticated():
+        for backend in get_backends():
+            if type(backend) == OpenIDBackend:
+                backend.associate_openid(request.user, openid_response)
+
+        # Clear the openid_response from the session so it can't be used to create another account
+        del request.session['openid_response']
+
+        return HttpResponseRedirect(reverse('preferences'))
 
     try:
         attributes = auth._extract_user_details(openid_response)
@@ -115,6 +129,7 @@ def render_openid_failure(request, message, status=403, **kwargs):
 def accounts_preferences(request, template_name='accounts/preferences.html'):
     user = request.user
     profile = user.get_profile()
+    open_ids = UserOpenID.objects.filter(user=user)
 
     if 'password_form' in request.POST:
         password_form = PasswordChangeForm(user, data=request.POST)
@@ -138,8 +153,20 @@ def accounts_preferences(request, template_name='accounts/preferences.html'):
     else:
         i18n_form = InternationalizationForm(instance=profile)
 
+    if 'openid_form' in request.POST:
+        openid_form = RemoveUserOpenIDForm(request.POST, open_ids=open_ids)
+        if openid_form.is_valid():
+            if len(open_ids) == 1 and not user.has_usable_password():
+                openid_form.errors['openid'] = [_('Cannot delete the last OpenID account')]
+            else:
+                openid_form.cleaned_data['openid'].delete()
+    else:
+        openid_form = RemoveUserOpenIDForm(open_ids=open_ids)
+
     return render_to_response(template_name,
                               {'user': user, 'i18n_form': i18n_form,
                                'password_form': password_form,
-                               'email_form' : email_form},
+                               'email_form' : email_form,
+                               'open_ids' : open_ids,
+                               'openid_form' : openid_form},
                               context_instance=RequestContext(request))

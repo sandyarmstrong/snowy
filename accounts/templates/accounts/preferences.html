@@ -72,5 +72,27 @@
     <input type="hidden" name="i18n_form" value="1" />
 </form>
 
+<h3>{% trans "OpenID Accounts" %}</h3>
+<form method="POST">
+    <table class="input-form">
+        <tr>
+            <th>
+                <a href="{% url openid-login %}">{% trans "Add OpenID account" %}</a>
+            </th>
+            <td></td>
+        </tr>
+    {{ openid_form.as_table }}
+        <tfoot>
+            <tr>
+                <th></th>
+                <td>
+                    <input type="submit" value="{% trans "Delete" %}"/>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <input type="hidden" name="openid_form" value="1" />
+</form>
+
 {#<h3>{% trans "Registered Applications" %}</h3>#}
 {% endblock %}
