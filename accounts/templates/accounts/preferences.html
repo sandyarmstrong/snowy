@@ -2,6 +2,16 @@
 
 {% load i18n %}
 
+{% block extra_head %}
+{{ block.super }}
+    <script type="text/javascript">
+        // clear the password form
+        $(document).ready(function() {
+            $('.input-form input[type="password"]').val("")
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
 
 {% if messages %}
