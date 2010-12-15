@@ -3,6 +3,14 @@
 {% load i18n %}
 
 {% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div{% if message.tags %} class="{{ message.tags }} center"{% endif %} style="color: red;">{{ message }}</div>
+<br />
+{% endfor %}
+{% endif %}
+
 <h1>{% trans "Preferences" %}</h1>
 {% if user.has_usable_password %}
 <h3>{% trans "Change your password" %}</h3>

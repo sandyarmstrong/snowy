@@ -115,6 +115,7 @@ def accounts_preferences(request, template_name='accounts/preferences.html'):
         password_form = PasswordChangeForm(user, data=request.POST)
         if password_form.is_valid():
             password_form.save()
+            messages.add_message(request, messages.SUCCESS, _("Password changed"))
     else:
         password_form = PasswordChangeForm(user)
 
