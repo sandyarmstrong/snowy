@@ -17,6 +17,7 @@
 
 from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.shortcuts import render_to_response, get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
@@ -67,8 +68,16 @@ def note_detail(request, username, note_id, slug='',
 
     body = note_to_html(note, author)
 
+    try:
+        # Get the notebook name, if any
+        notebook = note.tags.get(is_notebook=True)
+        if notebook:
+            notebook = notebook.get_name_for_display()
+    except ObjectDoesNotExist:
+        notebook = []
+
     return render_to_response(template_name,
-                              {'title': note.title,
-                               'note': note, 'body': body,
+                              {'title': note.title,  'note': note,
+                               'notebook': notebook, 'body': body,
                                'request': request, 'author': author},
                               context_instance=RequestContext(request))

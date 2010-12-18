@@ -49,6 +49,9 @@
 {% endblock %}
 
 {% block content %}
+<div id="note_topbar">
+    <span id="breadcrumb">{% if notebook %} {{ notebook|safe }} &raquo; {{ title|safe }}{% endif %}</span>
+</div>
 <table id="content-layout" cellspacing="0" cellpadding="0">
     <tr>
         <td id="note">
