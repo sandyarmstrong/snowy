@@ -1,5 +1,7 @@
-
+// TODO: Break each piece of this JS into separate files, serve minimized and
+//       compressed except during dev.
 var TomboyWeb = {
+    // TODO: index.html should pass this in; this JS should be a static file
     root_uri: '{{ root_uri }}',
     notes_uri: null,
 
@@ -179,10 +181,17 @@ var NoteSynchronizer = {
                     //      * All new and modified notes
                     //      * All deleted notes
                     //      * Set expected new sync rev to latest server sync rev + 1
+                    
+                    // PUT note update content
 
                     // Set local sync rev to new latest server sync rev
 
-
+                    // TODO: Don't do all this work for each note.  Only inject
+                    //       a few notes into the note list, let use load more
+                    //       on demand.  Need to consider how to do this when
+                    //       sync could cause notes to disappear or get reordered
+                    //       in the list. Save state, wipe list, recreate?
+                    //       Can we do that without being jarring?
                     var insertCallbackMaker = function(note) {
                         return function() {
                             // TODO: Ugh, this is gross. Calling this method
