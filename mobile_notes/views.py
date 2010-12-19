@@ -41,6 +41,8 @@ def mobile_note_index(request):
                               {'jquery_uri': MEDIA_URL + 'js/jquery.min.js',
                                'jquery_mobile_js_uri': MEDIA_URL + 'js/jquery.mobile-1.0a2.js',
                                'jquery_mobile_css_uri': MEDIA_URL  + 'css/jquery.mobile-1.0a2.min.css',
+                               'underscore_uri': MEDIA_URL + 'js/underscore-min.js',
+                               'backbone_uri': MEDIA_URL + 'js/backbone-min.js',
                               },
                               context_instance=RequestContext(request))
 
@@ -50,6 +52,8 @@ def cache_manifest(request):
                                'jquery_uri': MEDIA_URL + 'js/jquery.min.js',
                                'jquery_mobile_js_uri': MEDIA_URL + 'js/jquery.mobile-1.0a2.js',
                                'jquery_mobile_css_uri': MEDIA_URL  + 'css/jquery.mobile-1.0a2.min.css',
+                               'underscore_uri': MEDIA_URL + 'js/underscore-min.js',
+                               'backbone_uri': MEDIA_URL + 'js/backbone-min.js',
                                'note_xml_to_html_xsl_uri': MEDIA_URL + 'xsl/note2xhtml.xsl',
                               },
                               mimetype='text/cache-manifest',

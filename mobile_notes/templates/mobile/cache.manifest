@@ -5,6 +5,8 @@ slicknotes.js
 {{ jquery_uri }}
 {{ jquery_mobile_js_uri }}
 {{ jquery_mobile_css_uri }}
+{{ underscore_uri }}
+{{ backbone_uri }}
 {{ note_xml_to_html_xsl_uri }}
 http://192.168.1.106:8000/site_media/css/images/icons-18-white.png
 
