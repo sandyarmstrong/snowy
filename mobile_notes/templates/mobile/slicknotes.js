@@ -60,7 +60,11 @@ var OfflineNotesDatabase = {
         // TODO: Error-checking, encapuslation, etc
         this.db.transaction(function(tx) {
             tx.executeSql('CREATE TABLE IF NOT EXISTS ' +
-                          'notes(guid TEXT PRIMARY KEY ON CONFLICT REPLACE, title TEXT, content TEXT)',
+                          'notes(guid TEXT PRIMARY KEY ON CONFLICT REPLACE, ' +
+                          '      title TEXT, content TEXT, '+
+                          '      content_mod DATETIME, metadata_mod DATETIME, ' +
+                          '      create_date DATETIME, last_sync_rev INT, ' +
+                          '      pinned BOOLEAN, content_version TEXT)',
                           []);
         });
     },
