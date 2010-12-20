@@ -30,6 +30,7 @@ def note_to_html(note, author):
     # so we keep a little cache to save on lookups
     link_cache = {}
     def get_url_for_title(dummy, link_text):
+        link_text = unicode(link_text)
         if link_text in link_cache:
             return link_cache[link_text]
         try:
