@@ -33,6 +33,8 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
 
+    (r'^export/', include('snowy.export.urls')),
+
     (r'^mobile/', include('snowy.mobile_notes.urls')),
 
     url(r'^(?P<username>\w+)/$', 'snowy.views.user_index', name="user_index"),

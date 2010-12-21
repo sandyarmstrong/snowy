@@ -27,6 +27,8 @@ from registration.views import register
 import snowy.accounts.views
 import django_openid_auth.views
 
+import snowy.export.views
+
 urlpatterns = patterns('',
     url(r'^preferences/$', 'snowy.accounts.views.accounts_preferences',
         name='preferences'),

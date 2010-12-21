@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     'django_openid_auth',
     'notes',
     'mobile_notes',
+    'export',
 
     # System apps
     'django.contrib.admin',

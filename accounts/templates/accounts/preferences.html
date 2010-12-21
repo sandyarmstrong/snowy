@@ -94,5 +94,17 @@
     <input type="hidden" name="openid_form" value="1" />
 </form>
 
+<h3>{% trans "Export Notes" %}</h3>
+<table class="input-form">
+    <tr>
+        <th><a href="{% url note_api_index username=request.user %}?include_notes=true">{% trans "JSON (see API docs)" %}</a></th>
+        {% comment %}
+        {# Providing API output in XML format may just be confusing #}
+        <th><a href="{% url note_api_index username=request.user %}?include_notes=true&format=xml">{% trans "XML" %}</a></th>
+        {% endcomment %}
+        <th><a href="{% url export-tar %}">{% trans "Tarball of .note files (EXPERIMENTAL!)" %}</a></th>
+    </tr>
+</table>
+
 {#<h3>{% trans "Registered Applications" %}</h3>#}
 {% endblock %}
