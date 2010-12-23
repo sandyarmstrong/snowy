@@ -7,9 +7,9 @@
 {% if author %}
 <form method="GET" name="searchForm" action="">
     {% if request.GET.query %}
-    <input type="search" id="search" name="query" accesskey="s" value="{{request.GET.query}}">
+    <input type="text" id="search" name="query" accesskey="s" value="{{request.GET.query}}">
     {% else %}
-    <input type="search" id="search" class="dim" name="query" accesskey="s" placeholder="{% trans "Search your notes" %}" value="{% trans "Search your notes" %}">
+    <input type="text" id="search" class="dim" name="query" accesskey="s" placeholder="{% trans "Search your notes" %}" value="{% trans "Search your notes" %}">
     {% endif %}
 </form>
 {% endif %}
