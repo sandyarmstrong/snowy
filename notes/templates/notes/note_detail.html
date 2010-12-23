@@ -64,11 +64,14 @@
 {% endblock %}
 
 {% block content-header %}
+{# Enable when we allow editing/sharing, but only when user has permission on this note #}
+{% comment %}
 <div id="note-header">
     <button class="header-button">Share</button>
     <button class="header-button">Delete</button>
     <button class="header-button" style="float:right;">Edit</button>
 </div>
+{% endcomment %}
 {% endblock %}
 {% block content %}
 <table id="content-layout" cellspacing="0" cellpadding="0">
