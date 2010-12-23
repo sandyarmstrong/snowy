@@ -1,7 +1,7 @@
 {% comment %}In the spirit of D.R.Y.{% endcomment %}
 {% for n in all_notebooks %}
   {# This grossness goes away with django 1.2's smarter if tags #}
-  {% if n.is_public %}<li class="notebook-item"><a href="#">{{ n.get_name_for_display }}</a></li>
-  {% else %}{% ifequal request.user n.author %}<li class="notebook-item"><a href="#">{{ n.get_name_for_display }}</a></li>{% endifequal %}
+  {% if n.is_public %}<li class="notebook-item"><a href="{% url notebook_detail n.author n.pk n.get_name_for_display|slugify %}">{{ n.get_name_for_display }}</a></li>
+  {% else %}{% ifequal request.user n.author %}<li class="notebook-item"><a href="{% url notebook_detail n.author n.pk n.get_name_for_display|slugify %}">{{ n.get_name_for_display }}</a></li>{% endifequal %}
   {% endif %}
 {% endfor %}

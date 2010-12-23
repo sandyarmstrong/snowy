@@ -1,4 +1,7 @@
 {% load i18n %}{% load humanize %}{% load pagination_tags %}
+{% if notebook %}
+<h1>{% trans "All notes for" %} {{ notebook.get_name_for_display }}</h1>
+{% endif %}
 <table class="object_list" cellspacing="0" cellpadding="0">
     <thead>
         <tr>

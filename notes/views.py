@@ -56,6 +56,18 @@ def note_list(request, username,
                                'author': author},
                               context_instance=RequestContext(request))
 
+def notebook_detail(request, username, notebook_id, slug,
+                template_name='notes/note_list.html'):
+    author = get_object_or_404(User, username=username)
+    notebook = get_object_or_404(NoteTag, pk=notebook_id)
+    notes = Note.objects.user_viewable(request.user, author).filter(tags__in=[notebook]).order_by("-modified")
+    return render_to_response(template_name,
+                              {'notes': notes,
+                               'author': author,
+                               'username': username,
+                               'notebook': notebook},
+                              context_instance=RequestContext(request))
+
 def note_detail(request, username, note_id, slug='',
                 template_name='notes/note_detail.html'):
     author = get_object_or_404(User, username=username)
