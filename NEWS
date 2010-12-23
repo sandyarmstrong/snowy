@@ -7,6 +7,9 @@ http://mail.gnome.org/mailman/listinfo/snowy-list.
 Please report bugs using https://bugzilla.gnome.org/
 (https://bugzilla.gnome.org/enter_bug.cgi?product=snowy).
 
+Version 0.6.1 "Jagdterrier.1"
+* Re-apply mysql fix for django_openid_auth
+
 Version 0.6 "Jagdterrier"
 * Require Django 1.2
 * First version of new theme based on Jeff Fortin's mockups from the hackfest (#637614)

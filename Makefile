@@ -1,5 +1,5 @@
 PROJECT=snowy
-VERSION=0.6
+VERSION=0.6.1
 
 dist:
 	git archive --prefix=$(PROJECT)/ $(VERSION) | \
