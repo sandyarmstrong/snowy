@@ -7,6 +7,20 @@ http://mail.gnome.org/mailman/listinfo/snowy-list.
 Please report bugs using https://bugzilla.gnome.org/
 (https://bugzilla.gnome.org/enter_bug.cgi?product=snowy).
 
+Version 0.6 "Jagdterrier"
+* Require Django 1.2
+* First version of new theme based on Jeff Fortin's mockups from the hackfest (#637614)
+* Early incomplete experimental HTML5 offline mobile client (#630780)
+* Improvements to preferences:
+  + Export user data to JSON or tarball of .note files (experimental, #629590)
+  + Better password changing UX (#631372)
+  + Allow user to edit the OpenID account(s) associated with Snowy (#623291)
+* Show which notebook a note belongs to (#613881)
+* Fix redirection after account creation (#633067, #629853)
+* Better error pages (#633766) and openid OpenID error messages (#632949)
+* Fix display of notes with unicode link text (#633543)
+* Other fixes: #629868, #634262
+
 Version 0.5 "Cavalier King Charles Spaniel"
 * Don't crash if MODERATE_NEW_USERS not set
 * Enforce storage of UTC dates in database
