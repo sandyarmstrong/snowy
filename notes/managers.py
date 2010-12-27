@@ -18,9 +18,11 @@
 from django.db import models
 
 class NoteManager(models.Manager):
-    def user_viewable(self, request_user, author):
+    def user_viewable(self, request_user, author, templates=False):
         notes = self.filter(author=author)
         if request_user != author:
             # Public notes only
-            notes = notes.filter(permissions=1) 
+            notes = notes.filter(permissions=1)
+        if not templates:
+            notes = notes.exclude(tags__name="system:template")
         return notes
