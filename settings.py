@@ -72,13 +72,13 @@ ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = '2n17f16%vd2^x=q6&7a)s*$ft@vtp572-4+)@6spfxpe^^7^j6'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
+TEMPLATE_LOADERS = [
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
 #     'django.template.loaders.eggs.load_template_source',
-)
+]
 
-TEMPLATE_CONTEXT_PROCESSORS = (
+TEMPLATE_CONTEXT_PROCESSORS = [
     'django.core.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
@@ -86,7 +86,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
     'snowy.core.context_processors.current_site',
-)
+]
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
@@ -171,7 +171,9 @@ AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
-try:
-    from local_settings import *
-except ImportError:
-    pass
+local_settings = os.path.join(PROJECT_ROOT, 'local_settings.py')
+if os.path.isfile(local_settings):
+    try:
+        execfile(local_settings)
+    except:
+        pass
