@@ -117,7 +117,7 @@ TEMPLATE_DIRS = [
 EXTERNAL_APPS_PATH = os.path.join(PROJECT_ROOT, "lib")
 
 import sys
-sys.path.append(EXTERNAL_APPS_PATH)
+sys.path.insert(0, EXTERNAL_APPS_PATH)
 
 INSTALLED_APPS = [
     # Local apps
