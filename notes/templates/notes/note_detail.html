@@ -75,9 +75,10 @@
 {% endblock %}
 {% block content %}
 <table id="content-layout" cellspacing="0" cellpadding="0">
-    {% if notebook %}
+    {% if notebook or request.user != author %}
     <tr><td>
-        <span id="breadcrumb">{{ notebook|safe }} &raquo; {{ title|safe }}</span>
+        {# FIXME: Proper l10n for "'s" #}
+        <span id="breadcrumb">{% if request.user != author %}<a href="{% url user_index author.username %}">{{ author.username }}{% trans "'s" %}</a> {% trans "Notes" %} &raquo; {% endif %}{% if notebook %}{{ notebook|safe }} &raquo; {% endif %}{{ title|safe }}</span>
     </td></tr>
     {% endif %}
     <tr>
