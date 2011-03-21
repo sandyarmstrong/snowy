@@ -16,6 +16,13 @@
 
   <maintainer>
     <foaf:Person>
+      <foaf:name>Jeff Schroeder</foaf:name>
+      <foaf:mbox rdf:resource="mailto:jeffschroeder@computer.org" />
+      <gnome:userid>jschroeder</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+  <maintainer>
+    <foaf:Person>
       <foaf:name>Brad Taylor</foaf:name>
       <foaf:mbox rdf:resource="mailto:brad@getcoded.net" />
       <gnome:userid>btaylor</gnome:userid>
